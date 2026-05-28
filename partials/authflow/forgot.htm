@@ -1,0 +1,27 @@
+<div class="pgt-modal-card pgt-forgot">
+    <button type="button" class="pgt-close" data-pgt-close aria-label="Close">&times;</button>
+
+    <div class="pgt-forgot__head">
+        <h2 class="pgt-forgot__title">Forgot your password?</h2>
+        <p class="pgt-forgot__lead">
+            Enter the email address linked to your account and we&rsquo;ll send you a link to reset your password.
+        </p>
+    </div>
+
+    <form id="pgtForgotForm" data-request="{{ __SELF__ }}::onSendResetLink" class="pgt-forgot__form">
+        <div class="pgt-forgot__fields">
+            <div class="pgt-field">
+                <label for="pgtForgotEmail">Email address</label>
+                <input type="email" id="pgtForgotEmail" name="email" autocomplete="email">
+            </div>
+        </div>
+
+        <div class="pgt-forgot__actions">
+            <button type="submit" class="pgt-forgot__submit">Send reset link</button>
+        </div>
+
+        <p class="pgt-forgot__back">
+            Remembered your password? <a href="#" data-pgt-step="login">Back to log in</a>
+        </p>
+    </form>
+</div>

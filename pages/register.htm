@@ -1,0 +1,21 @@
+title = "Register"
+url = "/register"
+layout = "default"
+is_hidden = 0
+robot_index = "noindex"
+robot_follow = "nofollow"
+==
+<?php
+function onStart()
+{
+    // The dedicated /register page has been replaced by the auth-flow popup.
+    // Send guests to the homepage with ?register=1 to open the registration
+    // popup (which starts at the "reasons" step); logged-in visitors just land
+    // on the homepage.
+    if (\Auth::check()) {
+        return \Redirect::to('/');
+    }
+
+    return \Redirect::to('/?register=1');
+}
+==

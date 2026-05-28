@@ -1,0 +1,27 @@
+<div class="saved-content">
+
+    <form class="saved-content__search"
+          data-request="onSearch"
+          data-request-update="'savedcontent/body': '#savedContentBody'"
+          autocomplete="off"
+          role="search">
+        <input class="saved-content__search-input"
+               type="search"
+               name="q"
+               placeholder="Search content"
+               value="{{ query|default('') }}">
+        <button type="submit" class="saved-content__search-icon" aria-label="Search saved content">
+            <svg viewBox="0 0 22 22" width="22" height="22"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M10 17a7 7 0 100-14 7 7 0 000 14zm5-2l5 5"/></svg>
+        </button>
+    </form>
+
+    <div id="savedContentBody">
+        {% partial 'savedcontent/body'
+            query=query
+            searchEvents=searchEvents
+            searchJobs=searchJobs
+            eventsCount=eventsCount
+            jobsCount=jobsCount
+        %}
+    </div>
+</div>

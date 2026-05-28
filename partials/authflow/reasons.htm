@@ -1,0 +1,25 @@
+<div class="pgt-modal-card pgt-reasons">
+    <button type="button" class="pgt-close" data-pgt-close aria-label="Close">&times;</button>
+
+    <div class="pgt-reasons__icon" aria-hidden="true"></div>
+
+    <div class="pgt-reasons__head">
+        <h2 class="pgt-reasons__title">Why are you joining the Capacity-Building platform?</h2>
+
+        <form id="pgtReasonsForm" data-request="{{ __SELF__ }}::onSaveReasons" class="pgt-reasons__form">
+            <div class="pgt-reason-list">
+                {% for reason in joiningReasons %}
+                    <label class="pgt-reason">
+                        <input type="checkbox" name="reasons[]" value="{{ reason.id }}">
+                        <span class="pgt-reason__box"></span>
+                        <span class="pgt-reason__label">{{ reason.label }}</span>
+                    </label>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+
+    <div class="pgt-reasons__actions">
+        <button type="submit" form="pgtReasonsForm" class="pgt-reasons__continue">Continue</button>
+    </div>
+</div>

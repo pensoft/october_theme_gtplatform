@@ -1,0 +1,82 @@
+<div class="saved-list">
+
+    <form method="get" class="saved-list__search-form">
+        <div class="saved-list__search">
+            <input class="saved-list__search-input" type="search" name="q" placeholder="Search content" value="{{ this.param.q|default('') }}">
+            <span class="saved-list__search-icon" aria-hidden="true">
+                <svg viewBox="0 0 22 22" width="22" height="22"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M10 17a7 7 0 100-14 7 7 0 000 14zm5-2l5 5"/></svg>
+            </span>
+        </div>
+    </form>
+
+    <div class="saved-list__head">
+        <h2 class="saved-list__title">Events</h2>
+        <p class="saved-list__sub">All your saved events</p>
+    </div>
+
+    {% if events is empty or events.isEmpty() %}
+        <div class="saved-list__empty">You haven't saved any events yet.</div>
+    {% else %}
+        <div class="events-grid">
+            {% for ev in events %}
+                {% partial 'event-card' ev=ev saved=true %}
+            {% endfor %}
+        </div>
+
+        {% if events.hasPages() %}
+            {% set _current = events.currentPage %}
+            {% set _last    = events.lastPage %}
+            {% set _window  = 2 %}
+            {% set _from    = max(1, _current - _window) %}
+            {% set _to      = min(_last, _current + _window) %}
+            {% if _to - _from < 4 %}
+                {% if _from == 1 %}{% set _to = min(_last, _from + 4) %}
+                {% elseif _to == _last %}{% set _from = max(1, _to - 4) %}{% endif %}
+            {% endif %}
+
+            <nav class="events-pager" aria-label="Pagination">
+                <ul class="events-pager__list">
+                    <li class="events-pager__item events-pager__item--nav">
+                        {% if events.onFirstPage %}
+                            <span class="events-pager__btn is-disabled" aria-disabled="true" aria-label="Previous page">
+                                <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M15.4 7.4L14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></svg>
+                            </span>
+                        {% else %}
+                            <a class="events-pager__btn" href="{{ events.previousPageUrl() }}" rel="prev" aria-label="Previous page">
+                                <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M15.4 7.4L14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></svg>
+                            </a>
+                        {% endif %}
+                    </li>
+                    {% if _from > 1 %}
+                        <li class="events-pager__item"><a class="events-pager__page" href="{{ events.url(1) }}">1</a></li>
+                        {% if _from > 2 %}<li class="events-pager__item events-pager__item--gap" aria-hidden="true">…</li>{% endif %}
+                    {% endif %}
+                    {% for p in _from.._to %}
+                        <li class="events-pager__item">
+                            {% if p == _current %}
+                                <span class="events-pager__page is-active" aria-current="page">{{ p }}</span>
+                            {% else %}
+                                <a class="events-pager__page" href="{{ events.url(p) }}">{{ p }}</a>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                    {% if _to < _last %}
+                        {% if _to < _last - 1 %}<li class="events-pager__item events-pager__item--gap" aria-hidden="true">…</li>{% endif %}
+                        <li class="events-pager__item"><a class="events-pager__page" href="{{ events.url(_last) }}">{{ _last }}</a></li>
+                    {% endif %}
+                    <li class="events-pager__item events-pager__item--nav">
+                        {% if events.hasMorePages %}
+                            <a class="events-pager__btn" href="{{ events.nextPageUrl() }}" rel="next" aria-label="Next page">
+                                <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M8.6 16.6L10 18l6-6-6-6-1.4 1.4L13.2 12z"/></svg>
+                            </a>
+                        {% else %}
+                            <span class="events-pager__btn is-disabled" aria-disabled="true" aria-label="Next page">
+                                <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M8.6 16.6L10 18l6-6-6-6-1.4 1.4L13.2 12z"/></svg>
+                            </span>
+                        {% endif %}
+                    </li>
+                </ul>
+            </nav>
+        {% endif %}
+    {% endif %}
+</div>

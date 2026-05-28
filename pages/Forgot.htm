@@ -1,0 +1,26 @@
+title = "Password reset request"
+url = "/forgot"
+layout = "default"
+is_hidden = 0
+robot_index = "noindex"
+robot_follow = "nofollow"
+==
+<?php
+function onStart()
+{
+    // The dedicated /forgot page has been replaced by the auth-flow popup.
+    if (\Auth::check()) {
+        return \Redirect::to('/');
+    }
+
+    // An emailed reset link carries a code — forward it to the homepage as
+    // ?reset=… so the AuthFlow component opens the reset popup. Otherwise send
+    // the visitor to the homepage with ?forgot=1 to open the "forgot" popup.
+    $code = trim((string) (get('reset') ?: get('code')));
+    if ($code !== '') {
+        return \Redirect::to('/?reset=' . rawurlencode($code));
+    }
+
+    return \Redirect::to('/?forgot=1');
+}
+==

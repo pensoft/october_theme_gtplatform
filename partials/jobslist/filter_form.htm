@@ -1,0 +1,205 @@
+{# Filter drawer body. Lives inside the page-level GET form rendered by
+   default.htm — so every checkbox/hidden input here ships in the query string
+   when the user clicks "Apply filters". The `selected` map (built server-side
+   from the request) is used to pre-check / pre-fill matching inputs so a
+   shared URL repaints the drawer in the same state. #}
+
+{% set _selected = selected|default({
+    'work_modes':    [],
+    'work_physical_presence': [],
+    'funding':       [],
+    'career_stages': [],
+    'country_id':    [],
+    'date_from':     '',
+    'date_to':       ''
+}) %}
+
+{% if workModes|length %}
+    {% set _open = _selected.work_modes|length > 0 %}
+    <details class="jobs-filter-group" {{ _open ? 'open' : '' }}>
+        <summary class="jobs-filter-group__head">
+            <span class="jobs-filter-group__title">Work mode</span>
+            <svg class="jobs-filter-group__chevron" viewBox="0 0 18 18" width="18" height="18" fill="none" aria-hidden="true">
+                <path stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M7 5l4 4-4 4"/>
+            </svg>
+        </summary>
+        <div class="jobs-filter-group__body">
+            <div class="jobs-filter-modes">
+                {% for w in workModes %}
+                    <label class="jobs-filter-mode">
+                        <input type="checkbox" name="work_modes[]" value="{{ w.id }}" {{ w.id in _selected.work_modes ? 'checked' : '' }}>
+                        <span class="jobs-filter-mode__pill">{{ w.title }}</span>
+                        <span class="jobs-filter-mode__count">{{ w.jobs_count|default(0) }}</span>
+                    </label>
+                {% endfor %}
+            </div>
+        </div>
+    </details>
+{% endif %}
+
+{% if workPhysicalPresences|length %}
+    {% set _open = _selected.work_physical_presence|length > 0 %}
+    <details class="jobs-filter-group" {{ _open ? 'open' : '' }}>
+        <summary class="jobs-filter-group__head">
+            <span class="jobs-filter-group__title">Physical presence</span>
+            <svg class="jobs-filter-group__chevron" viewBox="0 0 18 18" width="18" height="18" fill="none" aria-hidden="true">
+                <path stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M7 5l4 4-4 4"/>
+            </svg>
+        </summary>
+        <div class="jobs-filter-group__body">
+            <div class="jobs-filter-modes">
+                {% for p in workPhysicalPresences %}
+                    <label class="jobs-filter-mode">
+                        <input type="checkbox" name="work_physical_presence[]" value="{{ p.id }}" {{ p.id in _selected.work_physical_presence ? 'checked' : '' }}>
+                        <span class="jobs-filter-mode__pill">{{ p.title }}</span>
+                        <span class="jobs-filter-mode__count">{{ p.jobs_count|default(0) }}</span>
+                    </label>
+                {% endfor %}
+            </div>
+        </div>
+    </details>
+{% endif %}
+
+{% if fundings|length %}
+    {# Funding pills — per-tab static color + category class (Figma 912:5221 / 171:9196). #}
+    {% set _pillVariants = {
+        'paid':              'lime',
+        'unpaid':            'orange',
+        'funded':            'blue',
+        'fully-funded':      'green',
+        'self-funded':       'orange',
+        'partially-funded':  'blue',
+        'grant-based':       'lime'
+    } %}
+    {% set _positionsKeys   = ['paid', 'unpaid', 'funded'] %}
+    {% set _secondmentsKeys = ['fully-funded', 'self-funded', 'partially-funded', 'grant-based'] %}
+    {% set _open = _selected.funding|length > 0 %}
+
+    <details class="jobs-filter-group" {{ _open ? 'open' : '' }}>
+        <summary class="jobs-filter-group__head">
+            <span class="jobs-filter-group__title">Funding</span>
+            <svg class="jobs-filter-group__chevron" viewBox="0 0 18 18" width="18" height="18" fill="none" aria-hidden="true">
+                <path stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M7 5l4 4-4 4"/>
+            </svg>
+        </summary>
+        <div class="jobs-filter-group__body">
+            <div class="jobs-filter-pills">
+                {% for f in fundings %}
+                    {% set _slug = f.title|lower|replace({' ': '-', '_': '-'}) %}
+                    {% set _variant = _pillVariants[_slug]|default(['green', 'orange', 'blue', 'lime'][loop.index0 % 4]) %}
+                    {% set _catClass = '' %}
+                    {% if _slug in _positionsKeys %}{% set _catClass = 'is-for-positions' %}
+                    {% elseif _slug in _secondmentsKeys %}{% set _catClass = 'is-for-secondments' %}
+                    {% endif %}
+                    <label class="jobs-filter-pill jobs-filter-pill--{{ _variant }} {{ _catClass }}" data-funding-key="{{ _slug }}">
+                        <input type="checkbox" name="funding[]" value="{{ f.id }}" {{ f.id in _selected.funding ? 'checked' : '' }}>
+                        <span class="jobs-filter-pill__face">{{ f.title }}</span>
+                    </label>
+                {% endfor %}
+            </div>
+        </div>
+    </details>
+{% endif %}
+
+{# Time period — Figma 926:3075. The custom calendar widget hooks itself
+   onto these inputs (see initDatepicker in default.htm). The hidden inputs
+   are pre-filled from the URL so a shared "?date_from=..." link repaints
+   the picker in the same state. #}
+{% set _datesOpen = _selected.date_from != '' or _selected.date_to != '' %}
+<details class="jobs-filter-group" {{ _datesOpen ? 'open' : '' }}>
+    <summary class="jobs-filter-group__head">
+        <span class="jobs-filter-group__title">Time period</span>
+        <svg class="jobs-filter-group__chevron" viewBox="0 0 18 18" width="18" height="18" fill="none" aria-hidden="true">
+            <path stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M7 5l4 4-4 4"/>
+        </svg>
+    </summary>
+    <div class="jobs-filter-group__body">
+        <div class="jobs-filter-dates" data-jobs-datepicker>
+            <div class="jobs-filter-dates__pills">
+                <button type="button" class="jobs-filter-date jobs-filter-date--start is-active" data-date-target="from">
+                    <span class="jobs-filter-date__label">Start</span>
+                </button>
+                <button type="button" class="jobs-filter-date jobs-filter-date--end" data-date-target="to">
+                    <span class="jobs-filter-date__label">End</span>
+                </button>
+            </div>
+
+            <input type="hidden" name="date_from" value="{{ _selected.date_from }}" data-date-input="from">
+            <input type="hidden" name="date_to"   value="{{ _selected.date_to }}"   data-date-input="to">
+
+            <div class="jobs-filter-calendar" data-calendar>
+                <div class="jobs-filter-calendar__head">
+                    <span class="jobs-filter-calendar__month" data-month-label></span>
+                    <div class="jobs-filter-calendar__nav">
+                        <button type="button" class="jobs-filter-calendar__nav-btn" data-nav="-1" aria-label="Previous month">
+                            <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
+                                <path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M10 12 6 8l4-4"/>
+                            </svg>
+                        </button>
+                        <button type="button" class="jobs-filter-calendar__nav-btn" data-nav="1" aria-label="Next month">
+                            <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
+                                <path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M6 4l4 4-4 4"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="jobs-filter-calendar__weekdays" aria-hidden="true">
+                    <span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span>
+                </div>
+                <div class="jobs-filter-calendar__grid" data-calendar-grid></div>
+            </div>
+        </div>
+    </div>
+</details>
+
+{% if countries|length %}
+    {% set _open = _selected.country_id|length > 0 %}
+    <details class="jobs-filter-group" {{ _open ? 'open' : '' }}>
+        <summary class="jobs-filter-group__head">
+            <span class="jobs-filter-group__title">Location</span>
+            <svg class="jobs-filter-group__chevron" viewBox="0 0 18 18" width="18" height="18" fill="none" aria-hidden="true">
+                <path stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M7 5l4 4-4 4"/>
+            </svg>
+        </summary>
+        <div class="jobs-filter-group__body">
+            <div class="jobs-filter-checks">
+                {% for c in countries %}
+                    <label class="jobs-filter-check {{ c.jobs_count == 0 ? 'is-disabled' : '' }}">
+                        <span class="jobs-filter-check__row">
+                            <input type="checkbox" name="country_id[]" value="{{ c.id }}" {{ c.jobs_count == 0 ? 'disabled' : '' }} {{ c.id in _selected.country_id ? 'checked' : '' }}>
+                            <span class="jobs-filter-check__box"></span>
+                            <span class="jobs-filter-check__label">{{ c.name }}</span>
+                        </span>
+                        <span class="jobs-filter-check__count">{{ c.jobs_count|default(0) }}</span>
+                    </label>
+                {% endfor %}
+            </div>
+        </div>
+    </details>
+{% endif %}
+
+{% if careerStages|length %}
+    {% set _open = _selected.career_stages|length > 0 %}
+    <details class="jobs-filter-group" {{ _open ? 'open' : '' }}>
+        <summary class="jobs-filter-group__head">
+            <span class="jobs-filter-group__title">Career stage</span>
+            <svg class="jobs-filter-group__chevron" viewBox="0 0 18 18" width="18" height="18" fill="none" aria-hidden="true">
+                <path stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M7 5l4 4-4 4"/>
+            </svg>
+        </summary>
+        <div class="jobs-filter-group__body">
+            <div class="jobs-filter-checks">
+                {% for cs in careerStages %}
+                    <label class="jobs-filter-check {{ cs.jobs_count == 0 ? 'is-disabled' : '' }}">
+                        <span class="jobs-filter-check__row">
+                            <input type="checkbox" name="career_stages[]" value="{{ cs.id }}" {{ cs.jobs_count == 0 ? 'disabled' : '' }} {{ cs.id in _selected.career_stages ? 'checked' : '' }}>
+                            <span class="jobs-filter-check__box"></span>
+                            <span class="jobs-filter-check__label">{{ cs.title }}</span>
+                        </span>
+                        <span class="jobs-filter-check__count">{{ cs.jobs_count|default(0) }}</span>
+                    </label>
+                {% endfor %}
+            </div>
+        </div>
+    </details>
+{% endif %}

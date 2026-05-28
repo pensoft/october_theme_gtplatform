@@ -1,0 +1,334 @@
+{% set _detail = detailPage|default('job') %}
+{% set _activeType = activeType|default(0) %}
+{% if not _activeType and jobTypes|length %}
+    {% set _activeType = (jobTypes|first).id %}
+{% endif %}
+
+{# Tab partition for the Funding filter (Figma 912:5221 vs 171:9196) and the
+   active-tab background swap (lime for positions, #3D5692 for secondments). #}
+{% set _firstTypeId = jobTypes|length ? (jobTypes|first).id : 0 %}
+{% set _isSecondments = _activeType and _activeType != _firstTypeId %}
+
+{% set _pageUrl   = this.page.url %}
+{% set _selected  = selected|default({
+    'q':             '',
+    'work_modes':    [],
+    'funding':       [],
+    'career_stages': [],
+    'country_id':    [],
+    'date_from':     '',
+    'date_to':       ''
+}) %}
+{% set _chips     = chips|default([]) %}
+{% set _clearUrl  = clearAllUrl|default(_pageUrl) %}
+
+<div class="jobs-page {{ _isSecondments ? 'is-tab-secondments' : '' }}" data-first-type-id="{{ _firstTypeId }}">
+
+    {# Tabs — each one is its own URL. Clicking navigates to a fresh page
+       with only `?job_type=N`, so the two job-type tabs behave like
+       independent pages (filters/search reset across the tab boundary). #}
+    <div class="jobs-page__head-stack">
+        <div class="jobs-page__tabs">
+            {% for t in jobTypes %}
+                <a href="{{ _pageUrl }}?job_type={{ t.id }}"
+                   class="jobs-tab {{ _activeType == t.id ? 'is-active' : '' }}">
+                    {{ t.title }}
+                </a>
+            {% endfor %}
+        </div>
+
+        {# Single page-level GET form. Submitting this form (search Enter,
+           Apply Filters button) navigates to the same page with all selected
+           filter values in the query string — URL is shareable. #}
+        <form method="get" action="{{ _pageUrl }}" id="jobsFilterForm" class="jobs-page__filter-form" autocomplete="off">
+
+            {# Always carry the active tab through every filter submit. #}
+            <input type="hidden" name="job_type" value="{{ _activeType }}">
+
+            <div class="jobs-page__controls">
+                <div class="jobs-page__search">
+                    <input type="search" name="q" id="jobsSearch" class="jobs-page__search-input" placeholder="Search opportunities" value="{{ _selected.q }}">
+                    <span class="jobs-page__search-icon" aria-hidden="true">
+                        <svg viewBox="0 0 22 22" width="22" height="22"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M10 17a7 7 0 100-14 7 7 0 000 14zm5-2l5 5"/></svg>
+                    </span>
+                    {# Hidden submit so the icon stays decorative; Enter on the
+                       input or this button (visually hidden) submits the GET. #}
+                    <button type="submit" class="jobs-page__search-submit" aria-label="Search" tabindex="-1"></button>
+                </div>
+                <button type="button" class="jobs-page__filter-btn" data-jobs-open-filter>
+                    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+                        <path fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" d="M2.5 4h7M2.5 12h3"/>
+                        <path fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" d="M2.5 8h10"/>
+                        <circle cx="11" cy="4" r="1.7" fill="#192E11"/>
+                        <circle cx="7"  cy="12" r="1.7" fill="#192E11"/>
+                    </svg>
+                    <span>Filters</span>
+                </button>
+            </div>
+
+            {# Active-filter chips bar — Figma 171:8572. Server-rendered from
+               the component's $chips list. Each chip is a link that strips
+               its section's params from the current URL; "Clear all" links
+               to the tab-only URL. #}
+            {% if _chips|length %}
+                <div class="jobs-page__active-filters">
+                    <div class="jobs-page__active-filters-chips">
+                        {% for chip in _chips %}
+                            <a href="{{ chip.url }}" class="jobs-page__active-filter-chip">
+                                <span>{{ chip.label }}</span>
+                                <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
+                                    <path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" d="M4 4l8 8M12 4l-8 8"/>
+                                </svg>
+                            </a>
+                        {% endfor %}
+                    </div>
+                    <a href="{{ _clearUrl }}" class="jobs-page__active-filters-clear">
+                        <svg viewBox="0 0 18 18" width="18" height="18" fill="none" aria-hidden="true">
+                            <path stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" d="M3 5h12M7.5 5V3.5h3V5M5 5l.7 9.5a1 1 0 0 0 1 .9h4.6a1 1 0 0 0 1-.9L13 5"/>
+                        </svg>
+                        <span>Clear all</span>
+                    </a>
+                </div>
+            {% endif %}
+
+            {# Filter drawer. Still part of the form so its checkboxes /
+               hidden date inputs submit together with the search field
+               when the user clicks Apply. #}
+            <div class="jobs-filter-drawer" id="jobsFilterDrawer" role="dialog" aria-modal="true" aria-hidden="true">
+                <div class="jobs-filter-drawer__backdrop" data-jobs-close-filter></div>
+
+                <aside class="jobs-filter-drawer__panel" role="document">
+                    <div class="jobs-filter-drawer__head">
+                        <h2 class="jobs-filter-drawer__title">Filters</h2>
+                        <button type="button" class="jobs-filter-drawer__close" data-jobs-close-filter aria-label="Close">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true">
+                                <path stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="jobs-filter-drawer__body">
+                        {% partial 'jobslist/filter_form'
+                            workModes=workModes
+                            fundings=fundings
+                            careerStages=careerStages
+                            countries=countries
+                            selected=_selected
+                        %}
+                    </div>
+
+                    <div class="jobs-filter-drawer__foot">
+                        <a href="{{ _clearUrl }}" class="jobs-filter-drawer__reset">
+                            <svg viewBox="0 0 14 14" width="14" height="14" fill="none" aria-hidden="true">
+                                <path stroke="currentColor" stroke-width="1.4" stroke-linecap="round" d="M4 4l6 6M10 4l-6 6"/>
+                            </svg>
+                            Reset
+                        </a>
+                        <button type="submit" class="jobs-filter-drawer__apply">Apply filters</button>
+                    </div>
+                </aside>
+            </div>
+        </form>
+    </div>
+
+    {# Server-rendered grid based on current URL params. No AJAX swap any more. #}
+    <div id="jobsGrid">
+        {% partial '@grid' jobs=jobs detailPage=_detail activeType=_activeType %}
+    </div>
+</div>
+
+<script>
+(function ($) {
+    'use strict';
+
+    var $drawer = $('#jobsFilterDrawer');
+    var $fForm  = $('#jobsFilterForm');
+
+    // --- Per-tab filter persistence -----------------------------------------
+    // Each job-type tab keeps its own filter state in sessionStorage. The URL
+    // always reflects the currently visible tab's state (so it's shareable),
+    // and clicking another tab restores that tab's previously-saved filters
+    // instead of jumping to a clean state. Filtering / searching / clearing
+    // within a tab only affects that tab — the other tab's saved state is
+    // untouched until the user switches back to it.
+    var $pageEl     = document.querySelector('.jobs-page');
+    var firstTypeId = $pageEl ? (parseInt($pageEl.dataset.firstTypeId, 10) || 0) : 0;
+
+    function currentTabId() {
+        var p = new URLSearchParams(window.location.search);
+        var t = parseInt(p.get('job_type') || '0', 10);
+        return t || firstTypeId;
+    }
+
+    function storageKey(typeId) { return 'jobsFilters_' + typeId; }
+
+    // On every page load, save the URL's current filter params under the
+    // active tab's key. The `job_type` itself is implicit in the key, so we
+    // strip it before storing.
+    (function rememberCurrentTab() {
+        var t = currentTabId();
+        if (!t) return;
+        var params = new URLSearchParams(window.location.search);
+        params.delete('job_type');
+        sessionStorage.setItem(storageKey(t), params.toString());
+    })();
+
+    // Intercept tab anchor clicks. If the target tab has remembered filters,
+    // navigate to the URL that restores them; otherwise let the plain
+    // `?job_type=N` link land on a clean tab.
+    document.querySelectorAll('.jobs-page__tabs a').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+            var url    = new URL(a.href, window.location.origin);
+            var target = parseInt(url.searchParams.get('job_type') || '0', 10);
+            if (!target) return;
+
+            // Clicking the already-active tab would otherwise wipe the URL
+            // back to `?job_type=N`; swallow it so current filters stay.
+            if (target === currentTabId()) {
+                e.preventDefault();
+                return;
+            }
+
+            var saved = sessionStorage.getItem(storageKey(target));
+            if (!saved) return; // no saved state — let the clean tab URL navigate
+
+            e.preventDefault();
+            var qs = new URLSearchParams(saved);
+            qs.set('job_type', target);
+            window.location.href = window.location.pathname + '?' + qs.toString();
+        });
+    });
+
+    // --- Drawer open/close (the only filter-side client behavior left —
+    //     filtering/searching/clearing all flow through GET form submission). ---
+    $(document).on('click', '[data-jobs-open-filter]', function (e) {
+        e.preventDefault();
+        $drawer.addClass('is-open').attr('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    });
+    $(document).on('click', '[data-jobs-close-filter]', function (e) {
+        e.preventDefault();
+        closeDrawer();
+    });
+    function closeDrawer() {
+        $drawer.removeClass('is-open').attr('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    }
+    $(document).on('keydown', function (e) {
+        if (e.key === 'Escape' && $drawer.hasClass('is-open')) closeDrawer();
+    });
+
+    // --- Calendar widget (Figma 926:3075) ---------------------------------
+    // Reads its initial state from the hidden date_from / date_to inputs,
+    // which the server pre-fills from the URL — so a shared "?date_from=..."
+    // link repaints the picker in the same state. Picking a day writes back
+    // into those inputs; the user then clicks Apply to submit the form.
+    function initDatepicker() {
+        var picker = document.querySelector('[data-jobs-datepicker]');
+        if (!picker) return;
+
+        var monthLabel = picker.querySelector('[data-month-label]');
+        var grid       = picker.querySelector('[data-calendar-grid]');
+        var fromInput  = picker.querySelector('[data-date-input="from"]');
+        var toInput    = picker.querySelector('[data-date-input="to"]');
+        var fromPill   = picker.querySelector('[data-date-target="from"]');
+        var toPill     = picker.querySelector('[data-date-target="to"]');
+        var fromLbl    = fromPill.querySelector('.jobs-filter-date__label');
+        var toLbl      = toPill.querySelector('.jobs-filter-date__label');
+
+        var monthNames = ['January','February','March','April','May','June',
+                          'July','August','September','October','November','December'];
+
+        var today      = new Date();
+        var initial    = parseIso(fromInput.value) || parseIso(toInput.value) || today;
+        var view       = new Date(initial.getFullYear(), initial.getMonth(), 1);
+        var activeKey  = 'from';
+
+        function pad(n)      { return n < 10 ? '0' + n : '' + n; }
+        function iso(date)   { return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()); }
+        function parseIso(v) {
+            if (!v) return null;
+            var p = v.split('-');
+            return new Date(+p[0], +p[1] - 1, +p[2]);
+        }
+        function shortLabel(d) {
+            return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+        function sameDay(a, b) {
+            return a && b
+                && a.getFullYear() === b.getFullYear()
+                && a.getMonth()    === b.getMonth()
+                && a.getDate()     === b.getDate();
+        }
+
+        function syncPills() {
+            var f = parseIso(fromInput.value);
+            var t = parseIso(toInput.value);
+            fromLbl.textContent = f ? 'Start: ' + shortLabel(f) : 'Start';
+            toLbl.textContent   = t ? 'End: '   + shortLabel(t) : 'End';
+        }
+
+        function setActive(key) {
+            activeKey = key;
+            fromPill.classList.toggle('is-active', key === 'from');
+            toPill.classList.toggle('is-active',   key === 'to');
+        }
+
+        function renderMonth() {
+            monthLabel.textContent = monthNames[view.getMonth()] + ' ' + view.getFullYear();
+
+            var fromDate = parseIso(fromInput.value);
+            var toDate   = parseIso(toInput.value);
+            var first    = new Date(view.getFullYear(), view.getMonth(), 1);
+            var totalDays= new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
+            var firstWd  = (first.getDay() + 6) % 7;
+
+            var cells = [];
+            for (var i = 0; i < firstWd; i++) {
+                cells.push('<span class="jobs-filter-calendar__cell jobs-filter-calendar__cell--empty"></span>');
+            }
+            for (var d = 1; d <= totalDays; d++) {
+                var date = new Date(view.getFullYear(), view.getMonth(), d);
+                var k    = iso(date);
+                var cls  = ['jobs-filter-calendar__cell'];
+                if (sameDay(date, fromDate)) cls.push('is-selected', 'is-start');
+                if (sameDay(date, toDate))   cls.push('is-selected', 'is-end');
+                if (fromDate && toDate && date > fromDate && date < toDate) cls.push('is-in-range');
+                cells.push('<button type="button" class="' + cls.join(' ') + '" data-day="' + k + '">' + d + '</button>');
+            }
+            while (cells.length % 7) {
+                cells.push('<span class="jobs-filter-calendar__cell jobs-filter-calendar__cell--empty"></span>');
+            }
+            grid.innerHTML = cells.join('');
+        }
+
+        fromPill.addEventListener('click', function () { setActive('from'); });
+        toPill  .addEventListener('click', function () { setActive('to'); });
+
+        picker.querySelectorAll('[data-nav]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                view = new Date(view.getFullYear(), view.getMonth() + parseInt(btn.getAttribute('data-nav'), 10), 1);
+                renderMonth();
+            });
+        });
+
+        grid.addEventListener('click', function (e) {
+            var btn = e.target.closest('[data-day]');
+            if (!btn) return;
+            var target = activeKey === 'from' ? fromInput : toInput;
+            target.value = btn.getAttribute('data-day');
+            if (activeKey === 'from' && !toInput.value) {
+                setActive('to');
+            }
+            renderMonth();
+            syncPills();
+        });
+
+        // Initial paint reflects whatever's in the hidden inputs (URL state).
+        renderMonth();
+        syncPills();
+    }
+
+    initDatepicker();
+})(jQuery);
+</script>

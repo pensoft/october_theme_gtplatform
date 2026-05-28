@@ -1,0 +1,299 @@
+title = "Exchange Forum"
+subtitle = "A shared space for knowledge exchange, events, opportunities, and professional collaboration across the GREEN TALENT community"
+layout = "default"
+url = "/exchange-forum"
+==
+<?php
+function onStart()
+{
+    $this['upcomingEvents'] = \Pensoft\Events\Models\Event::with(['country', 'image'])
+        ->whereDate('end_date', '>=', now()->toDateString())
+        ->orderBy('start_date', 'asc')
+        ->limit(3)
+        ->get();
+}
+?>
+==
+<div class="exchange-forum-page container">
+
+    {% partial 'site/platform-pills' active='exchange-forum' %}
+
+    {# ---------- Section 1: Events that keep your community connected (Figma node 487:3555) ---------- #}
+    <section class="ef-section ef-connect" data-aos="fade-up">
+        <span class="ef-connect__rings" aria-hidden="true">
+            <span class="ef-connect__ring ef-connect__ring--outer"></span>
+            <span class="ef-connect__ring ef-connect__ring--mid"></span>
+            <span class="ef-connect__ring ef-connect__ring--inner"></span>
+        </span>
+
+        <span class="ef-connect__photo ef-connect__photo--tl" aria-hidden="true">
+            <img src="{{ 'assets/images/ef-photo-1.jpg'|theme }}"  alt="">
+            <span class="ef-connect__photo-overlay"></span>
+        </span>
+        <span class="ef-connect__photo ef-connect__photo--tr" aria-hidden="true">
+            <img src="{{ 'assets/images/ef-photo-2.jpg'|theme }}"  alt="">
+            <span class="ef-connect__photo-overlay"></span>
+        </span>
+        <span class="ef-connect__photo ef-connect__photo--br" aria-hidden="true">
+            <img src="{{ 'assets/images/ef-photo-4.jpg'|theme }}"  alt="">
+            <span class="ef-connect__photo-overlay"></span>
+        </span>
+        <span class="ef-connect__photo ef-connect__photo--bl" aria-hidden="true">
+            <img src="{{ 'assets/images/ef-photo-3.jpg'|theme }}"  alt="">
+            <span class="ef-connect__photo-overlay"></span>
+        </span>
+
+        <div class="ef-connect__inner">
+            <div class="ef-connect__text">
+                <h2 class="ef-connect__title">
+                    <span class="ef-connect__word" style="--i:0">Events</span>
+                    <span class="ef-connect__word" style="--i:1">that</span>
+                    <span class="ef-connect__word" style="--i:2">keep</span>
+                    <span class="ef-connect__word" style="--i:3">your</span>
+                    <span class="ef-connect__word" style="--i:4">community</span>
+                    <span class="ef-accent ef-connect__accent">connected</span>
+                </h2>
+                <p class="ef-connect__lead">
+                    Explore webinars, workshops, conferences, and shared learning opportunities across the community.
+                </p>
+            </div>
+            <a href="/events" class="ef-connect__cta">
+                <span class="ef-connect__cta-label">Explore all events</span>
+                <span class="ef-connect__cta-arrow" aria-hidden="true">
+                    <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="#8AC53E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 10h10M11 6l4 4-4 4"/>
+                    </svg>
+                </span>
+            </a>
+        </div>
+    </section>
+
+    {# ---------- Section 2: Upcoming events (Figma node 232:2995) ---------- #}
+    <section class="ef-section ef-upcoming" data-aos="fade-up">
+        <h2 class="ef-upcoming__title">Upcoming events</h2>
+
+        {% if upcomingEvents is not empty %}
+            <div class="ef-upcoming__grid events-grid">
+                {% for ev in upcomingEvents %}
+                    {% partial 'event-card' ev=ev %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="ef-upcoming__empty">No upcoming events yet. Check back soon.</p>
+        {% endif %}
+    </section>
+
+    {# ---------- Section 3: Designed to bring people, knowledge... (Figma 274:2197) ---------- #}
+    <section class="ef-section ef-quote">
+        <p class="ef-quote__text" data-scroll-fill>
+            Designed to bring people, knowledge, and opportunities together in one shared space for exchange, learning, and collaboration.
+        </p>
+    </section>
+
+    <script>
+        // Section title reveals — staggered word-by-word for the first phrase,
+        // then a separate fade + slide-from-left for the accent.
+        // Section 1 (.ef-connect__title): "…community" + accent "connected"
+        // Section 4 (.ef-conv-card__title): "Structured spaces for" + accent "focused conversations"
+        //
+        // This <script> sits between Section 3 and Section 4 in document order,
+        // so we wait for DOMContentLoaded before querying — otherwise Section 4's
+        // title isn't parsed yet, never gets observed, and stays opacity: 0 forever.
+        (function () {
+            function bindRevealObserver() {
+                var titles = document.querySelectorAll('.ef-connect__title, .ef-conv-card__title, .ef-opps__title');
+                if (!titles.length) return;
+                if (!('IntersectionObserver' in window)) {
+                    titles.forEach(function (t) { t.classList.add('is-revealed'); });
+                    return;
+                }
+                // Toggle .is-revealed on every entry/exit so the staggered
+                // word + accent-slide animation replays each time the title
+                // scrolls back into view (instead of firing only once).
+                var io = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-revealed');
+                        } else {
+                            entry.target.classList.remove('is-revealed');
+                        }
+                    });
+                }, { threshold: 0.25 });
+                titles.forEach(function (t) { io.observe(t); });
+            }
+
+            // Section 4 illustration: trigger the phone slide-up + staggered
+            // label entrance when the conv-card enters the viewport.
+            // (CSS handles the actual transitions on .is-in-view.)
+            function bindIllustrationObserver() {
+                var illu = document.querySelector('.ef-conv-illustration');
+                if (!illu) return;
+                if (!('IntersectionObserver' in window)) {
+                    illu.classList.add('is-in-view');
+                    return;
+                }
+                var io = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        if (entry.isIntersecting) {
+                            illu.classList.add('is-in-view');
+                        } else {
+                            illu.classList.remove('is-in-view');
+                        }
+                    });
+                }, { threshold: 0.2 });
+                io.observe(illu);
+            }
+
+            // Section 6/7 europe maps: each .ef-opps-row__illu gains .is-in-view
+            // every time it scrolls into view and loses it on the way out, so
+            // the dashed connector "drawing from bottom to top" reveal (and the
+            // label pop-bounce) replay each time the user returns to the row.
+            // The CSS animation isn't `infinite`, so each entry is a single,
+            // smooth run — no looping while the row stays visible.
+            function bindOppsObserver() {
+                var illus = document.querySelectorAll('.ef-opps-row__illu');
+                if (!illus.length) return;
+                if (!('IntersectionObserver' in window)) {
+                    illus.forEach(function (el) { el.classList.add('is-in-view'); });
+                    return;
+                }
+                var io = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-in-view');
+                        } else {
+                            entry.target.classList.remove('is-in-view');
+                        }
+                    });
+                }, { threshold: 0.2 });
+                illus.forEach(function (el) { io.observe(el); });
+            }
+
+            function init() { bindRevealObserver(); bindIllustrationObserver(); bindOppsObserver(); }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+    <script>
+        (function () {
+            var el = document.querySelector('[data-scroll-fill]');
+            if (!el) return;
+
+            // Split into word-spans once, preserving whitespace.
+            var words = el.textContent.trim().split(/\s+/);
+            el.innerHTML = words.map(function (w) {
+                return '<span class="ef-quote__word">' + w + '</span>';
+            }).join(' ');
+            var spans = el.querySelectorAll('.ef-quote__word');
+
+            function update() {
+                var rect = el.getBoundingClientRect();
+                var vh   = window.innerHeight || document.documentElement.clientHeight;
+                // Fill starts as text enters the lower 85% of the viewport,
+                // completes when its top reaches roughly 25% from the top.
+                var start = vh * 0.85;
+                var end   = vh * 0.25;
+                var progress = (start - rect.top) / (start - end);
+                if (progress < 0) progress = 0;
+                if (progress > 1) progress = 1;
+                var filled = Math.round(progress * spans.length);
+                for (var i = 0; i < spans.length; i++) {
+                    if (i < filled) spans[i].classList.add('is-filled');
+                    else            spans[i].classList.remove('is-filled');
+                }
+            }
+
+            update();
+            window.addEventListener('scroll', update, { passive: true });
+            window.addEventListener('resize', update, { passive: true });
+        })();
+    </script>
+
+    {# ---------- Section 4: Structured spaces for focused conversations (Figma 245:10213) ---------- #}
+    <section class="ef-section ef-conversations" data-aos="fade-up">
+        <div class="ef-conv-card">
+            {% partial 'site/conv-illustration' %}
+            <span class="ef-conv-card__wave" aria-hidden="true"></span>
+
+            <header class="ef-conv-card__head">
+                <h2 class="ef-conv-card__title">
+                    <span class="ef-conv-card__word" style="--i:0">Structured</span>
+                    <span class="ef-conv-card__word" style="--i:1">spaces</span>
+                    <span class="ef-conv-card__word" style="--i:2">for</span>
+                    <span class="ef-conv-card__title-accent">focused conversations</span>
+                </h2>
+                <p class="ef-conv-card__lead">
+                    Green Talent’s collaboration corner is designed for sharing, co-developing and co-creating. Find like-minded people and partners for publications, projects or your next R&I venture.
+                </p>
+            </header>
+
+
+        </div>
+
+        <div class="ef-conversations__cta">
+            <span class="ef-coming-soon">Coming in September!</span>
+        </div>
+    </section>
+
+    {# ---------- Section 5: Opportunities for growth and exchange (Figma 245:10214) ---------- #}
+    <section class="ef-section ef-opps" data-aos="fade-up">
+        <header class="ef-opps__head">
+            <h2 class="ef-opps__title">
+                <span class="ef-opps__word" style="--i:0">Opportunities</span>
+                <span class="ef-opps__word" style="--i:1">for</span>
+                <span class="ef-opps__title-accent">growth and exchange</span>
+            </h2>
+            <p class="ef-opps__lead">
+                Are you searching for a new opportunity? This space connects employers and employees and mentors with students by allowing a two-sided process of offering and seeking a position.
+            </p>
+        </header>
+    </section>
+
+    {# ---------- Section 6: Job positions (Figma 245:10214) ---------- #}
+    <section class="ef-section ef-opps-row ef-opps-row--green" data-aos="fade-up">
+        <div class="ef-opps-row__body">
+            <h3 class="ef-opps-row__title">Job positions</h3>
+            <p class="ef-opps-row__lead">
+                Browse opportunities shared by the Green Talent community and discover positions that match your interests, skills and career goals - from internships and mentoring to research and professional roles.
+            </p>
+            <a href="/job-opportunities" class="ef-opps-row__cta ef-opps-row__cta--green">
+                <span class="ef-opps-row__cta-label">See positions</span>
+                <span class="ef-opps-row__cta-arrow" aria-hidden="true">
+                    <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="#8AC53E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 10h10M11 6l4 4-4 4"/>
+                    </svg>
+                </span>
+            </a>
+        </div>
+
+        <div class="ef-opps-row__illu ef-opps-row__illu--green">
+            {% partial 'site/opps-map-green' %}
+        </div>
+    </section>
+
+    {# ---------- Section 7: Secondment positions (Figma 245:10214) ---------- #}
+    <section class="ef-section ef-opps-row ef-opps-row--blue ef-opps-row--reverse" data-aos="fade-up">
+        <div class="ef-opps-row__illu ef-opps-row__illu--blue">
+            {% partial 'site/opps-map-blue' %}
+        </div>
+
+        <div class="ef-opps-row__body">
+            <h3 class="ef-opps-row__title">Secondment positions</h3>
+            <p class="ef-opps-row__lead">
+                Here you can discover secondment opportunities that support career growth in R&I, connect with experienced mentors, and help you gain practical experience through collaboration across organisations and countries.
+            </p>
+            <a href="/job-opportunities?job_type=2" class="ef-opps-row__cta ef-opps-row__cta--blue">
+                <span class="ef-opps-row__cta-label">See positions</span>
+                <span class="ef-opps-row__cta-arrow" aria-hidden="true">
+                    <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="#5787FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 10h10M11 6l4 4-4 4"/>
+                    </svg>
+                </span>
+            </a>
+        </div>
+    </section>
+
+</div>

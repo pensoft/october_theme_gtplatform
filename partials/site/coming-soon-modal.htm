@@ -1,0 +1,62 @@
+{# Reusable "Coming soon" popup (Figma 440:7446).
+   Bound to any element on the page with [data-coming-soon] (and optional [data-month]).
+   Include this partial once per page that has such triggers. If included more than once
+   (e.g. multiple pill rows on the same page), the script removes the extra DOM copies. #}
+<div class="pgt-modal pgt-modal--coming pgt-coming-soon-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="pgtComingSoonTitle">
+    <div class="pgt-modal__backdrop" data-coming-close></div>
+    <div class="pgt-modal__dialog pgt-coming-soon">
+        <div class="pgt-coming-soon__icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50" fill="none">
+                <path d="M25 6.25V12.5M25 37.5V43.75M12.5 25H6.25M43.75 25H37.5M11.7432 11.7432L16.1662 16.1662M33.8379 33.8379L38.2568 38.2568M38.2609 11.7391L33.842 16.158M16.1621 33.8379L11.7391 38.2609" stroke="#52843E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div class="pgt-coming-soon__text">
+            <h2 class="pgt-coming-soon__title" id="pgtComingSoonTitle">Coming soon!</h2>
+            <p class="pgt-coming-soon__sub">Visit our platform in <span data-coming-month>June</span> to explore</p>
+        </div>
+        <button type="button" class="pgt-coming-soon__btn" data-coming-close>Done</button>
+    </div>
+</div>
+
+<script>
+    (function () {
+        if (window.PGT_COMING_SOON_INIT) {
+            // Earlier include already wired everything up — drop any duplicate modal DOM.
+            var dupes = document.querySelectorAll('.pgt-coming-soon-modal');
+            for (var i = 1; i < dupes.length; i++) dupes[i].parentNode.removeChild(dupes[i]);
+            return;
+        }
+        window.PGT_COMING_SOON_INIT = true;
+
+        var modal = document.querySelector('.pgt-coming-soon-modal');
+        if (!modal) return;
+        var monthEl = modal.querySelector('[data-coming-month]');
+
+        function open(month) {
+            if (monthEl) monthEl.textContent = month && month.length ? month : '[ Month ]';
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+        function close() {
+            modal.classList.remove('is-open');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        // Event delegation — catches every [data-coming-soon] trigger on the page,
+        // including those rendered by sibling partials.
+        document.addEventListener('click', function (e) {
+            var trigger = e.target.closest && e.target.closest('[data-coming-soon]');
+            if (trigger) {
+                e.preventDefault();
+                open(trigger.getAttribute('data-month') || '');
+                return;
+            }
+            if (e.target.closest && e.target.closest('[data-coming-close]')) close();
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && modal.classList.contains('is-open')) close();
+        });
+    })();
+</script>

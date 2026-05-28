@@ -1,0 +1,22 @@
+url = "/profile/saved"
+layout = "default"
+title = "Saved content"
+is_hidden = 0
+
+[session]
+security = "user"
+redirect = "login"
+
+[profileMenu]
+active = "saved"
+
+[savedContent]
+==
+<div class="container profile-container">
+    <div class="profile-layout">
+        {% component 'profileMenu' %}
+        <main class="profile-layout__main">
+            {% component 'savedContent' %}
+        </main>
+    </div>
+</div>

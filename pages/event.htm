@@ -1,0 +1,14 @@
+url = "/events/:slug"
+layout = "default"
+title = "Event"
+is_hidden = 0
+
+[eventDetail]
+slug = "{{ :slug }}"
+
+[saveButton]
+type = "event"
+==
+<div class="event-detail-container">
+    {% component 'eventDetail' %}
+</div>

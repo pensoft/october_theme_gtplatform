@@ -1,0 +1,23 @@
+url = "/profile/saved/jobs"
+layout = "default"
+title = "Saved jobs"
+is_hidden = 0
+
+[session]
+security = "user"
+redirect = "login"
+
+[profileMenu]
+active = "saved"
+
+[savedJobs]
+perPage = "12"
+==
+<div class="container profile-container">
+    <div class="profile-layout">
+        {% component 'profileMenu' %}
+        <main class="profile-layout__main">
+            {% component 'savedJobs' %}
+        </main>
+    </div>
+</div>

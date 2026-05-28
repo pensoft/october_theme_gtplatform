@@ -1,0 +1,17 @@
+url = "/"
+layout = "default"
+title = "GREEN TALENT PLATFORM"
+is_hidden = 0
+meta_description = "The GREEN TALENT PLATFORM"
+robot_index = "index"
+robot_follow = "follow"
+
+==
+{% partial 'site/welcome-hero'
+    user=user
+    joiningReasons=joiningReasons
+    canRegister=canRegister
+    justActivated=justActivated
+    activationError=activationError
+    tag_line=this.theme.tag_line
+%}

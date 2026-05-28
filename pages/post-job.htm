@@ -1,0 +1,15 @@
+url = "/post-job"
+layout = "default"
+title = "Post a job"
+is_hidden = 0
+
+[session]
+security = "user"
+redirect = "login"
+
+[postJob]
+redirect = "/job-opportunities"
+==
+<div class="post-job-container">
+    {% component 'postJob' %}
+</div>

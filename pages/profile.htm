@@ -1,0 +1,596 @@
+url = "/profile"
+layout = "default"
+title = "Profile"
+is_hidden = 0
+robot_index = "noindex"
+robot_follow = "nofollow"
+
+[session]
+security = "user"
+redirect = "login"
+
+[account]
+redirect = ""
+paramCode = "code"
+forceSecure = 0
+requirePassword = 0
+
+[profileMenu]
+active = "profile"
+==
+<?php
+use System\Models\File;
+
+public function onRemoveAttachmentHandler() {
+    if (($fileId = post('file_id')) && ($file = File::find((int) $fileId))) {
+        $file->delete();
+        return Redirect::to('/profile');
+    }
+}
+
+// "Delete account" in the profile menu opens a confirmation popup whose
+// primary button posts here. We intentionally do NOT delete the user record —
+// we only deactivate it (`is_activated = false`), which is enough to block
+// future logins via RainLab.User, while preserving the user's data so they
+// can be reactivated later by an admin.
+public function onDeactivateAccount() {
+    if (!\Auth::check()) {
+        return;
+    }
+    $user = \Auth::getUser();
+    $user->is_activated = false;
+    $user->save();
+    \Auth::logout();
+    return Redirect::to('/');
+}
+
+// Dedicated handler for the Security card. RainLab.User's stock Account::onUpdate
+// only checks `password_current` when `requirePassword = 1`, but turning that on
+// would force every section's Save (biography / personal info / photo) to demand
+// the password. Instead, route only the Security card's Save here so we verify
+// the current password against the actual hash, then write the new one.
+public function onChangePassword() {
+    if (!\Auth::check()) {
+        throw new \ApplicationException('You must be logged in.');
+    }
+    $user = \Auth::getUser();
+
+    $current = (string) post('password_current');
+    $new     = (string) post('password');
+    $confirm = (string) post('password_confirmation');
+
+    $validation = \Validator::make(
+        [
+            'password_current'      => $current,
+            'password'              => $new,
+            'password_confirmation' => $confirm,
+        ],
+        [
+            'password_current'      => 'required',
+            'password'              => 'required|min:' . \RainLab\User\Models\User::getMinPasswordLength() . '|confirmed',
+            'password_confirmation' => 'required',
+        ],
+        [
+            'password_current.required' => 'Please enter your current password.',
+            'password.required'         => 'Please enter a new password.',
+            'password.confirmed'        => 'New password and confirmation do not match.',
+        ]
+    );
+    if ($validation->fails()) {
+        throw new \ValidationException($validation);
+    }
+
+    // Hash::check compares plaintext vs the stored hash.
+    if (!\Hash::check($current, $user->password)) {
+        throw new \ValidationException(['password_current' => 'Current password is incorrect.']);
+    }
+
+    // Assigning to `password` triggers the User model's hashing mutator on save.
+    $user->password = $new;
+    $user->password_confirmation = $confirm;
+    $user->forceSave();
+
+    return ['changed' => true];
+}
+?>
+==
+<div class="container profile-container">
+    <div class="profile-layout">
+        {% component 'profileMenu' %}
+        <main class="profile-layout__main">
+            {% if user %}
+                <header class="profile-head">
+                    <h1 class="profile-head__title">Profile details</h1>
+                    <p class="profile-head__sub">Manage your account information and details</p>
+                </header>
+
+                {% partial 'components/account/activation_check' %}
+
+                <form class="profile-form"
+                      method="post"
+                      data-request="onUpdate"
+                      data-request-files
+                      data-request-flash
+                      enctype="multipart/form-data">
+
+                    {# ---------- Profile photo card (Figma 210:2598 read / 209:841 edit) ---------- #}
+                    <section class="profile-card profile-card--photo" data-profile-section="photo">
+                        <div class="profile-card__head">
+                            <h2 class="profile-card__title">Profile photo</h2>
+                            <div class="profile-card__actions">
+                                <button type="button" class="profile-btn profile-btn--primary" data-profile-save="photo" hidden>Save changes</button>
+                                <button type="button" class="profile-card__action" data-profile-edit="photo" data-edit-label="Edit photo">
+                                    <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
+                                        <path stroke="#192E11" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" d="M11 2.5l2.5 2.5L6 12.5H3.5V10z"/>
+                                    </svg>
+                                    <span class="profile-card__action-label">Edit photo</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="profile-photo" data-profile-readout="photo">
+                            <div class="profile-photo__avatar">
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar.getThumb(118, 118, { mode: 'crop' }) }}" alt="{{ user.name }} {{ user.surname }}">
+                                {% else %}
+                                    <span class="profile-photo__initials" aria-hidden="true">
+                                        {{ user.name|first|upper }}{{ user.surname|first|upper }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <div class="profile-photo__name">{{ user.name }} {{ user.surname }}</div>
+                            {% if user.avatar %}
+                                <a href="javascript:;" class="profile-photo__remove"
+                                   data-request="onRemoveAttachmentHandler"
+                                   data-request-confirm="Remove avatar?"
+                                   data-request-data="file_id: {{ user.avatar.id }}">Remove</a>
+                            {% endif %}
+                        </div>
+
+                        <div class="profile-photo profile-photo--edit" data-profile-edit-target="photo" hidden>
+                            <div class="profile-photo__avatar">
+                                <img id="avatarPreview" alt="profile preview"
+                                     {% if user.avatar %}src="{{ user.avatar.getThumb(118, 118, { mode: 'crop' }) }}"{% endif %}
+                                     {% if not user.avatar %}hidden{% endif %}>
+                                {% if not user.avatar %}
+                                    <span class="profile-photo__initials" data-avatar-initials aria-hidden="true">
+                                        {{ user.name|first|upper }}{{ user.surname|first|upper }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <label class="profile-dropzone" for="accountAvatar">
+                                <svg class="profile-dropzone__icon" viewBox="0 0 32 28" width="32" height="28" fill="none" aria-hidden="true">
+                                    <path stroke="#182D10" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M4 18v5a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2v-5"/>
+                                    <path stroke="#182D10" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M16 18V3M10 9l6-6 6 6"/>
+                                </svg>
+                                <span class="profile-dropzone__text">
+                                    <span class="profile-dropzone__cta">Click to upload</span>
+                                    <span class="profile-dropzone__or">or drag and drop</span>
+                                </span>
+                                <span class="profile-dropzone__hint">PNG, JPG up to 5MB</span>
+                                <input type="file" name="avatar" id="accountAvatar" class="profile-dropzone__input" accept="image/png,image/jpeg">
+                            </label>
+                        </div>
+                    </section>
+
+                    {# ---------- Biography card ---------- #}
+                    <section class="profile-card" data-profile-section="biography">
+                        <div class="profile-card__head">
+                            <h2 class="profile-card__title">Biography</h2>
+                            <div class="profile-card__actions">
+                                <button type="button" class="profile-btn profile-btn--primary" data-profile-save="biography" hidden>Save changes</button>
+                                <button type="button" class="profile-card__action" data-profile-edit="biography" data-edit-label="Edit biography">
+                                    <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
+                                        <path stroke="#192E11" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" d="M11 2.5l2.5 2.5L6 12.5H3.5V10z"/>
+                                    </svg>
+                                    <span class="profile-card__action-label">Edit biography</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="profile-readout" data-profile-readout="biography">
+                            <p class="profile-readout__text">{{- user.biography|default('Tell others about yourself — your background, expertise, and what you’re looking for on the platform.')|trim -}}</p>
+                        </div>
+                        <textarea class="profile-field profile-field--textarea profile-edit-target"
+                                  name="biography"
+                                  data-profile-edit-target="biography"
+                                  rows="6"
+                                  hidden>{{ user.biography }}</textarea>
+                    </section>
+
+                    {# ---------- Personal information card (Figma 251:17693 read / 251:19507 saved) ---------- #}
+                    <section class="profile-card" data-profile-section="personal">
+                        <div class="profile-card__head">
+                            <h2 class="profile-card__title">Personal information</h2>
+                            <div class="profile-card__actions">
+                                <span class="profile-saved-pill" data-profile-saved-pill="personal" hidden>Saved</span>
+                                <button type="button" class="profile-btn profile-btn--primary" data-profile-save="personal" hidden>Save changes</button>
+                                <button type="button" class="profile-card__action" data-profile-edit="personal" data-edit-label="Edit profile">
+                                    <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
+                                        <path stroke="#192E11" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" d="M11 2.5l2.5 2.5L6 12.5H3.5V10z"/>
+                                    </svg>
+                                    <span class="profile-card__action-label">Edit profile</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="profile-readout-group" data-profile-readout="personal">
+                            <div class="profile-info-label">
+                                <svg viewBox="0 0 22 22" width="22" height="22" fill="none" aria-hidden="true">
+                                    <circle cx="11" cy="8" r="3.5" stroke="#182D10" stroke-width="1.6"/>
+                                    <path stroke="#182D10" stroke-width="1.6" stroke-linecap="round" d="M4.5 18.5a6.5 6.5 0 0 1 13 0"/>
+                                </svg>
+                                <span>Full name</span>
+                            </div>
+                            <div class="profile-readout">
+                                <p class="profile-readout__text">{{- user.name }} {{ user.surname -}}</p>
+                            </div>
+
+                            <div class="profile-info-label">
+                                <svg viewBox="0 0 22 22" width="22" height="22" fill="none" aria-hidden="true">
+                                    <rect x="3" y="5" width="16" height="12" rx="2" stroke="#182D10" stroke-width="1.6"/>
+                                    <path stroke="#182D10" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M3.5 6.5L11 12l7.5-5.5"/>
+                                </svg>
+                                <span>Email</span>
+                            </div>
+                            <div class="profile-readout">
+                                <p class="profile-readout__text">{{- user.email -}}</p>
+                            </div>
+                        </div>
+
+                        <div class="profile-edit-target" data-profile-edit-target="personal" hidden>
+                            <div class="profile-field-group">
+                                <label class="profile-field-label" for="accountFullName">Full name</label>
+                                <input class="profile-field"
+                                       type="text"
+                                       id="accountFullName"
+                                       data-full-name
+                                       value="{{- (user.name ~ (user.surname ? ' ' ~ user.surname : ''))|trim -}}"
+                                       placeholder="Full name">
+                                {# Hidden mirrors of the model's two columns.
+                                   JS splits the visible full-name value into these
+                                   just before the AJAX save fires. #}
+                                <input type="hidden" name="name"    value="{{ user.name }}">
+                                <input type="hidden" name="surname" value="{{ user.surname }}">
+                            </div>
+
+                            <div class="profile-field-group">
+                                <label class="profile-field-label" for="accountEmail">Change email</label>
+                                <input class="profile-field" type="email" name="email" id="accountEmail" value="{{ user.email }}" placeholder="you@example.com">
+                            </div>
+
+                            {% if updateRequiresPassword %}
+                                <div class="profile-field-group">
+                                    <label class="profile-field-label" for="accountPasswordCurrent">Current password<span class="profile-field-required">*</span></label>
+                                    <input class="profile-field" type="password" name="password_current" id="accountPasswordCurrent" autocomplete="current-password">
+                                    <p class="profile-field-hint">Required to apply these changes.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="profile-saved-state" data-profile-saved-state="personal" hidden>
+                            <div class="profile-saved-banner" data-saved-banner="name" hidden>
+                                <span class="profile-saved-banner__text">Username changed successfully</span>
+                                <span class="profile-saved-banner__check" aria-hidden="true">
+                                    <svg viewBox="0 0 17 17" width="17" height="17" fill="none">
+                                        <path stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M4 9l3 3 6-6"/>
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="profile-saved-banner" data-saved-banner="email" hidden>
+                                <span class="profile-saved-banner__text">Email changed successfully</span>
+                                <span class="profile-saved-banner__check" aria-hidden="true">
+                                    <svg viewBox="0 0 17 17" width="17" height="17" fill="none">
+                                        <path stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M4 9l3 3 6-6"/>
+                                    </svg>
+                                </span>
+                            </div>
+                        </div>
+                    </section>
+
+                    {# ---------- Security card (Figma 251:18146 read / 209:1350 edit / 251:18396 saved) ---------- #}
+                    <section class="profile-card" data-profile-section="security">
+                        <div class="profile-card__head">
+                            <h2 class="profile-card__title">Security</h2>
+                            <div class="profile-card__actions">
+                                <span class="profile-saved-pill" data-profile-saved-pill="security" hidden>Saved</span>
+                                <button type="button" class="profile-btn profile-btn--primary" data-profile-save="security" hidden>Save changes</button>
+                                <button type="button" class="profile-card__action" data-profile-edit="security" data-edit-label="Change password">
+                                    <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
+                                        <rect x="3.25" y="7" width="9.5" height="6.5" rx="1" stroke="#192E11" stroke-width="1.4"/>
+                                        <path stroke="#192E11" stroke-width="1.4" stroke-linecap="round" d="M5.25 7V5.25a2.75 2.75 0 015.5 0V7"/>
+                                    </svg>
+                                    <span class="profile-card__action-label">Change password</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="profile-readout-group" data-profile-readout="security">
+                            <div class="profile-info-label"><span>Password</span></div>
+                        </div>
+
+                        <div class="profile-edit-target" data-profile-edit-target="security" hidden>
+                            <div class="profile-field-group">
+                                <label class="profile-field-label" for="securityCurrentPassword">Current password</label>
+                                <input class="profile-field" type="password" name="password_current" id="securityCurrentPassword" autocomplete="current-password" placeholder="Enter current password">
+                            </div>
+                            <div class="profile-field-group">
+                                <label class="profile-field-label" for="securityNewPassword">New password</label>
+                                <input class="profile-field" type="password" name="password" id="securityNewPassword" autocomplete="new-password" placeholder="Enter new password">
+                            </div>
+                            <div class="profile-field-group">
+                                <label class="profile-field-label" for="securityConfirmPassword">Confirm new password</label>
+                                <input class="profile-field" type="password" name="password_confirmation" id="securityConfirmPassword" autocomplete="new-password" placeholder="Confirm new password">
+                            </div>
+                        </div>
+
+                        <div class="profile-saved-state" data-profile-saved-state="security" hidden>
+                            <div class="profile-saved-banner" data-saved-banner="password">
+                                <span class="profile-saved-banner__text">Password changed successfully</span>
+                                <span class="profile-saved-banner__check" aria-hidden="true">
+                                    <svg viewBox="0 0 17 17" width="17" height="17" fill="none">
+                                        <path stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M4 9l3 3 6-6"/>
+                                    </svg>
+                                </span>
+                            </div>
+                        </div>
+                    </section>
+
+                </form>
+            {% endif %}
+        </main>
+    </div>
+</div>
+
+<script>
+(function ($) {
+    'use strict';
+
+    var $form = $('.profile-form');
+    // Field-value snapshots taken when entering edit mode, used by Cancel to revert.
+    var snapshots = {};
+
+    function captureSnapshot(key, $target) {
+        var snap = [];
+        $target.find('input, textarea, select').each(function () {
+            if (this.type === 'file') {
+                snap.push({ el: this, prop: 'file' });
+            } else if (this.type === 'checkbox' || this.type === 'radio') {
+                snap.push({ el: this, prop: 'checked', value: this.checked });
+            } else {
+                snap.push({ el: this, prop: 'value', value: this.value });
+            }
+        });
+        snapshots[key] = snap;
+    }
+
+    function restoreSnapshot(key) {
+        var snap = snapshots[key];
+        if (!snap) return;
+        $.each(snap, function (i, s) {
+            if (s.prop === 'file') {
+                // Browsers don't permit programmatic writes to a file input's
+                // FileList beyond clearing it — that matches the "no selection"
+                // initial state, which is what Cancel wants here.
+                try { s.el.value = ''; $(s.el).trigger('change'); } catch (e) {}
+            } else {
+                s.el[s.prop] = s.value;
+            }
+        });
+        delete snapshots[key];
+    }
+
+    function setEditMode(key, on) {
+        var $editBtn  = $('[data-profile-edit="' + key + '"]');
+        var $saveBtn  = $('[data-profile-save="' + key + '"]');
+        var $readout  = $('[data-profile-readout="' + key + '"]');
+        var $target   = $('[data-profile-edit-target="' + key + '"]');
+        var $card     = $editBtn.closest('.profile-card');
+        var $label    = $editBtn.find('.profile-card__action-label');
+        var origLabel = $editBtn.data('edit-label');
+
+        if (on) {
+            captureSnapshot(key, $target);
+            $readout.hide();
+            $target.prop('hidden', false).show();
+            $editBtn.addClass('is-cancel');
+            $label.text('Cancel');
+            $saveBtn.prop('hidden', false).show();
+            $card.addClass('is-editing');
+        } else {
+            restoreSnapshot(key);
+            $target.hide().prop('hidden', true);
+            $readout.show();
+            $editBtn.removeClass('is-cancel');
+            $label.text(origLabel);
+            $saveBtn.hide().prop('hidden', true);
+            $card.removeClass('is-editing');
+        }
+    }
+
+    // ---- Avatar preview & drag-drop on the Profile photo dropzone ----
+    $(document).on('change', '#accountAvatar', function () {
+        var file = this.files && this.files[0];
+        var $preview = $('#avatarPreview');
+        var $initials = $('[data-avatar-initials]');
+        if (!file) {
+            // Cancel/clear — restore the original src+visibility.
+            var orig = $preview.attr('data-original-src');
+            if (orig) { $preview.attr('src', orig).prop('hidden', false); $initials.hide(); }
+            else      { $preview.removeAttr('src').prop('hidden', true);  $initials.show(); }
+            return;
+        }
+        if (!$preview.attr('data-original-src')) {
+            $preview.attr('data-original-src', $preview.attr('src') || '');
+        }
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $preview.attr('src', e.target.result).prop('hidden', false);
+            $initials.hide();
+        };
+        reader.readAsDataURL(file);
+    });
+
+    $(document).on('dragover', '.profile-dropzone', function (e) {
+        e.preventDefault();
+        $(this).addClass('is-dragover');
+    });
+    $(document).on('dragleave dragend drop', '.profile-dropzone', function (e) {
+        $(this).removeClass('is-dragover');
+    });
+    $(document).on('drop', '.profile-dropzone', function (e) {
+        e.preventDefault();
+        var dt = e.originalEvent && e.originalEvent.dataTransfer;
+        if (dt && dt.files && dt.files.length) {
+            var $input = $(this).find('input[type=file]');
+            $input[0].files = dt.files;
+            $input.trigger('change');
+        }
+    });
+
+    // Toggle edit ↔ cancel
+    $(document).on('click', '[data-profile-edit]', function (e) {
+        e.preventDefault();
+        var key   = $(this).data('profile-edit');
+        var isOn  = $(this).hasClass('is-cancel');
+        setEditMode(key, !isOn);
+    });
+
+    // Save the section — most sections submit the whole profile form to the
+    // stock RainLab.User Account::onUpdate handler (untouched fields keep their
+    // server-rendered values, so only the edited section diverges). The
+    // Security card routes to onChangePassword instead so we can verify the
+    // current password without forcing it on every other save.
+    $(document).on('click', '[data-profile-save]', function (e) {
+        e.preventDefault();
+        var key     = $(this).data('profile-save');
+        var handler = key === 'security' ? 'onChangePassword' : 'onUpdate';
+
+        // The Personal info card shows a single "Full name" field; the User
+        // model stores first/last separately, so split the value into the
+        // hidden `name`/`surname` inputs the form actually submits.
+        if (key === 'personal') {
+            var $target = $('[data-profile-edit-target="personal"]');
+            var full    = ($target.find('[data-full-name]').val() || '').trim().replace(/\s+/g, ' ');
+            var space   = full.indexOf(' ');
+            var first   = space === -1 ? full : full.slice(0, space);
+            var last    = space === -1 ? ''   : full.slice(space + 1).trim();
+            $target.find('input[name="name"]').val(first);
+            $target.find('input[name="surname"]').val(last);
+        }
+
+        $form.request(handler, {
+            files: true,
+            flash: true,
+            success: function (data) {
+                this.success(data);
+                applySavedSection(key);
+            }
+        });
+    });
+
+    // After a successful AJAX save, mirror the freshly-saved values from the
+    // edit fields into their read-only summary, drop the snapshot (so the
+    // subsequent setEditMode(false) won't revert to pre-edit values), and
+    // collapse the section back to read mode.
+    function applySavedSection(key) {
+        var $readout = $('[data-profile-readout="' + key + '"]');
+
+        if (key === 'biography') {
+            var $bio = $('[data-profile-edit-target="biography"]');
+            var text = ($bio.val() || '').trim() ||
+                'Tell others about yourself — your background, expertise, and what you’re looking for on the platform.';
+            $readout.find('.profile-readout__text').text(text);
+        }
+        else if (key === 'personal') {
+            var name    = ($form.find('[name="name"]').val()    || '').trim();
+            var surname = ($form.find('[name="surname"]').val() || '').trim();
+            var email   = ($form.find('[name="email"]').val()   || '').trim();
+            var $rows   = $readout.find('.profile-readout__text');
+            $rows.eq(0).text((name + ' ' + surname).trim());
+            $rows.eq(1).text(email);
+
+            // Diff against the snapshot taken when entering edit mode so we
+            // can show field-specific "X changed successfully" banners.
+            var snap = snapshots.personal || [];
+            var origs = { name: '', surname: '', email: '' };
+            $.each(snap, function (i, s) {
+                if (s.el && s.el.name in origs) origs[s.el.name] = s.value || '';
+            });
+            var nameChanged  = (name + ' ' + surname).trim() !== (origs.name + ' ' + origs.surname).trim();
+            var emailChanged = email !== origs.email;
+
+            if (nameChanged || emailChanged) {
+                showSavedState('personal', { name: nameChanged, email: emailChanged });
+                delete snapshots.personal;
+                return; // showSavedState handles the eventual UI revert
+            }
+        }
+        else if (key === 'security') {
+            var $secTarget = $('[data-profile-edit-target="security"]');
+            var newPwd     = ($secTarget.find('[name="password"]').val() || '').trim();
+            if (newPwd.length > 0) {
+                // Wipe the password fields so they don't linger in the DOM.
+                $secTarget.find('input[type="password"]').val('');
+                showSavedState('security', { password: true });
+                delete snapshots.security;
+                return;
+            }
+        }
+        else if (key === 'photo') {
+            var $preview = $('#avatarPreview');
+            if ($preview.length && $preview.attr('src') && !$preview.prop('hidden')) {
+                $readout.find('.profile-photo__avatar img, .profile-photo__avatar .profile-photo__initials')
+                        .remove();
+                $('<img>').attr('src', $preview.attr('src'))
+                          .attr('alt', '')
+                          .appendTo($readout.find('.profile-photo__avatar'));
+            }
+        }
+        // Security: password stays masked; nothing to mirror.
+
+        delete snapshots[key];
+        setEditMode(key, false);
+    }
+
+    // Saved confirmation state (Figma 251:19507 personal / 251:18396 security).
+    // Replaces the edit/save buttons with a green "Saved" pill and shows the
+    // banners whose key is truthy in the `banners` map. Auto-reverts to read
+    // mode after 4 seconds (the timer is keyed per section so two sections
+    // saved in quick succession don't cancel each other).
+    var revertTimers = {};
+    function showSavedState(key, banners) {
+        var $card      = $('[data-profile-section="' + key + '"]');
+        var $target    = $card.find('[data-profile-edit-target="' + key + '"]');
+        var $readout   = $card.find('[data-profile-readout="' + key + '"]');
+        var $saved     = $card.find('[data-profile-saved-state="' + key + '"]');
+        var $savedPill = $card.find('[data-profile-saved-pill="' + key + '"]');
+        var $editBtn   = $card.find('[data-profile-edit="' + key + '"]');
+        var $saveBtn   = $card.find('[data-profile-save="' + key + '"]');
+        var $label     = $editBtn.find('.profile-card__action-label');
+
+        $target.hide().prop('hidden', true);
+        $readout.hide().prop('hidden', true);
+        $editBtn.hide().prop('hidden', true);
+        $saveBtn.hide().prop('hidden', true);
+        $card.removeClass('is-editing');
+
+        $editBtn.removeClass('is-cancel');
+        $label.text($editBtn.data('edit-label'));
+
+        $saved.find('[data-saved-banner]').each(function () {
+            var name = $(this).data('saved-banner');
+            $(this).prop('hidden', !(banners && banners[name]));
+        });
+        $saved.prop('hidden', false);
+        $savedPill.prop('hidden', false);
+
+        clearTimeout(revertTimers[key]);
+        revertTimers[key] = setTimeout(function () {
+            $saved.prop('hidden', true);
+            $savedPill.prop('hidden', true);
+            $readout.prop('hidden', false).show();
+            $editBtn.prop('hidden', false).show();
+        }, 4000);
+    }
+})(jQuery);
+</script>

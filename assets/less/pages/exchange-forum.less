@@ -1,0 +1,1507 @@
+// =====================================================
+//  Exchange forum landing page (Figma node 228:1781)
+// =====================================================
+
+@ef-text:        #0c2110;
+@ef-muted:       #4f624c;
+@ef-rule:        #e3e6df;
+@ef-green:       #8AC53E;
+@ef-green-dark:  #5d9e1f;
+@ef-bg-soft:     #eef6dc;
+@ef-blue:        #4f6cff;
+@ef-blue-dark:   #3a55d4;
+
+.exchange-forum-page {
+    //max-width: 1280px;
+    margin: 60px auto 0  auto;
+    padding: 0 20px 80px;
+
+}
+
+// Pull the floating pill row up under the hero
+.pgt-hero__buttons--floating {
+    justify-content: center;
+    margin: -28px auto 40px;
+    position: relative;
+    z-index: 3;
+    flex-wrap: wrap;
+}
+// Inverse colour for the pills row on a white background (the dark hero ends above)
+.pgt-hero__buttons--floating .pgt-pill {
+    border-color: @ef-rule;
+    color: @ef-text;
+    background: #fff;
+    backdrop-filter: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .04);
+
+    .pgt-pill__icon svg { color: @ef-text; }
+
+    &:hover {
+        background: @ef-green;
+        border-color: @ef-green;
+        color: #fff;
+        .pgt-pill__icon svg { color: #fff; }
+    }
+
+
+}
+.pgt-hero__buttons--floating .pgt-pill--active {
+    background: @ef-green;
+    border-color: @ef-green;
+    color: #fff;
+    .pgt-pill__icon svg { color: #fff; }
+    &:hover { background: #7ab632; color: #fff; }
+}
+
+// ---- Shared section building blocks ----
+.ef-section {
+    padding: 56px 0;
+}
+
+.ef-h2 {
+    font-family: Parkinsans, Fustat, Arial, sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: @ef-text;
+    margin: 0 0 18px;
+    text-align: center;
+}
+
+.ef-h3 {
+    font-family: Parkinsans, Fustat, Arial, sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: @ef-text;
+    margin: 0 0 12px;
+    text-align: center;
+}
+
+.ef-lead {
+    font-size: 14px;
+    line-height: 1.65;
+    color: @ef-muted;
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto 22px;
+
+    &--tight { max-width: 560px; }
+}
+
+.ef-accent { color: @ef-green-dark; }
+
+.ef-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 22px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 0;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease, transform .15s ease;
+
+    &:hover { transform: translateY(-1px); text-decoration: none; }
+
+    &--primary { background: @ef-green; color: @ef-text; }
+    &--primary:hover { background: @ef-green-dark; color: #fff; }
+
+    &--blue { background: @ef-blue; color: #fff; }
+    &--blue:hover { background: @ef-blue-dark; color: #fff; }
+}
+
+// Keyframes for Section 1 title's two-step reveal.
+// Word-by-word rise+fade for "Events that keep your community", then a
+// fade + slide-from-left for the accent "connected".
+@keyframes ef-connect-word-rise {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes ef-connect-accent-slide {
+    from { opacity: 0; transform: translateX(-24px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+// Gentle breathing pulse for the decorative concentric rings. Centering is
+// handled by each ring's negative margins, so the animation is free to drive
+// `transform: scale()` without fighting a translate.
+@keyframes ef-connect-ring-pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.06); }
+}
+
+// =====================================================
+//  Section 1: Events that keep your community connected (Figma node 487:3555)
+// =====================================================
+.ef-connect {
+    position: relative;
+    // Figma 1000:3878: light green at bottom, fading to white at top.
+    background: linear-gradient(0.747deg, rgb(236, 246, 230) 2.516%, rgb(255, 255, 255) 99.06%);
+    border-radius: 20px;
+    padding: 110px 24px;
+    overflow: hidden;
+    margin-top: 32px;
+    min-height: 800px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    // Decorative concentric circles behind the central text block
+    // (Figma 1000:3879 "Green circle"): three stacked discs, group at 68%.
+    &__rings {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        opacity: .68;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    &__ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        border-radius: 50%;
+        box-sizing: border-box;
+        will-change: transform;
+        // Centered via negative margins (see ef-connect-ring-pulse note).
+        animation: ef-connect-ring-pulse 4s ease-in-out infinite;
+
+        // Outer: gradient #8AC53E → transparent, 50% opacity
+        &--outer {
+            width: 759px;  height: 759px;  margin: -379.5px 0 0 -379.5px;
+            background: linear-gradient(180deg, #8AC53E 0%, rgba(186, 236, 190, 0) 100%);
+            opacity: .5;
+            animation-delay: 0s;
+        }
+        // Middle: solid #E2FADD, 40% opacity
+        &--mid {
+            width: 628px;  height: 628px;  margin: -314px 0 0 -314px;
+            background: #E2FADD;
+            opacity: .4;
+            animation-delay: .5s;
+        }
+        // Inner: solid #ECF6E6
+        &--inner {
+            width: 458px;  height: 458px;  margin: -229px 0 0 -229px;
+            background: #ECF6E6;
+            animation-delay: 1s;
+        }
+    }
+
+    @media (max-width: 760px) {
+        &__ring {
+            &--outer { width: 460px; height: 460px; margin: -230px 0 0 -230px; }
+            &--mid   { width: 269px; height: 269px; margin: -134.5px 0 0 -134.5px; }
+            &--inner { width: 196px; height: 196px; margin: -98px 0 0 -98px; }
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        &__ring { animation: none; }
+    }
+
+    &__inner {
+        position: relative;
+        z-index: 2;
+        max-width: 620px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+        text-align: center;
+    }
+
+    &__text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        color: @ef-text;
+        text-align: center;
+    }
+
+    &__title {
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-size: 38px;
+        font-weight: 500;
+        line-height: 1.35;
+        color: @ef-text;
+        margin: 0;
+        max-width: 600px;
+        text-align: center;
+
+        @media (max-width: 760px) {
+            font-size: 28px;
+        }
+
+        // The `.ef-accent` modifier already paints "connected" in @ef-green-dark;
+        // keep that, since the Figma's accent matches our @ef-accent token.
+
+        // ---- Two-step reveal animation ----
+        // Phase 1: words rise + fade in sequentially (staggered via --i).
+        // Phase 2: "connected" slides in from the left after the phrase lands.
+        // Animations stay paused on initial render; an IntersectionObserver
+        // on the page adds .is-revealed when the section enters the viewport.
+        .ef-connect__word,
+        .ef-connect__accent {
+            display: inline-block;
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+        .ef-connect__word {
+            transform: translateY(8px);
+        }
+        .ef-connect__accent {
+            transform: translateX(-24px);
+        }
+
+        &.is-revealed .ef-connect__word {
+            animation: ef-connect-word-rise .55s cubic-bezier(.2, .7, .2, 1) forwards;
+            // ~"…" passes the string through untouched; without it Less.php
+            // tries to compute `var(--i, 0) * .12s` and bails ("Operation on
+            // an invalid type"), since var(--i, 0) isn't a Less value.
+            animation-delay: ~"calc(var(--i, 0) * .12s)";
+        }
+        &.is-revealed .ef-connect__accent {
+            animation: ef-connect-accent-slide .8s cubic-bezier(.2, .7, .2, 1) forwards;
+            // 5 words × .12s stagger ≈ .6s; start the accent shortly after the
+            // last word starts so the phrase and accent overlap naturally.
+            animation-delay: .85s;
+        }
+
+        // Respect reduced-motion preferences: skip the animation, show
+        // everything in its final state.
+        @media (prefers-reduced-motion: reduce) {
+            .ef-connect__word,
+            .ef-connect__accent {
+                opacity: 1;
+                transform: none;
+                animation: none !important;
+            }
+        }
+    }
+
+    &__lead {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 24px;
+        font-weight: 400;
+        line-height: 1.6;
+        color: @ef-text;
+        margin: 0;
+        max-width: 100%;
+        text-align: center;
+
+        strong {
+            font-family: Fustat, Arial, sans-serif;
+            font-weight: 400;
+            color: @ef-text;
+        }
+
+        @media (max-width: 760px) {
+            font-size: 18px;
+            line-height: 1.55;
+        }
+    }
+
+    &__cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;                       // text → arrow (Figma 245:8775)
+        background: #8AC53E;
+        color: #fff;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: -0.36px;
+        line-height: 1;
+        padding: 12px 25px;
+        border-radius: 900px;
+        text-decoration: none;
+        transition: background .15s ease, transform .15s ease;
+
+        &:hover {
+            background: darken(#8AC53E, 6%);
+            color: #fff;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+    }
+
+    &__cta-label {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    // White arrow pill — hidden by default, slides in when the CTA is hovered
+    // or keyboard-focused (Figma 245:8775 hover state).
+    &__cta-arrow {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 28px;
+        width: 0;
+        max-width: 0;
+        margin-left: -5px;              // collapses the CTA's 5px gap when hidden
+        overflow: hidden;
+        background: #fff;
+        border-radius: 500px;
+        opacity: 0;
+        transform: translateX(-6px);
+        transition: width .3s ease, max-width .3s ease, opacity .25s ease .05s,
+                    transform .3s ease, margin-left .3s ease;
+
+        svg { display: block; flex-shrink: 0; }
+    }
+
+    &__cta:hover &__cta-arrow,
+    &__cta:focus-visible &__cta-arrow {
+        width: 46px;
+        max-width: 46px;
+        margin-left: 0;
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    // Decorative photo thumbnails positioned around the central content.
+    // Each gets a dark green base (#182D10) with a green gradient overlay so they
+    // read consistently whether the image loads or not.
+    &__photo {
+        position: absolute;
+        overflow: hidden;
+        background: #182D10;
+        z-index: 1;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        &--tl {
+            top: 79px;
+            left: 100px;
+            width: 243px;
+            height: 171px;
+            border-radius: 17px;
+        }
+        &--tr {
+            top: 84px;
+            right: 100px;
+            width: 197px;
+            height: 129px;
+            border-radius: 15px;
+        }
+        &--bl {
+            bottom: 47px;
+            left: 194px;
+            width: 149px;
+            height: 161px;
+            border-radius: 15px;
+        }
+        &--br {
+            bottom: 55px;
+            right: 144px;
+            width: 180px;
+            height: 153px;
+            border-radius: 15px;
+        }
+    }
+
+    &__photo-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            -21deg,
+            rgba(138, 197, 62, 1) 8%,
+            rgba(138, 197, 62, 0) 69%
+        );
+        pointer-events: none;
+    }
+
+    @media (max-width: 980px) {
+        padding: 70px 24px;
+        min-height: 0;
+
+        &__photo--tl { width: 160px; height: 110px; top: 30px; left: 16px; }
+        &__photo--tr { width: 130px; height: 90px;  top: 30px; right: 16px; }
+        &__photo--bl { width: 110px; height: 120px; bottom: 30px; left: 60px; }
+        &__photo--br { width: 130px; height: 110px; bottom: 30px; right: 60px; }
+    }
+
+    @media (max-width: 640px) {
+        &__photo { display: none; }
+    }
+}
+
+// =====================================================
+//  Section 2: Upcoming events (Figma node 232:2995)
+// =====================================================
+.ef-upcoming {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+
+    &__title {
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-size: 38px;
+        font-weight: 500;
+        line-height: 1.45;
+        color: @ef-text;
+        margin: 0;
+        text-align: center;
+        width: 100%;
+
+        @media (max-width: 760px) {
+            font-size: 28px;
+        }
+    }
+
+    &__grid {
+        width: 100%;
+        // .events-grid (3-column, 15px gap, dropping to 2/1) is applied alongside
+        // this class — no additional layout needed.
+    }
+
+    &__empty {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        color: @ef-muted;
+        text-align: center;
+        margin: 0;
+        padding: 24px 0;
+    }
+}
+
+// Event cards (`.event-card`) and their grid (`.events-grid`) live in
+// pages/events.less and are shared by:
+//   - pages/exchange-forum.htm (Section 2: Upcoming events)
+//   - partials/eventslist/grid.htm
+//   - partials/savedevents/default.htm
+//   - partials/savedcontent/body.htm
+// The card markup is rendered from the shared `partials/event-card.htm`.
+
+// =====================================================
+//  Section 3: Quote with scroll-driven text fill (Figma 274:2197)
+// =====================================================
+.ef-quote {
+    padding: 120px 0;
+    text-align: center;
+
+    &__text {
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-size: 42px;
+        font-weight: 500;
+        line-height: 1.62;
+        max-width: 980px;
+        margin: 0 auto;
+        color: #ccd1df;
+
+        @media (max-width: 980px) { font-size: 34px; }
+        @media (max-width: 760px) { font-size: 26px; line-height: 1.5; }
+    }
+
+    &__word {
+        color: #ccd1df;
+        transition: color .35s ease;
+
+        &.is-filled { color: #182d10; }
+    }
+}
+
+// =====================================================
+//  Section 4: Structured spaces for focused conversations (Figma 245:10213)
+// =====================================================
+.ef-conversations {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+
+    &__cta {
+        text-align: center;
+    }
+}
+
+.ef-conv-card {
+    position: relative;
+    width: 100%;
+    border-radius: 20px;
+    // Background illustration is now rendered inline via partials/site/conv-illustration
+    // (was: background-image: url("…/structure.svg")) so we can animate its parts.
+    overflow: hidden;
+    padding: 60px 24px;
+    min-height: 597px;
+
+    @media (max-width: 980px) { min-height: 0; padding: 60px 20px; }
+
+    // Faint background flourish (replaces decorative Figma SVG wave)
+    &__wave {
+        position: absolute;
+        inset: 30% -10% auto -10%;
+        height: 460px;
+        background:
+            radial-gradient(closest-side, rgba(86, 135, 255, .07), transparent 75%) center / 70% 100% no-repeat,
+            radial-gradient(closest-side, rgba(138, 197, 62, .08), transparent 70%) 10% 60% / 60% 90% no-repeat;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    &__head {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        max-width: 980px;
+        margin: 0 auto;
+    }
+
+    &__title {
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-weight: 500;
+        font-size: 38px;
+        line-height: 1.35;
+        color: @ef-text;
+        margin: 0 0 18px;
+        max-width: 540px;
+        margin-left: auto;
+        margin-right: auto;
+
+        @media (max-width: 760px) { font-size: 28px; }
+
+        // ---- Two-step reveal animation ----
+        // Phase 1: "Structured spaces for" words rise + fade in sequentially.
+        // Phase 2: "focused conversations" slides in from the left.
+        // Triggered by the page-level IntersectionObserver toggling
+        // .is-revealed once the title scrolls into view.
+        .ef-conv-card__word,
+        .ef-conv-card__title-accent {
+            display: inline-block;
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+        .ef-conv-card__word {
+            transform: translateY(8px);
+        }
+        .ef-conv-card__title-accent {
+            transform: translateX(-24px);
+        }
+
+        &.is-revealed .ef-conv-card__word {
+            animation: ef-connect-word-rise .55s cubic-bezier(.2, .7, .2, 1) forwards;
+            // 3 words × .12s ≈ .36s total stagger; accent slides in
+            // shortly after the last word starts, mirroring Section 1.
+            animation-delay: ~"calc(var(--i, 0) * .12s)";
+        }
+        &.is-revealed .ef-conv-card__title-accent {
+            animation: ef-connect-accent-slide .8s cubic-bezier(.2, .7, .2, 1) forwards;
+            animation-delay: .55s;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .ef-conv-card__word,
+            .ef-conv-card__title-accent {
+                opacity: 1;
+                transform: none;
+                animation: none !important;
+            }
+        }
+    }
+
+    &__title-accent { color: #5687FF; }
+
+    &__lead {
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 400;
+        font-size: 22px;
+        line-height: 1.6;
+        color: @ef-text;
+        margin: 0 auto;
+        max-width: 960px;
+
+        @media (max-width: 760px) { font-size: 16px; }
+    }
+}
+
+// =====================================================
+//  Section 4 illustration — inline SVG with animations
+//  (rendered by partials/site/conv-illustration.htm)
+// =====================================================
+@keyframes ef-conv-pulse {
+    0%, 100% { transform: scale(1);    opacity: .50; }
+    50%      { transform: scale(1.03); opacity: .65; }
+}
+
+// Smooth continuous breathing for the 45×45 notification dots inside the SVG
+// (Figma uses a few of these around the phone/labels). Keeps full opacity —
+// only the size pulses so the dots feel alive without flickering.
+@keyframes ef-conv-dot-pulse {
+    0%, 100% { transform: scale(1);   }
+    50%      { transform: scale(1.18); }
+}
+
+// Section 6/7 europe-map illustrations:
+// White labels pop in with a small bounce, dashed connectors march continuously.
+@keyframes ef-opps-label-pop {
+    0%   { opacity: 0; transform: scale(.55) translateY(14px); }
+    60%  { opacity: 1; transform: scale(1.08) translateY(0);   }
+    100% { opacity: 1; transform: scale(1)    translateY(0);   }
+}
+// Dashed connectors are revealed by an SVG <mask> rect (.ef-opps-line-mask__cover)
+// that grows from the bottom up. The path keeps its native `stroke-dasharray="6 6"`
+// from the SVG attribute, so the dashed pattern is visible everywhere the mask
+// has revealed — no solid-then-snap-to-dashed phase.
+@keyframes ef-opps-line-reveal {
+    from { transform: scaleY(0); }
+    to   { transform: scaleY(1); }
+}
+
+.ef-conv-illustration {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 1200px;     // native SVG width
+    pointer-events: none;
+    z-index: 0;
+    line-height: 0;
+
+    .ef-conv-svg {
+        display: block;
+        width: 100%;
+        height: auto;
+
+        // Entrance: phone / whole illustration slides up + fades in.
+        opacity: 0;
+        transform: translateY(60px);
+        transition: opacity .9s ease, transform .9s cubic-bezier(.2, .7, .2, 1);
+    }
+
+    // The phone group (clip1 in the source SVG — covers the white phone body
+    // and its on-screen UI). Starts ABOVE its final position and slides down
+    // smoothly into place when the section enters the viewport. The clip-path
+    // travels with the transform so the phone moves as one unit.
+    .ef-conv-svg__phone {
+        opacity: 0;
+        transform: translateY(-180px);
+        transition: opacity .8s ease, transform 1s cubic-bezier(.2, .7, .2, 1);
+    }
+
+    // Floating label cards — hidden initially, fade + slide in staggered.
+    // Order in the SVG: filter0 → filter1 → filter2 → labels --0, --1, --2.
+    .ef-conv-svg__label {
+        opacity: 0;
+        transform: translateY(14px);
+        transform-box: fill-box;
+        transform-origin: center;
+        transition: opacity .6s ease, transform .6s cubic-bezier(.2, .7, .2, 1);
+    }
+
+    // Decorative pulse circles — continuous gentle breathing once visible.
+    .ef-conv-svg__pulse {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: ef-conv-pulse 4.5s ease-in-out infinite;
+
+        // Stagger phases so the rings don't all pulse in lockstep
+        &:nth-of-type(1) { animation-delay: 0s;   }
+        &:nth-of-type(2) { animation-delay: .35s; }
+        &:nth-of-type(3) { animation-delay: .7s;  }
+        &:nth-of-type(4) { animation-delay: 1.05s;}
+        &:nth-of-type(5) { animation-delay: 1.4s; }
+        &:nth-of-type(6) { animation-delay: 1.75s;}
+    }
+
+    // 45×45 notification dots — smooth, constant scale pulse so they feel
+    // alive and active. Independent of .is-in-view (always animating).
+    .ef-conv-svg__dot {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: ef-conv-dot-pulse 2.4s ease-in-out infinite;
+
+        // Slight stagger by position so the dots breathe out of phase
+        // (two share x="741" but at different y — the attribute selectors
+        // pick them out reliably).
+        &[x="280"]          { animation-delay: 0s;   }
+        &[x="741"][y="396"] { animation-delay: .5s;  }
+        &[x="741"][y="568"] { animation-delay: 1s;   }
+    }
+
+    // ----- Triggered when the section scrolls into view (JS adds .is-in-view) -----
+    &.is-in-view {
+        .ef-conv-svg {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .ef-conv-svg__phone {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .ef-conv-svg__label {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .ef-conv-svg__label--0 { transition-delay: .35s; }
+        .ef-conv-svg__label--1 { transition-delay: .65s; }
+        .ef-conv-svg__label--2 { transition-delay: .95s; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .ef-conv-svg,
+        .ef-conv-svg__phone,
+        .ef-conv-svg__label {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+        }
+        .ef-conv-svg__pulse,
+        .ef-conv-svg__dot {
+            animation: none !important;
+        }
+    }
+}
+
+.ef-conv-stage {
+    position: relative;
+    width: 100%;
+    max-width: 1060px;
+    margin: 40px auto 0;
+    height: 620px;
+
+    @media (max-width: 980px) {
+        max-width: 520px;
+        height: auto;
+        padding-bottom: 60px;
+    }
+}
+
+// ---- Decorative floating avatars ----
+.ef-conv-avatar {
+    position: absolute;
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, .08);
+    z-index: 3;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    &--tl { top: 40px;  left: 60px; }
+    &--tr { top: 90px;  right: 60px; }
+    &--bl { bottom: 30px; left: 250px; }
+
+    @media (max-width: 980px) {
+        width: 50px;
+        height: 50px;
+        &--tl { top: 20px; left: 10px; }
+        &--tr { top: 60px; right: 10px; }
+        &--bl { display: none; }
+    }
+}
+
+// ---- Floating pill chips ----
+.ef-conv-chip {
+    position: absolute;
+    z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 22px 8px 8px;
+    border-radius: 900px;
+    background: #fff;
+    color: @ef-text;
+    font-family: Fustat, Arial, sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: -0.32px;
+    box-shadow: 0 39px 88px rgba(0, 0, 0, .10),
+                0 14px 22px rgba(0, 0, 0, .05);
+    white-space: nowrap;
+
+    &__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: #E7EEFF;
+        flex-shrink: 0;
+    }
+
+    &__avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        overflow: hidden;
+        background: #fff;
+        flex-shrink: 0;
+
+        img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    }
+
+    &--publish { top: 360px; left: 180px; }
+    &--join    { top: 280px; right: 140px; }
+    &--comment { bottom: 30px; right: 30px; }
+
+    @media (max-width: 980px) {
+        font-size: 13px;
+        padding: 6px 16px 6px 6px;
+        gap: 8px;
+
+        &__icon, &__avatar { width: 34px; height: 34px; }
+        svg { width: 16px !important; height: 16px !important; }
+
+        &--publish { top: auto; bottom: -40px;  left: 0; }
+        &--join    { top: 10px; right: 0; }
+        &--comment { bottom: 30px; right: 10px; }
+    }
+}
+
+// ---- Phone mockup ----
+.ef-conv-phone {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 293px;
+    z-index: 2;
+
+    @media (max-width: 980px) {
+        position: relative;
+        left: auto;
+        transform: none;
+        margin: 0 auto;
+    }
+
+    &__device {
+        position: relative;
+        width: 100%;
+        height: 597px;
+        background: #182d10;
+        border-radius: 55px;
+        padding: 7px;
+        box-shadow: 0 40px 80px rgba(0, 0, 0, .15);
+        overflow: hidden;
+
+        &::before {
+            content: "";
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90px;
+            height: 22px;
+            background: #182d10;
+            border-radius: 0 0 14px 14px;
+            z-index: 3;
+        }
+    }
+
+    &__statusbar {
+        position: absolute;
+        top: 22px;
+        left: 22px;
+        right: 22px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 4;
+        background: #fff;
+    }
+
+    &__time {
+        font-family: Cairo, Fustat, Arial, sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        color: #182d10;
+        line-height: 1;
+    }
+
+    &__system {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    &__topbar {
+        position: absolute;
+        top: 62px;
+        left: 40px;
+        right: 18px;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    &__brand {
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1.3;
+        color: #182d10;
+        max-width: 110px;
+    }
+
+    &__logo {
+        height: 26px;
+        width: auto;
+        display: block;
+    }
+
+    &__feed {
+        position: absolute;
+        top: 100px;
+        left: 28px;
+        right: 28px;
+        bottom: 0;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding-top: 6px;
+        overflow: hidden;
+    }
+
+    &__fade {
+        position: absolute;
+        left: 22px;
+        right: 22px;
+        bottom: 6px;
+        height: 170px;
+        background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #fff 50%);
+        z-index: 3;
+        pointer-events: none;
+    }
+}
+
+// ---- Forum post card inside the phone ----
+.ef-conv-post {
+    background: #fff;
+    border-radius: 7px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    &__head {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    &__avatar {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        overflow: hidden;
+        background: rgba(24, 45, 16, .08);
+        flex-shrink: 0;
+
+        img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    }
+
+    &__name {
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 500;
+        font-size: 8px;
+        letter-spacing: -.15px;
+        color: #182d10;
+        line-height: 1;
+    }
+
+    &__sep {
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: rgba(24, 45, 16, .25);
+    }
+
+    &__time {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 600;
+        font-size: 7px;
+        letter-spacing: -.13px;
+        color: rgba(24, 45, 16, .45);
+        line-height: 1;
+    }
+
+    &__title {
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-weight: 500;
+        font-size: 10px;
+        letter-spacing: -.2px;
+        line-height: 1.55;
+        color: #182d10;
+        margin: 0;
+    }
+
+    &__body {
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 500;
+        font-size: 8px;
+        letter-spacing: -.16px;
+        line-height: 1.45;
+        color: #808080;
+        margin: 0;
+    }
+
+    &__actions {
+        list-style: none;
+        margin: 4px 0 0;
+        padding: 0;
+        display: flex;
+        gap: 24px;
+
+        li {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-family: Inter, Fustat, Arial, sans-serif;
+            font-weight: 400;
+            font-size: 8px;
+            color: rgba(0, 0, 0, .5);
+            line-height: 1;
+        }
+
+        svg { display: block; opacity: .5; }
+    }
+}
+
+// ---- Coming soon pill ----
+.ef-coming-soon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 25px;
+    border-radius: 900px;
+    background: #5787FF;
+    color: #fff;
+    font-family: Fustat, Arial, sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: -.36px;
+    line-height: 1;
+}
+
+// =====================================================
+//  Section 5: Opportunities for growth and exchange header (Figma 245:10214)
+// =====================================================
+.ef-opps {
+    text-align: center;
+
+    &__head {
+        max-width: 824px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    &__title {
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-weight: 500;
+        font-size: 38px;
+        line-height: 1.35;
+        color: #182d10;
+        margin: 0;
+        max-width: 540px;
+
+        @media (max-width: 760px) { font-size: 28px; }
+
+        // ---- Two-step reveal animation ----
+        // Phase 1: "Opportunities for" words rise + fade in sequentially.
+        // Phase 2: "growth and exchange" slides in from the left.
+        // Triggered by the page-level IntersectionObserver toggling
+        // .is-revealed once the title scrolls into view.
+        .ef-opps__word,
+        .ef-opps__title-accent {
+            display: inline-block;
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+        .ef-opps__word {
+            transform: translateY(8px);
+        }
+        .ef-opps__title-accent {
+            transform: translateX(-24px);
+        }
+
+        &.is-revealed .ef-opps__word {
+            animation: ef-connect-word-rise .55s cubic-bezier(.2, .7, .2, 1) forwards;
+            // 2 words × .12s = .24s; accent starts at .35s so it overlaps
+            // the tail of the last word.
+            animation-delay: ~"calc(var(--i, 0) * .12s)";
+        }
+        &.is-revealed .ef-opps__title-accent {
+            animation: ef-connect-accent-slide .8s cubic-bezier(.2, .7, .2, 1) forwards;
+            animation-delay: .35s;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .ef-opps__word,
+            .ef-opps__title-accent {
+                opacity: 1;
+                transform: none;
+                animation: none !important;
+            }
+        }
+    }
+
+    &__title-accent { color: #8AC53E; }
+
+    &__lead {
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 400;
+        font-size: 22px;
+        line-height: 1.6;
+        color: #182d10;
+        margin: 0;
+
+        @media (max-width: 760px) { font-size: 16px; }
+    }
+}
+
+// =====================================================
+//  Sections 6 + 7: Job & Secondment positions rows (Figma 245:10214)
+// =====================================================
+.ef-opps-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 600px;
+    align-items: center;
+    gap: 55px;
+    padding: 30px 0;
+
+    @media (max-width: 1100px) { grid-template-columns: minmax(0, 1fr) 480px; gap: 32px; }
+    @media (max-width: 900px)  { grid-template-columns: 1fr; gap: 28px; }
+
+    &--reverse {
+        grid-template-columns: 600px minmax(0, 1fr);
+
+        @media (max-width: 1100px) { grid-template-columns: 480px minmax(0, 1fr); }
+        @media (max-width: 900px)  {
+            grid-template-columns: 1fr;
+            .ef-opps-row__illu { order: 2; }
+            .ef-opps-row__body { order: 1; }
+        }
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+        max-width: 540px;
+
+        @media (max-width: 900px) { max-width: none; }
+    }
+
+    &__title {
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-weight: 500;
+        font-size: 38px;
+        line-height: 1.45;
+        color: #182d10;
+        margin: 0;
+
+        @media (max-width: 760px) { font-size: 28px; }
+    }
+
+    &__lead {
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 400;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #182d10;
+        margin: 0;
+
+        @media (max-width: 760px) { font-size: 16px; }
+    }
+
+    &__cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 12px 25px;
+        border-radius: 900px;
+        color: #fff;
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 600;
+        font-size: 18px;
+        letter-spacing: -.36px;
+        line-height: 1;
+        text-decoration: none;
+        transition: background .15s ease, transform .15s ease;
+
+        &:hover { transform: translateY(-1px); color: #fff; text-decoration: none; }
+
+        &--green { background: #8AC53E; &:hover { background: #7ab632; } }
+        &--blue  { background: #5787FF; &:hover { background: #3a55d4; } }
+    }
+
+    &__cta-label {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    // Arrow pill — hidden until the CTA is hovered, then slides in smoothly.
+    &__cta-arrow {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 28px;
+        width: 0;
+        max-width: 0;
+        margin-left: -5px; // collapses the CTA's gap when arrow is hidden
+        overflow: hidden;
+        background: #fff;
+        border-radius: 500px;
+        opacity: 0;
+        transform: translateX(-6px);
+        transition: width .3s ease, max-width .3s ease, opacity .25s ease .05s,
+                    transform .3s ease, margin-left .3s ease;
+
+        svg { display: block; flex-shrink: 0; }
+    }
+
+    &__cta:hover &__cta-arrow,
+    &__cta:focus-visible &__cta-arrow {
+        width: 46px;
+        max-width: 46px;
+        margin-left: 0;
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    &__illu {
+        position: relative;
+        width: 100%;
+        height: 550px;
+        border-radius: 20px;
+        overflow: hidden;
+
+        // The map illustration is now rendered inline by
+        // partials/site/opps-map-{green,blue}.htm so we can animate the
+        // white labels (.ef-opps-label) and the dashed connectors (.ef-opps-line).
+        .ef-opps-svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        // Labels start hidden + slightly scaled-down and shifted down.
+        // Each one's own bounding box drives the transform so the bounce
+        // origin is its own centre (not the SVG's 0,0).
+        .ef-opps-label {
+            opacity: 0;
+            transform-box: fill-box;
+            transform-origin: center;
+            transform: scale(.55) translateY(14px);
+        }
+
+        // Dashed connectors are hidden by their <mask>: the cover rect inside
+        // the mask starts at scaleY(0) (no mask area → line fully hidden) and
+        // grows upward to scaleY(1) when the row scrolls in. The lines keep
+        // their `stroke-dasharray="6 6"` throughout — dashes are visible
+        // wherever the mask has revealed.
+        .ef-opps-line-mask__cover {
+            transform-box: fill-box;
+            transform-origin: 0 100%;   // grow upward from the bottom edge
+            transform: scaleY(0);
+        }
+
+        // ----- Triggered when the row scrolls into view (.is-in-view from JS) -----
+        &.is-in-view {
+            // All labels pop in with a bouncy easing on a single keyframes run;
+            // each gets its own delay so they cascade in.
+            .ef-opps-label {
+                animation: ef-opps-label-pop .7s cubic-bezier(.34, 1.56, .64, 1) forwards;
+            }
+            .ef-opps-label:nth-of-type(1) { animation-delay: .15s; }
+            .ef-opps-label:nth-of-type(2) { animation-delay: .35s; }
+            .ef-opps-label:nth-of-type(3) { animation-delay: .55s; }
+            .ef-opps-label:nth-of-type(4) { animation-delay: .75s; }
+            .ef-opps-label:nth-of-type(5) { animation-delay: .85s; } // duplicate inner dot
+
+            // Once labels have started landing, the dashed connectors draw in
+            // from bottom to top. forwards keeps the mask fully open after.
+            .ef-opps-line-mask__cover {
+                animation: ef-opps-line-reveal 3.6s ease-out 0.3s forwards;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .ef-opps-label,
+            .ef-opps-line {
+                opacity: 1 !important;
+                transform: none !important;
+                animation: none !important;
+            }
+            // Reveal the dashed lines at rest by holding the mask fully open.
+            .ef-opps-line-mask__cover {
+                transform: scaleY(1) !important;
+                animation: none !important;
+            }
+        }
+
+        @media (max-width: 900px) { height: 420px; }
+        @media (max-width: 560px) { height: 380px; }
+    }
+
+    &__curve {
+        position: absolute;
+        pointer-events: none;
+        z-index: 1;
+
+        &--a { top: 40px;  right: -40px; width: 360px; height: 260px; }
+        &--b { bottom: 30px; left: 0;     width: 130px; height: 220px; opacity: .85; }
+    }
+}
+
+// ---- Floating chips and profile card on illustration panel ----
+.ef-opps-chip {
+    position: absolute;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 22px 8px 8px;
+    border-radius: 900px;
+    background: #fff;
+    color: #182d10;
+    font-family: Fustat, Arial, sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: -.32px;
+    line-height: 1;
+    white-space: nowrap;
+    box-shadow: 0 39px 88px rgba(0, 0, 0, .10),
+                0 14px 22px rgba(0, 0, 0, .05);
+
+    &__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    &--green &__icon { background: #E9F8DC; }
+    &--blue  &__icon { background: #E7EEFF; }
+
+    // Positions for green panel
+    &--paid    { top: 148px; left: 276px; }
+    &--remote  { top: 364px; left: 324px; }
+
+    // Positions for blue panel
+    &--grant   { top: 60px;  left: 110px; }
+    &--onloc   { top: 280px; left: 70px; }
+
+    @media (max-width: 900px) {
+        font-size: 13px;
+        padding: 6px 16px 6px 6px;
+        gap: 8px;
+
+        &__icon { width: 34px; height: 34px; svg { width: 16px; height: 16px; } }
+
+        &--paid   { top: 60px;  left: auto; right: 24px; }
+        &--remote { top: auto;  bottom: 30px; left: 30px; }
+        &--grant  { top: 30px;  left: 30px; }
+        &--onloc  { top: auto;  bottom: 30px; right: 30px; left: auto; }
+    }
+}
+
+.ef-opps-card {
+    position: absolute;
+    z-index: 4;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 15px 20px;
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 39px 88px rgba(0, 0, 0, .10),
+                0 14px 22px rgba(0, 0, 0, .05);
+
+    &--green { top: 225px; left: 53px; }
+    &--blue  { top: 130px; left: 310px; }
+
+    &__head {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    &__avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        overflow: hidden;
+        background: #fff;
+        flex-shrink: 0;
+
+        img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    }
+
+    &__name {
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 600;
+        font-size: 16px;
+        letter-spacing: -.32px;
+        color: #182d10;
+        line-height: 1;
+    }
+
+    &__role {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 12px;
+        border-radius: 90px;
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 600;
+        font-size: 10px;
+        letter-spacing: -.2px;
+        line-height: 1;
+
+        &--green { background: #E9F8DC; color: #52843E; }
+        &--blue  { background: #E7EEFF; color: #5687FF; }
+    }
+
+    @media (max-width: 900px) {
+        padding: 10px 14px;
+
+        &--green { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        &--blue  { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+        &__avatar { width: 36px; height: 36px; }
+        &__name { font-size: 13px; }
+    }
+}

@@ -1,0 +1,60 @@
+{% if isLoggedIn %}
+    <button type="button"
+            class="save-tag {{ saved ? 'is-saved' : '' }}"
+            data-saved="{{ saved ? '1' : '0' }}"
+            aria-pressed="{{ saved ? 'true' : 'false' }}"
+            data-request="{{ __SELF__ }}::onToggle"
+            data-request-data="type: '{{ type }}', id: {{ id }}"
+            aria-label="{{ saved ? 'Unsave' : 'Save' }}">
+        {# Single bookmark glyph — `fill` flips between "none" (outline) and "#52843E" (solid) #}
+        <svg class="save-tag__icon" xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+            <rect width="52" height="52" rx="10" fill="#E9F8DC"/>
+            <path class="save-tag__bookmark"
+                  d="M33.5 37.25L25.9991 32.5625L18.5 37.25V16.625C18.5 16.3764 18.5988 16.1379 18.7746 15.9621C18.9504 15.7863 19.1889 15.6875 19.4375 15.6875H32.5625C32.8111 15.6875 33.0496 15.7863 33.2254 15.9621C33.4012 16.1379 33.5 16.3764 33.5 16.625V37.25Z"
+                  fill="{{ saved ? '#52843E' : 'none' }}"
+                  stroke="#52843E" stroke-width="2.10241"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+{% else %}
+    <button type="button"
+            class="save-tag"
+            data-signup-trigger
+            aria-label="Sign up to save">
+        <svg class="save-tag__icon" xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+            <rect width="52" height="52" rx="10" fill="#E9F8DC"/>
+            <path class="save-tag__bookmark"
+                  d="M33.5 37.25L25.9991 32.5625L18.5 37.25V16.625C18.5 16.3764 18.5988 16.1379 18.7746 15.9621C18.9504 15.7863 19.1889 15.6875 19.4375 15.6875H32.5625C32.8111 15.6875 33.0496 15.7863 33.2254 15.9621C33.4012 16.1379 33.5 16.3764 33.5 16.625V37.25Z"
+                  fill="none"
+                  stroke="#52843E" stroke-width="2.10241"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+
+    {# Render the sign-up popup once on the page; opened by any [data-signup-trigger] #}
+    {% partial 'signuppopup/default' %}
+{% endif %}
+
+{# Delegated AJAX success listener. The partial is rendered once per item
+   (related cards, detail, …) so we guard the binding with a window flag
+   to make sure we only listen once per page. October fires `ajaxSuccess`
+   on the element that owns the [data-request]; the response payload comes
+   in as the third arg. #}
+<script>
+    (function () {
+        if (window.PGT_SAVE_TAG_INIT) return;
+        window.PGT_SAVE_TAG_INIT = true;
+
+        $(document).on('ajaxSuccess', '.save-tag', function (event, context, data) {
+            if (!data || typeof data.saved === 'undefined') return;
+            var s = !!data.saved;
+            var $btn = $(this);
+            $btn.toggleClass('is-saved', s)
+                .attr('data-saved', s ? '1' : '0')
+                .attr('aria-pressed', s ? 'true' : 'false')
+                .attr('aria-label', s ? 'Unsave' : 'Save');
+            $btn.find('.save-tag__bookmark').attr('fill', s ? '#52843E' : 'none');
+        });
+    })();
+</script>
+

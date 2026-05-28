@@ -1,0 +1,29 @@
+<div class="pgt-modal-card pgt-checkemail">
+    <button type="button" class="pgt-close" data-pgt-close aria-label="Close">&times;</button>
+
+    <div class="pgt-checkemail__icon" aria-hidden="true"></div>
+
+    <div class="pgt-checkemail__body">
+        <h2 class="pgt-checkemail__title">Check your email</h2>
+        <div class="pgt-checkemail__text">
+            <p class="pgt-checkemail__line">
+                <span class="pgt-checkemail__muted">We&rsquo;ve sent a password reset link to</span>
+                <strong>{{ email }}</strong>
+            </p>
+            <p class="pgt-checkemail__line pgt-checkemail__line--faded">
+                Click the link in the email to choose a new password. The link will expire in 24 hours.
+            </p>
+        </div>
+    </div>
+
+    <div class="pgt-checkemail__actions">
+        <button type="button"
+                class="pgt-checkemail__resend"
+                data-request="{{ __SELF__ }}::onSendResetLink"
+                data-request-data="email: '{{ email }}'"
+                data-request-success="alert('A new reset link has been sent.')">
+            Resend email
+        </button>
+        <button type="button" class="pgt-checkemail__alt" data-pgt-step="login">Back to log in</button>
+    </div>
+</div>

@@ -1,0 +1,35 @@
+<div class="pgt-modal-card pgt-checkemail">
+    <button type="button" class="pgt-close" data-pgt-close aria-label="Close">&times;</button>
+
+    <div class="pgt-checkemail__icon" aria-hidden="true"></div>
+
+    <div class="pgt-checkemail__body">
+        <h2 class="pgt-checkemail__title">Check your email</h2>
+        <div class="pgt-checkemail__text">
+            <p class="pgt-checkemail__line">
+                <span class="pgt-checkemail__muted">
+                    {% if resent|default(false) %}
+                        You already started signing up with this email but never confirmed it. We&rsquo;ve resent the link to
+                    {% else %}
+                        We&rsquo;ve sent a confirmation link to
+                    {% endif %}
+                </span>
+                <strong>{{ email }}</strong>
+            </p>
+            <p class="pgt-checkemail__line pgt-checkemail__line--faded">
+                Please verify your email address to activate your account.
+            </p>
+        </div>
+    </div>
+
+    <div class="pgt-checkemail__actions">
+        <button type="button"
+                class="pgt-checkemail__resend"
+                data-request="{{ __SELF__ }}::onResendActivation"
+                data-request-data="email: '{{ email }}'"
+                data-request-success="alert('A new confirmation email has been sent.')">
+            Resend email
+        </button>
+        <button type="button" class="pgt-checkemail__alt" data-pgt-step="register">Use another email</button>
+    </div>
+</div>

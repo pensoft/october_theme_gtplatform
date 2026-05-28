@@ -1,0 +1,19 @@
+<form
+		class="ui form"
+		method="post"
+		data-request="onRestorePassword"
+		data-request-success="alert('Password reset request has been sent. Please check you email!'); window.PGT_AUTH.loadStep('login');"
+		>
+	<div class="field email">
+		<input name="email" type="email" id="userRestoreEmail" placeholder="Enter your email">
+	</div>
+
+	<div class="mt-1 text-center">
+        <button type="submit" class="btn btn-secondary">Restore password</button>
+	</div>
+
+	<div class="text-center">
+		<a class="btn btn-link" href="/login" data-pgt-step="login">Return to login</a>
+
+	</div>
+</form>

@@ -1,0 +1,12 @@
+url = "/events"
+layout = "default"
+title = "Upcoming and relevant events across the network"
+subtitle = "Discover workshops, conferences, and community gatherings"
+
+[eventsList]
+perPage = 12
+detailPage = "event"
+==
+<div class="container events-container">
+    {% component 'eventsList' %}
+</div>

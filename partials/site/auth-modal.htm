@@ -1,0 +1,21 @@
+{# Shared auth-flow modal shell. Included from the layout for non-logged-in users so
+   any [data-pgt-step="…"] trigger on any page can open the login / reasons / register /
+   forgot / reset cards via AJAX through the [authFlow] component (declared on the layout). #}
+<div class="pgt-modal" id="pgtAuthModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="pgt-modal__backdrop" data-pgt-close></div>
+    <div class="pgt-modal__dialog">
+        <div class="pgt-modal__logo">
+            <img src="{{ 'assets/images/logo.png'|theme }}" alt="GREEN TALENT" onerror="this.style.display='none'">
+        </div>
+        <div id="authFlowModalContent" class="pgt-modal__content"></div>
+    </div>
+</div>
+
+<script>
+    window.PGT_AUTH = {
+        justActivated: {{ (justActivated|default(false)) ? 'true' : 'false' }},
+        activationError: {{ activationError|default(null) is null ? 'null' : (activationError|json_encode|raw) }},
+        resetCode: {{ resetCode|default(null) is null ? 'null' : (resetCode|json_encode|raw) }}
+    };
+</script>
+<script src="{{ 'assets/js/pgt-auth-flow.js'|theme }}"></script>

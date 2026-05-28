@@ -1,0 +1,2395 @@
+// =====================================================
+//  Jobs listing + filter drawer + job detail (Figma node 489:9828)
+// =====================================================
+
+@jb-green:        #8AC53E;
+@jb-green-dark:   #5d9e1f;
+@jb-green-text:   #1f4a16;
+@jb-earth:        #52843E;
+@jb-text-dark:    #182D10;
+@jb-text-muted:   #6b7a6b;
+@jb-card-radius:  15px;
+@jb-border:       #E7E7F1;
+@jb-bg:           #ffffff;
+@jb-bg-soft:      #f5f7f1;
+@jb-funding-bg:   #E9F8DC;
+@jb-remote-bg:    #E7E7FF;
+@jb-onsite-bg:    #E7F0F1;
+
+// =====================================================
+//  Jobs listing hero (Figma node 251:12098)
+// Reuses .event-detail__hero / __hero-inner / __hero-title / __subscribe
+// for the dark band, layout, title typography, and CTA pill. Only the
+// page-specific deltas (text group spacing, green accent, subtitle) live here.
+// =====================================================
+.jobs-hero__text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.jobs-hero__accent { color: #8AC53E; }
+
+.jobs-hero__sub {
+    font-family: Fustat, Arial, sans-serif;
+    font-weight: 400;
+    font-size: 28px;
+    line-height: 1.45;
+    color: #FEFFFD;
+    margin: 0;
+    text-align: center;
+
+    .breakpoint-large-down({ font-size: 18px; });
+}
+
+// ----- Page wrapper -----
+.jobs-container {
+    padding: 40px 16px 80px;
+}
+
+.jobs-page {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 55px;
+
+    // ----- Tabs (Job positions / Secondments) -----
+    &__tabs {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 0;
+    }
+
+    // ----- Header block: tabs + controls (40px gap from controls) -----
+    &__head-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+    }
+}
+
+.jobs-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 15px;
+    border-radius: 500px;
+    border: 1px solid @jb-border;
+    background: #fff;
+    color: @jb-text-dark;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.45;
+    cursor: pointer;
+    backdrop-filter: blur(20.924px);
+    -webkit-backdrop-filter: blur(20.924px);
+    transition: background .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
+
+    &:hover {
+        background: @jb-bg-soft;
+        transform: translateY(-1px);
+    }
+
+    &.is-active {
+        background: @jb-green;
+        color: #fff;
+        border-color: @jb-green;
+        box-shadow: 0 4px 12px rgba(138, 197, 62, .25);
+
+        &:hover { background: darken(@jb-green, 4%); border-color: darken(@jb-green, 4%); color: #fff; }
+    }
+}
+
+// When the Secondments tab is active, the active-tab pill switches from lime
+// (positions) to navy blue (#3D5692). Scoped under .jobs-page.is-tab-secondments
+// so it only kicks in for that tab.
+.jobs-page.is-tab-secondments .jobs-tab.is-active {
+    background: #3D5692;
+    border-color: #3D5692;
+    box-shadow: 0 4px 12px rgba(61, 86, 146, .25);
+
+    &:hover {
+        background: darken(#3D5692, 4%);
+        border-color: darken(#3D5692, 4%);
+        color: #fff;
+    }
+}
+
+// Funding filter pills — show only the tab-relevant subset.
+//   Positions tab (default): hide pills tagged .is-for-secondments
+//   Secondments tab        : hide pills tagged .is-for-positions
+// Pills with neither tag (custom DB entries) show in both views.
+.jobs-page:not(.is-tab-secondments) .jobs-filter-pill.is-for-secondments,
+.jobs-page.is-tab-secondments       .jobs-filter-pill.is-for-positions {
+    display: none;
+}
+
+// ----- Search + filter button row -----
+.jobs-page__controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 0;
+}
+
+.jobs-page__search {
+    position: relative;
+    flex: 1 1 auto;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: -6px 4px 25px rgba(85, 85, 85, .06);
+
+    &-icon {
+        position: absolute;
+        right: 25px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: @jb-text-dark;
+        opacity: .45;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    &-input {
+        width: 100%;
+        height: 70px;
+        box-sizing: border-box;
+        padding: 0 60px 0 25px;
+        border: 0;
+        border-radius: 15px;
+        background: transparent;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 20px;
+        letter-spacing: -0.4px;
+        color: @jb-text-dark;
+
+        &::placeholder { color: @jb-text-dark; opacity: .45; }
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    // Invisible submit so pressing Enter in the search input fires the GET
+    // form. Kept out of the tab order — the input itself already has focus.
+    &-submit {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        border: 0;
+        clip: rect(0 0 0 0);
+        overflow: hidden;
+    }
+}
+
+.jobs-page__filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 15px;
+    border: 1px solid rgba(24, 45, 16, .15);
+    border-radius: 100px;
+    background: rgba(255, 255, 255, .85);
+    backdrop-filter: blur(20.924px);
+    -webkit-backdrop-filter: blur(20.924px);
+    color: #192E11;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: normal;
+    letter-spacing: -0.36px;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow:
+        0 39px 44px rgba(0, 0, 0, .10),
+        0 160px 80px rgba(0, 0, 0, .09),
+        0 363px 109px rgba(0, 0, 0, .05);
+    transition: background .15s ease, border-color .15s ease, transform .15s ease;
+
+    svg { display: block; flex-shrink: 0; }
+
+    &:hover {
+        background: #fff;
+        border-color: rgba(24, 45, 16, .25);
+        transform: translateY(-1px);
+    }
+}
+
+// ----- Active filters bar (Figma 171:8572) -----
+// Sits under the search/filter row inside .jobs-page__head-stack. Renders
+// one chip per filter section that has any selection, plus a "Clear all"
+// button on the right.
+.jobs-page__active-filters {
+    display: flex;
+    align-items: center;
+    //justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-top: 20px;
+
+    // Hide the strip when JS marks it [hidden]. Defensive — the global
+    // `[hidden]` rule already handles this in most cases but keep here too.
+    &[hidden] { display: none; }
+
+    &-chips {
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 15px;
+    }
+
+    &-clear {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 0;
+        background: transparent;
+        border: 0;
+        cursor: pointer;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 500;
+        line-height: normal;
+        letter-spacing: -0.36px;
+        color: #3D5692;
+        transition: color .15s ease, opacity .15s ease;
+
+        svg { display: block; flex-shrink: 0; }
+
+        &:hover  { color: darken(#3D5692, 8%); }
+        &:active { opacity: .8; }
+    }
+}
+
+.jobs-page__active-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 15px;
+    border: 1px solid rgba(24, 45, 16, .15);
+    background: rgba(255, 255, 255, .85);
+    backdrop-filter: blur(20.924px);
+    -webkit-backdrop-filter: blur(20.924px);
+    border-radius: 100px;
+    color: #192E11;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: normal;
+    letter-spacing: -0.32px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow:
+        0 39px 44px rgba(0, 0, 0, .10),
+        0 160px 80px rgba(0, 0, 0, .09);
+    transition: background .15s ease, border-color .15s ease, transform .15s ease;
+
+    svg { display: block; flex-shrink: 0; opacity: .7; }
+
+    &:hover {
+        background: #fff;
+        border-color: rgba(24, 45, 16, .3);
+        transform: translateY(-1px);
+
+        svg { opacity: 1; }
+    }
+}
+
+.jobs-page__empty {
+    background: @jb-bg-soft;
+    border: 1px dashed @jb-border;
+    border-radius: @jb-card-radius;
+    padding: 40px;
+    text-align: center;
+    color: @jb-text-muted;
+}
+
+// ----- Cards grid (4 per row on desktop; gap 18px) -----
+.jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+
+    .breakpoint-large-down({ grid-template-columns: repeat(2, 1fr); });
+    @media (max-width: 640px) { grid-template-columns: 1fr; }
+
+    &--related { margin-top: 18px; }
+}
+
+.job-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: #fff;
+    border: 1px solid @jb-border;
+    border-radius: 15px;
+    padding: 24px 30px;
+    color: @jb-text-dark;
+    text-decoration: none;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .06);
+        border-color: rgba(138, 197, 62, .5);
+        color: @jb-text-dark;
+        text-decoration: none;
+    }
+
+    &__head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 0;
+    }
+
+    &__logo {
+        width: 48px;
+        height: 48px;
+        border-radius: 90px;
+        border: 1px solid #000;
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        img { width: 100%; height: 100%; object-fit: cover; }
+    }
+    &__logo-stub {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        color: #000;
+        line-height: 1.6;
+    }
+
+    // Job type pill in the top-right (e.g. "Full Time" — outlined green)
+    &__type {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 12px;
+        border: 1px solid @jb-green;
+        border-radius: 90px;
+        color: @jb-green;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.6;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    &__title-block {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    &__title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1.4;
+        color: @jb-text-dark;
+        margin: 0;
+    }
+
+    &__sub {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 1.6;
+        color: @jb-text-dark;
+        opacity: .75;
+        flex-wrap: wrap;
+    }
+
+    &__dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: currentColor;
+        flex-shrink: 0;
+    }
+
+    &__desc {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 1.5;
+        color: @jb-text-dark;
+        opacity: .45;
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    &__chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: auto;
+    }
+
+    &__chip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 16px;
+        border-radius: 90px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.6;
+        white-space: nowrap;
+
+        &--funding {
+            background: @jb-funding-bg;
+            color: @jb-earth;
+            letter-spacing: -0.28px;
+        }
+
+        &--mode-remote {
+            background: @jb-remote-bg;
+            color: @jb-text-dark;
+        }
+
+        &--mode-onsite {
+            background: @jb-onsite-bg;
+            color: @jb-text-dark;
+            border-radius: 80px;
+        }
+
+        // Used by the work-physical-presence "Hybrid" value (Figma doesn't
+        // define a colour for it, so a soft warm tint keeps it distinct
+        // from Remote/On-location).
+        &--mode-hybrid {
+            background: #FFF4D8;
+            color: @jb-text-dark;
+        }
+    }
+
+    &__link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.6;
+        color: @jb-text-dark;
+
+        svg { display: block; flex-shrink: 0; transition: transform .2s ease; }
+    }
+
+    &:hover &__link svg { transform: translateY(2px); }
+}
+
+// =====================================================
+//  Filter drawer (Figma node 171:9167)
+// =====================================================
+@jbf-text:           #192E11;
+@jbf-rule:           #E5E8EE;
+@jbf-border:         #E7E7F1;
+@jbf-count-bg:       #E7EEFF;
+@jbf-count-tx:       #5687FF;
+@jbf-apply-bg:       #8AC53E;
+@jbf-apply-hv:       darken(#8AC53E, 6%);
+
+// Funding pill palettes
+@jbf-fund-green-bg:  #EFFFEE;
+@jbf-fund-green-tx:  #5CA358;
+@jbf-fund-orange-bg: #FFF5EE;
+@jbf-fund-orange-tx: #806756;
+@jbf-fund-blue-bg:   #E7EEFF;
+@jbf-fund-blue-tx:   #5687FF;
+@jbf-fund-lime-bg:   #E9F8DC;
+@jbf-fund-lime-tx:   #52843E;
+
+.jobs-filter-drawer {
+    position: fixed;
+    inset: 0;
+    display: none;
+    z-index: 10000;
+
+    &.is-open { display: block; }
+
+    &__backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(20, 30, 20, .15);
+    }
+
+    &__panel {
+        position: absolute;
+        top: 24px;
+        right: 24px;
+        width: 419px;
+        max-width: calc(~'100% - 32px');
+        max-height: calc(~'100vh - 48px');
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: -6px 4px 12.5px rgba(85, 85, 85, .06),
+                     0 24px 60px rgba(20, 30, 40, .12);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transform: translateX(20px);
+        opacity: 0;
+        transition: transform .25s ease, opacity .25s ease;
+    }
+    &.is-open &__panel { transform: translateX(0); opacity: 1; }
+
+    &__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 35px 45px 0;
+    }
+
+    &__title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: -0.36px;
+        line-height: normal;
+        color: @jbf-text;
+        margin: 0;
+    }
+
+    &__close {
+        background: transparent;
+        border: 0;
+        cursor: pointer;
+        color: @jbf-text;
+        padding: 0;
+        line-height: 0;
+        transition: opacity .15s ease;
+
+        svg { display: block; }
+        &:hover { opacity: .7; }
+    }
+
+    &__body {
+        padding: 30px 45px 0;
+        overflow-y: auto;
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    // Soft scroll fade above the footer
+    &__foot {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 20px 45px 35px;
+
+        //&::before {
+        //    content: "";
+        //    position: absolute;
+        //    left: 0;
+        //    right: 0;
+        //    top: -40px;
+        //    height: 40px;
+        //    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff);
+        //    pointer-events: none;
+        //}
+    }
+
+    &__reset {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        width: 105px;
+        padding: 6px 10px;
+        background: #fff;
+        border: 1px solid @jbf-border;
+        color: @jbf-text;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: -0.28px;
+        line-height: normal;
+        border-radius: 500px;
+        cursor: pointer;
+        transition: background .15s ease, border-color .15s ease;
+
+        svg { display: block; flex-shrink: 0; }
+
+        &:hover {
+            background: #fafbfd;
+            border-color: darken(@jbf-border, 6%);
+        }
+    }
+
+    &__apply {
+        flex: 1 1 auto;
+        max-width: 214px;
+        background: @jbf-apply-bg;
+        color: #fff;
+        border: 0;
+        border-radius: 500px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: -0.28px;
+        line-height: normal;
+        padding: 6px 10px;
+        cursor: pointer;
+        transition: background .15s ease;
+
+        &:hover { background: @jbf-apply-hv; }
+    }
+}
+
+// Each group is a <details> — collapsed by default. The <summary> acts as the
+// header row (title + chevron); the body sits inside .jobs-filter-group__body.
+.jobs-filter-group {
+    display: block;
+    border-top: 1px solid @ev-drawer-rule;
+    padding: 0;
+    margin: 0;
+
+    &__head {
+        list-style: none;                    // hide default disclosure triangle
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 20px 0;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: -0.32px;
+        line-height: normal;
+        color: @jbf-text;
+
+        // WebKit-specific marker hide
+        &::-webkit-details-marker { display: none; }
+
+        // Remove the native focus outline on click; keep it for keyboard.
+        &:focus { outline: none; }
+        &:focus-visible {
+            outline: 2px solid @jb-green;
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+    }
+
+    &__title { flex: 1 1 auto; }
+
+    // Closed state: chevron points right. When the <details> opens, rotate 90°
+    // so it points down — visual cue for the expanded section.
+    &__chevron {
+        display: block;
+        flex-shrink: 0;
+        color: @jbf-text;
+        transition: transform .2s ease;
+        transform: rotate(90deg);
+    }
+    &[open] .jobs-filter-group__chevron {
+        transform: rotate(270deg);
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        padding: 0 0 24px;
+    }
+}
+
+// ----- Work mode (outlined pill toggles with count badges) -----
+.jobs-filter-modes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.jobs-filter-mode {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    cursor: pointer;
+    position: relative;
+
+    input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    &__pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 102px;
+        padding: 5px 15px;
+        border: 1px solid @jbf-border;
+        background: #fff;
+        border-radius: 90px;
+        color: #182D10;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.6;
+        text-align: center;
+        white-space: nowrap;
+        transition: background .15s ease, border-color .15s ease, color .15s ease;
+    }
+
+    input:checked + &__pill {
+        background: #8AC53E;
+        border-color: #8AC53E;
+        color: #fff;
+    }
+
+    &__count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 24px;
+        padding: 2px 8px;
+        background: @jbf-count-bg;
+        color: @jbf-count-tx;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: -0.2px;
+        line-height: normal;
+        text-align: center;
+        border-radius: 3px;
+    }
+}
+
+// ----- Funding (colored solid pills, wrap-flex) -----
+.jobs-filter-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.jobs-filter-pill {
+    cursor: pointer;
+    position: relative;
+
+    input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    &__face {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 15px;
+        border-radius: 50px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: -0.28px;
+        line-height: normal;
+        text-align: center;
+        white-space: nowrap;
+        transition: filter .15s ease, box-shadow .15s ease;
+    }
+
+    &--green  .jobs-filter-pill__face { background: @jbf-fund-green-bg;  color: @jbf-fund-green-tx;  }
+    &--orange .jobs-filter-pill__face { background: @jbf-fund-orange-bg; color: @jbf-fund-orange-tx; }
+    &--blue   .jobs-filter-pill__face { background: @jbf-fund-blue-bg;   color: @jbf-fund-blue-tx;   }
+    &--lime   .jobs-filter-pill__face { background: @jbf-fund-lime-bg;   color: @jbf-fund-lime-tx;   }
+
+    &:hover .jobs-filter-pill__face { filter: brightness(.96); }
+
+    input:checked + &__face {
+        box-shadow: 0 0 0 2px currentColor inset;
+        filter: brightness(.96);
+    }
+}
+
+// ----- Time period date picker (Figma 926:3075) -----
+// Two pill toggles + an always-visible monthly calendar. The active pill is
+// painted lime to mirror Figma's selected state.
+.jobs-filter-dates {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    &__pills {
+        display: flex;
+        gap: 10px;
+        flex-wrap: nowrap;       // always side-by-side; don't wrap on narrow drawers
+        width: 100%;
+    }
+}
+
+.jobs-filter-date {
+    flex: 1 1 0;                  // share the row equally instead of demanding 160px each
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 15px;
+    border-radius: 90px;
+    border: 1px solid #E7E7F1;
+    background: #fff;
+    color: #182D10;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.6;
+    letter-spacing: -0.28px;
+    cursor: pointer;
+    text-align: center;
+    transition: background .15s ease, border-color .15s ease, color .15s ease;
+
+    &__label { white-space: nowrap; }
+
+    &.is-active {
+        background: @jbf-fund-lime-bg;   // #E9F8DC
+        border-color: @jbf-fund-lime-bg;
+        color: @jbf-fund-lime-tx;        // #52843E
+    }
+}
+
+.jobs-filter-calendar {
+    width: 100%;
+    max-width: 329px;
+    box-sizing: border-box;
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 8px 3px 22px 10px rgba(150, 150, 150, .11);
+
+    &__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding-bottom: 12px;
+        margin-bottom: 12px;
+        border-bottom: 1px solid rgba(24, 45, 16, .12);
+    }
+
+    &__month {
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        color: #182D10;
+        flex: 1 1 auto;
+        text-align: center;
+    }
+
+    &__nav {
+        display: inline-flex;
+        gap: 24px;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    &__nav-btn {
+        width: 16px;
+        height: 16px;
+        padding: 0;
+        background: transparent;
+        border: 0;
+        color: #182D10;
+        cursor: pointer;
+        opacity: .8;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity .15s ease;
+
+        svg { display: block; }
+        &:hover { opacity: 1; }
+    }
+
+    &__weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        margin-bottom: 8px;
+
+        span {
+            font-family: Fustat, Arial, sans-serif;
+            font-weight: 700;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #182D10;
+            opacity: .35;
+            text-align: center;
+            padding: 4px 0;
+        }
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        row-gap: 16px;
+        justify-items: center;
+    }
+
+    &__cell {
+        width: 24px;
+        height: 24px;
+        padding: 0;
+        background: transparent;
+        border: 0;
+        border-radius: 40px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1;
+        color: #182D10;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background .15s ease, color .15s ease;
+
+        &:hover {
+            background: rgba(138, 197, 62, .15);
+        }
+
+        &.is-in-range {
+            background: @jbf-fund-lime-bg;   // #E9F8DC
+            color: @jbf-fund-lime-tx;        // #52843E
+            border-radius: 0;
+        }
+
+        &.is-selected {
+            background: @jb-green;            // #8AC53E
+            color: #FDFDFD;
+            border-radius: 40px;
+        }
+
+        &--empty {
+            cursor: default;
+            &:hover { background: transparent; }
+        }
+    }
+}
+
+// ----- Job functions / Career stage checkbox lists -----
+.jobs-filter-checks {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.jobs-filter-check {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    cursor: pointer;
+    position: relative;
+
+    &__row {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    &.is-disabled {
+        opacity: .45;
+        cursor: not-allowed;
+    }
+
+    &__box {
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        border: 1.5px solid #182D10;
+        background: #fff;
+        opacity: .45;
+        flex-shrink: 0;
+        position: relative;
+        transition: background .15s ease, opacity .15s ease, border-color .15s ease;
+    }
+    // Checked state — solid green-filled square (selected.png).
+    input:checked + &__box {
+        background: #8AC53E;
+        border-color: #8AC53E;
+        opacity: 1;
+    }
+
+    &__label {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: -0.28px;
+        line-height: normal;
+        color: @jbf-text;
+    }
+
+    &__count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 24px;
+        padding: 2px 8px;
+        background: @jbf-count-bg;
+        color: @jbf-count-tx;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: -0.2px;
+        line-height: normal;
+        text-align: center;
+        border-radius: 3px;
+    }
+}
+
+// =====================================================
+//  Job detail page (Figma node 496:12053)
+// =====================================================
+@jd-text:         #182D10;
+@jd-soft:         #E9F8DC;
+@jd-earth:        #52843E;
+@jd-border:       #E7E7F1;
+@jd-tag-bg:       rgba(210, 223, 255, .35);
+
+@jd-chip-green-bg:   #EFFFEE;
+@jd-chip-green-tx:   #5CA358;
+@jd-chip-blue-bg:    #E7EEFF;
+@jd-chip-blue-tx:    #5687FF;
+@jd-chip-orange-bg:  #FFF5EE;
+@jd-chip-orange-tx:  #806756;
+
+@jd-related-green-bg:  rgba(86, 205, 173, .1);
+@jd-related-green-tx:  #56CDAD;
+@jd-related-yellow-bg: rgba(235, 133, 51, .1);
+@jd-related-yellow-tx: #FFB836;
+
+.job-detail-container {
+    padding: 0;
+    margin: 0;
+    max-width: none;
+    width: 100%;
+}
+
+.job-detail {
+    background: #fff;
+    color: @jd-text;
+    // Outer width matches the events container — keeps the page aligned with the rest of the site
+    max-width: 1385px;
+    margin: 0 auto;
+    padding: 26px 16px 60px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+
+    // ----- "Back to jobs" chip -----
+    &__back {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        align-self: flex-start;
+        padding: 6px 12px;
+        background: @jd-soft;
+        color: @jd-earth;
+        border-radius: 90px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: -0.24px;
+        line-height: normal;
+        text-decoration: none;
+        transition: background .15s ease;
+
+        svg { display: block; flex-shrink: 0; }
+        &:hover { background: darken(@jd-soft, 4%); color: @jd-earth; text-decoration: none; }
+    }
+
+    // ----- Outer container holds the title row, body grid + share row -----
+    &__container {
+        display: flex;
+        flex-direction: column;
+        gap: 55px;
+        margin: 0;
+        padding: 0;
+        max-width: none;
+        grid-template-columns: none;
+    }
+
+    // ----- Title row -----
+    &__head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 32px;
+        margin: 0;
+    }
+
+    &__head-text {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        color: @jd-text;
+    }
+
+    &__title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 32px;
+        font-weight: 700;
+        line-height: normal;
+        color: @jd-text;
+        margin: 0;
+        text-align: left;
+
+        .breakpoint-large-down({ font-size: 24px; });
+    }
+
+    &__organiser {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 400;
+        line-height: normal;
+        color: @jd-text;
+        opacity: .45;
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        flex-shrink: 0;
+    }
+
+    // Save bookmark wrapper — relies on the global .save-tag styling for the 52×52 tile
+    &__save {
+        display: inline-flex;
+
+        .save-tag,
+        button.save-tag,
+        a.save-tag {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 52px;
+            height: 52px;
+            padding: 0;
+            border: 0;
+            border-radius: 10px;
+            background: transparent;
+            cursor: pointer;
+            text-decoration: none;
+            overflow: hidden;
+            transition: transform .15s ease, filter .15s ease;
+
+            &:hover { transform: translateY(-1px); filter: brightness(.96); }
+            &.is-saved,
+            &.is-saved:hover { background: transparent; color: inherit; }
+
+            .save-tag__icon { width: 52px; height: 52px; display: block; }
+        }
+    }
+
+    &__apply {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 201px;
+        padding: 12px 25px;
+        background: @jb-green;
+        color: #fff;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: -0.36px;
+        line-height: normal;
+        border-radius: 900px;
+        text-decoration: none;
+        border: 0;
+        cursor: pointer;
+        box-shadow:
+            0 39px 88px rgba(0, 0, 0, .10),
+            0 160px 160px rgba(0, 0, 0, .09),
+            0 362px 218px rgba(0, 0, 0, .05);
+        transition: background .15s ease, transform .15s ease;
+
+        // Longer label (e.g. "Send us a message") — let the button grow.
+        &--wide {
+            width: auto;
+            min-width: 201px;
+        }
+
+        &:hover {
+            background: darken(@jb-green, 6%);
+            color: #fff;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+    }
+
+    // ----- Body grid (description panel + aside card) -----
+    &__body-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 306px;
+        gap: 41px;
+        align-items: start;
+
+        @media (max-width: 980px) { grid-template-columns: 1fr; }
+    }
+
+    // Left panel — bordered card wrapping description / responsibilities / tags
+    &__panel {
+        display: flex;
+        flex-direction: column;
+        gap: 35px;
+        padding: 35px;
+        background: #fff;
+        border: 1px solid @jd-border;
+        border-radius: 20px;
+    }
+
+    &__section {
+        display: flex;
+        flex-direction: column;
+        gap: 35px;
+        margin: 0;
+    }
+
+    &__heading {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 24px;
+        font-weight: 700;
+        line-height: normal;
+        color: @jd-text;
+        margin: 0;
+    }
+
+    &__body {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 1.55;
+        color: @jd-text;
+
+        p { margin: 0 0 8px; }
+        p:last-child { margin-bottom: 0; }
+    }
+
+    &__responsibilities {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        color: @jd-text;
+
+        li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            list-style: none;
+        }
+    }
+
+    &__check {
+        flex-shrink: 0;
+        width: 22px;
+        height: 22px;
+        border-radius: 90px;
+        background: @jd-soft;
+        color: @jd-earth;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+
+        svg { display: block; }
+    }
+
+    &__tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    &__tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 18px;
+        background: @jd-tag-bg;
+        color: @jd-text;
+        border: 0;
+        border-radius: 90px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: -0.28px;
+        line-height: normal;
+    }
+
+    // ----- Share row (below body grid) -----
+    &__share {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 0;
+    }
+
+    // ----- Related section -----
+    &__related {
+        max-width: 1385px;
+        margin: 30px auto 0;
+        padding: 30px 16px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+
+        .job-detail__heading { color: @jd-text; }
+    }
+
+    &__related-head {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    &__related-title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 32px;
+        font-weight: 600;
+        line-height: normal;
+        color: @jd-text;
+        margin: 0;
+    }
+
+    &__related-sub {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 400;
+        line-height: normal;
+        color: @jd-text;
+        opacity: .45;
+        margin: 0;
+    }
+}
+
+// Related grid cards override — same shape as listing cards but with the accent chips from Figma
+.job-detail__related .job-card {
+    background: #fff;
+    color: @jb-text-dark;
+}
+
+.job-card__chip--funding-accent {
+    background: @jd-related-green-bg;
+    color: @jd-related-green-tx;
+    border-radius: 80px;
+    padding: 4px 16px;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.6;
+}
+
+.job-card__chip--mode-accent {
+    background: @jd-related-yellow-bg;
+    color: @jd-related-yellow-tx;
+    border-radius: 80px;
+    padding: 4px 16px;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.6;
+}
+
+// ----- Share button + social icons -----
+.job-share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: @jb-green;
+    color: #fff;
+    border: 0;
+    border-radius: 500px;
+    padding: 12px 25px;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.32px;
+    line-height: 1;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .15s ease;
+
+    svg { display: block; flex-shrink: 0; }
+    &:hover { background: darken(@jb-green, 6%); color: #fff; text-decoration: none; }
+}
+
+.job-share-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 5px;
+    border-radius: 6.5px;
+    background: @jd-soft;
+    color: @jd-earth;
+    text-decoration: none;
+    border: 0;
+    transition: background .15s ease;
+
+    svg { display: block; }
+    &:hover { background: darken(@jd-soft, 4%); color: @jd-earth; }
+}
+
+// ----- Right aside (job overview card — Figma node 496:12100) -----
+.job-detail__aside {
+    align-self: start;
+    width: 306px;
+    box-sizing: border-box;
+    background: #fff;
+    border-radius: 20px;
+    padding: 28px 20px 20px;
+    box-shadow: -6px 4px 25px rgba(85, 85, 85, .06);
+    display: flex;
+    flex-direction: column;
+    gap: 45px;
+    overflow: hidden;
+
+    @media (max-width: 980px) { width: 100%; }
+}
+
+.job-aside__salary {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    strong {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: @jd-text;
+        line-height: normal;
+    }
+    span {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        color: @jd-text;
+        opacity: .45;
+        line-height: normal;
+    }
+}
+
+.job-aside__chips {
+    display: grid;
+    grid-template-columns: 124px 124px;
+    justify-content: space-between;
+    row-gap: 28px;
+    column-gap: 10px;
+    width: 266px;
+    margin: 0;
+    align-self: center;
+}
+
+.job-aside__chip-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 124px;
+}
+
+// Tinted pill (icon + label) used inside the aside chip cells
+.job-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    width: 124px;
+    box-sizing: border-box;
+    padding: 6px 15px;
+    border-radius: 90px;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.28px;
+    line-height: normal;
+    text-align: center;
+    white-space: nowrap;
+
+    svg { display: block; flex-shrink: 0; }
+
+    &--green  { background: @jd-chip-green-bg;  color: @jd-chip-green-tx;  }
+    &--blue   { background: @jd-chip-blue-bg;   color: @jd-chip-blue-tx;   }
+    &--orange { background: @jd-chip-orange-bg; color: @jd-chip-orange-tx; }
+}
+
+.job-aside__value {
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: normal;
+    color: @jd-text;
+    opacity: .45;
+    text-align: center;
+    max-width: 124px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.job-aside__map {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+
+    h3 {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: normal;
+        color: @jd-text;
+        margin: 0;
+    }
+}
+
+.job-aside__map-frame {
+    width: 266px;
+    height: 266px;
+    border-radius: 12px;
+    border: 1px solid @jd-border;
+    display: block;
+    align-self: center;
+
+    &--link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #EEF3E8;
+        text-decoration: none;
+        transition: filter .15s ease;
+
+        &:hover { filter: brightness(.97); }
+
+        svg { display: block; }
+    }
+}
+
+// =====================================================
+//  Post a job form (Figma node 440:12116)
+// =====================================================
+@pj-text:        #182D10;
+@pj-muted:       #9aa39a;
+@pj-border:      transparent;
+@pj-bg:          #fff;
+@pj-shadow:      0 2px 6px rgba(20, 40, 20, .06);
+@pj-radius:      12px;
+@pj-earth:       #52843E;
+
+.post-job-container {
+    padding: 26px 16px 80px;
+    max-width: 1385px;
+    margin: 0 auto;
+}
+
+.post-job-page {
+    //max-width: 920px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+
+    form{
+        gap: 30px;
+    }
+
+    &__back {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        align-self: flex-start;
+        padding: 6px 12px;
+        border-radius: 500px;
+        border: 1px solid #E7E7F1;
+        background: #fff;
+        color: @pj-earth;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: -0.24px;
+        line-height: normal;
+        text-decoration: none;
+        transition: background .15s ease, border-color .15s ease;
+
+        svg { display: block; flex-shrink: 0; }
+        &:hover {
+            background: #fafbfd;
+            color: @pj-earth;
+            border-color: darken(#E7E7F1, 6%);
+            text-decoration: none;
+        }
+    }
+
+    &__guard {
+        max-width: 480px;
+        margin: 80px auto;
+        text-align: center;
+
+        h2 {
+            font-family: Fustat, Arial, sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: @pj-text;
+            margin-bottom: 10px;
+        }
+        p {
+            color: @jb-text-muted;
+            margin-bottom: 18px;
+        }
+    }
+
+    &__section {
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+        & + &{
+            margin-top: 35px;
+        }
+    }
+
+    &__section-title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1.45;
+        letter-spacing: -0.18px;
+        color: @pj-text;
+        margin: 0 0 2px;
+        text-align: left;
+    }
+
+    &__submit {
+        margin-top: 36px;
+    }
+}
+
+.pj-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 21px 33px;
+
+    @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.pj-field {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+    gap: 15px;
+
+    &--full { grid-column: 1 / -1; }
+}
+
+.pj-label {
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.45;
+    color: @pj-text;
+    margin: 0;
+}
+
+.pj-input,
+.pj-select,
+.pj-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 0;
+    border-radius: @pj-radius;
+    background: #fff;
+    box-shadow: @pj-shadow;
+    padding: 16px 20px;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 14px;
+    color: @pj-text;
+    line-height: 1.4;
+    transition: box-shadow .15s ease;
+
+    &::placeholder { color: @pj-muted; }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(138, 197, 62, .35), @pj-shadow;
+    }
+}
+
+.pj-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 40px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path fill='%23182d10' d='M6 8.5 1.5 4l1-1L6 6.5 9.5 3l1 1z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 18px center;
+    background-color: #fff;
+}
+
+.pj-textarea {
+    min-height: 180px;
+    resize: vertical;
+}
+
+// ---- CKEditor 4 wrapper around #pjDesc — match the .pj-textarea card shell.
+// CKEditor builds an outer container with id `cke_<textareaId>`. We restyle
+// only that instance so other CKEditors in the theme keep their defaults.
+#cke_pjDesc.cke {
+    border: 0;
+    border-radius: @pj-radius;
+    background: #fff;
+    box-shadow: @pj-shadow!important;
+    padding: 0;
+    overflow: hidden;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 14px;
+    color: @pj-text;
+    line-height: 1.4;
+    transition: box-shadow .15s ease;
+
+    &:hover,
+    &:focus-within {
+        box-shadow: 0 4px 12px rgba(20, 40, 20, .08);
+    }
+
+    .cke_inner,
+    .cke_top,
+    .cke_contents,
+    .cke_bottom {
+        background: #fff;
+        border: 0;
+    }
+
+    .cke_top {
+        padding: 8px 12px;
+        border-bottom: 1px solid rgba(24, 45, 16, .08);
+        box-shadow: none;
+    }
+
+    .cke_contents {
+        min-height: 200px;
+    }
+
+    // Subtle hover/active state for the toolbar buttons so they read on white.
+    .cke_button {
+        border-radius: 6px;
+
+        &:hover,
+        &:focus,
+        &.cke_button_on {
+            background: rgba(138, 197, 62, .14);
+        }
+    }
+}
+
+.pj-error {
+    color: #c0392b;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+}
+
+// ----- Buttons -----
+.pj-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    cursor: pointer;
+    padding: 12px 28px;
+    border-radius: 999px;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.28px;
+    line-height: 1;
+    text-decoration: none;
+    transition: background .15s ease, color .15s ease, transform .15s ease;
+
+    &--primary {
+        background: #8AC53E;
+        color: #fff;
+
+        &:hover {
+            background: darken(#8AC53E, 6%);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+    }
+}
+
+// =====================================================
+//  Job posted success popup (Figma node 440:8627)
+// =====================================================
+.job-posted-popup {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 10000;
+
+    &.is-open { display: flex; }
+
+    &__backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(10, 20, 10, .55);
+        backdrop-filter: blur(2px);
+    }
+
+    &__dialog {
+        position: relative;
+        z-index: 1;
+        background: #fff;
+        border-radius: 20px;
+        padding: 55px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 35px;
+        max-width: 480px;
+        width: 100%;
+        filter: drop-shadow(-6px 4px 12.5px rgba(85, 85, 85, .06));
+        box-shadow: 0 30px 60px rgba(0, 0, 0, .25);
+
+        @media (max-width: 560px) {
+            padding: 36px 24px;
+            gap: 24px;
+        }
+    }
+
+    &__title {
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-size: 32px;
+        font-weight: 500;
+        line-height: 1.45;
+        color: #182D10;
+        margin: 0;
+        text-align: center;
+        max-width: 220px;
+
+        @media (max-width: 560px) { font-size: 26px; }
+    }
+
+    &__sub {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #5B6B52;
+        margin: -10px 0 0;
+        text-align: center;
+        max-width: 360px;
+
+        @media (max-width: 560px) { font-size: 14px; }
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    &__btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 25px;
+        border-radius: 60px;
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 600;
+        font-size: 16px;
+        letter-spacing: -0.32px;
+        line-height: normal;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
+
+        &--primary {
+            background: #8AC53E;
+            color: #fff;
+            border: 0;
+            box-shadow: 0 39px 88px rgba(0, 0, 0, .10),
+                        0 14px 22px rgba(0, 0, 0, .05);
+
+            &:hover { background: #7ab632; color: #fff; text-decoration: none; transform: translateY(-1px); }
+        }
+
+        &--ghost {
+            background: #fff;
+            color: #182D10;
+            border: 1px solid #E7E7F1;
+            box-shadow: 0 39px 44px rgba(0, 0, 0, .10),
+                        0 14px 16px rgba(0, 0, 0, .05);
+
+            &:hover { background: #F5F7F1; color: #182D10; text-decoration: none; transform: translateY(-1px); }
+        }
+    }
+}
+
+// =====================================================
+//  Apply modals (Figma 901:4184 message, 440:8417 disclaimer)
+// =====================================================
+
+// ----- Message modal (apply_via = platform) -----
+.pgt-modal--job-message {
+    align-items: center;
+
+    .pgt-modal__dialog {
+        max-width: 985px;
+    }
+}
+
+.job-apply-message {
+    position: relative;
+    background: #fff;
+    border-radius: 20px;
+    padding: 45px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    filter: drop-shadow(-6px 4px 12.5px rgba(85, 85, 85, .06));
+
+    @media (max-width: 640px) {
+        padding: 32px 22px;
+        gap: 18px;
+    }
+
+    &__close {
+        position: absolute;
+        top: 26px;
+        right: 26px;
+        width: 32px;
+        height: 32px;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        opacity: .65;
+        transition: opacity .15s ease;
+
+        &:hover { opacity: 1; }
+    }
+
+    &__title {
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 700;
+        font-size: 24px;
+        line-height: 1.55;
+        color: #182D10;
+        margin: 0;
+    }
+
+    &__form {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    &__field {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    &__label {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 600;
+        font-size: 18px;
+        line-height: 1.35;
+        color: #182D10;
+
+        svg { display: block; flex-shrink: 0; }
+    }
+
+    &__input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 15px 25px;
+        background: #F7F9F9;
+        border: 1px solid transparent;
+        border-radius: 5px;
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 1.35;
+        color: #182D10;
+        transition: border-color .15s ease, background .15s ease;
+
+        &::placeholder {
+            color: #182D10;
+            opacity: .45;
+        }
+
+        &:focus {
+            outline: none;
+            border-color: #8AC53E;
+            background: #fff;
+        }
+
+        &--area {
+            min-height: 173px;
+            resize: vertical;
+            font-family: Fustat, Arial, sans-serif;
+        }
+    }
+
+    &__submit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 25px;
+        background: #8AC53E;
+        color: #fff;
+        border: 0;
+        border-radius: 900px;
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 600;
+        font-size: 16px;
+        letter-spacing: -.32px;
+        line-height: normal;
+        cursor: pointer;
+        transition: background .15s ease, transform .15s ease;
+
+        &:hover {
+            background: darken(#8AC53E, 6%);
+            transform: translateY(-1px);
+        }
+    }
+
+    &__success {
+        text-align: center;
+        padding: 20px 0 10px;
+
+        p {
+            font-family: Fustat, Arial, sans-serif;
+            font-size: 16px;
+            color: #798972;
+            margin: 8px 0 0;
+        }
+    }
+}
+
+// ----- Disclaimer modal (apply_via = website) -----
+.pgt-modal--job-disclaimer {
+    align-items: center;
+
+    .pgt-modal__dialog {
+        max-width: 532px;
+    }
+}
+
+.job-apply-disclaimer {
+    background: #fff;
+    border-radius: 20px;
+    padding: 55px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 35px;
+    text-align: center;
+    filter: drop-shadow(-6px 4px 12.5px rgba(85, 85, 85, .06));
+
+    @media (max-width: 560px) {
+        padding: 36px 24px;
+        gap: 24px;
+    }
+
+    &__text {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        color: #182D10;
+    }
+
+    &__title {
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-weight: 500;
+        font-size: 32px;
+        line-height: 1.45;
+        margin: 0;
+
+        @media (max-width: 560px) { font-size: 26px; }
+    }
+
+    &__lead {
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 600;
+        font-size: 20px;
+        line-height: 1.45;
+        margin: 0;
+    }
+
+    &__note {
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 1.45;
+        color: #798972;
+        margin: 0;
+    }
+
+    &__actions {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    &__continue,
+    &__cancel {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 25px;
+        border-radius: 60px;
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 600;
+        font-size: 16px;
+        letter-spacing: -.32px;
+        line-height: normal;
+        cursor: pointer;
+        transition: background .15s ease, transform .15s ease, border-color .15s ease;
+    }
+
+    &__continue {
+        background: #8AC53E;
+        color: #fff;
+        text-decoration: none;
+        border: 0;
+        box-shadow:
+            0 39px 88px rgba(0, 0, 0, .10),
+            0 160px 160px rgba(0, 0, 0, .09),
+            0 362px 218px rgba(0, 0, 0, .05);
+
+        &:hover {
+            background: darken(#8AC53E, 6%);
+            color: #fff;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+    }
+
+    &__cancel {
+        background: rgba(255, 255, 255, .85);
+        border: 1px solid #E7E7F1;
+        color: #182D10;
+        backdrop-filter: blur(20.924px);
+        -webkit-backdrop-filter: blur(20.924px);
+
+        &:hover {
+            background: #fff;
+            border-color: darken(#E7E7F1, 6%);
+            transform: translateY(-1px);
+        }
+    }
+}
+
+// ----- File attachment field inside the message modal -----
+.job-apply-message__hint {
+    font-weight: 400;
+    font-size: 14px;
+    color: #798972;
+    margin-left: 6px;
+}
+
+.job-apply-message__file {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #F7F9F9;
+    border: 1px dashed #C7D2C0;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease;
+
+    &:hover { border-color: #8AC53E; background: #fff; }
+}
+
+.job-apply-message__file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    clip: rect(0 0 0 0);
+    overflow: hidden;
+}
+
+.job-apply-message__file-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 14px;
+    border-radius: 60px;
+    background: #182D10;
+    color: #fff;
+    font-family: Fustat, Arial, sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: -.28px;
+    line-height: normal;
+    flex-shrink: 0;
+}
+
+.job-apply-message__file-name {
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 14px;
+    color: #182D10;
+    opacity: .65;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+// ----- "Message sent!" success popup (Figma 943:2518) -----
+.pgt-modal--job-message-success {
+    align-items: center;
+
+    .pgt-modal__dialog {
+        max-width: 532px;
+    }
+}
+
+.job-apply-sent {
+    background: #fff;
+    border-radius: 15px;
+    padding: 55px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    text-align: center;
+    filter: drop-shadow(-6px 4px 12.5px rgba(85, 85, 85, .06));
+
+    @media (max-width: 560px) {
+        padding: 36px 24px;
+        gap: 24px;
+    }
+
+    &__badge {
+        width: 110px;
+        height: 110px;
+        border-radius: 10px;
+        background: #E9F8DC;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px;
+        flex-shrink: 0;
+
+        svg { display: block; }
+    }
+
+    &__text {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+        color: #182D10;
+    }
+
+    &__title {
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 600;
+        font-size: 32px;
+        line-height: normal;
+        margin: 0;
+
+        @media (max-width: 560px) { font-size: 26px; }
+    }
+
+    &__sub {
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: normal;
+        margin: 0;
+        opacity: .45;
+        max-width: 406px;
+    }
+
+    &__btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 25px;
+        background: #8AC53E;
+        color: #fff;
+        border: 0;
+        border-radius: 900px;
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 600;
+        font-size: 16px;
+        letter-spacing: -.32px;
+        line-height: normal;
+        cursor: pointer;
+        transition: background .15s ease, transform .15s ease;
+
+        &:hover {
+            background: darken(#8AC53E, 6%);
+            transform: translateY(-1px);
+        }
+    }
+}

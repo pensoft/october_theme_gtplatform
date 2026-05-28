@@ -1,0 +1,161 @@
+[menu]
+start = "id-1"
+activeNode = 0
+listItemClasses = "nav-item"
+primaryClasses = "navbar-nav"
+secondaryClasses = "dropdown-menu"
+numberOfLevels = 2
+
+==
+
+{# Signup popup — rendered once when anonymous; opened by any [data-signup-trigger]
+   element on the page (e.g. .event-detail__subscribe in the hero blocks below). #}
+{% if not user %}
+    {% partial 'signuppopup/default' %}
+{% endif %}
+
+{% if page_id != 'home' %}
+
+{# Pages that show only the compact menu bar (no hero title) — Figma 496:12345 #}
+{% set _compactPages = ['job', 'profile', 'profile-saved', 'profile-saved-events', 'profile-saved-jobs', 'post-job', 'login', 'forgot'] %}
+{% set _compact = _compactPages|filter(p => page_id starts with 'profile' or page_id == p)|length > 0 %}
+
+<div class="gt-header-wrap {{ _compact ? 'gt-header-wrap--compact' : '' }}">
+
+    <nav class="pr-1 pl-1 navbar gt-header" id="headernavbar" role="navigation" aria-label="Main navigation">
+
+        <a href="{{'home'|page}}" class="navbar-brand gt-header__brand" aria-label="GREEN TALENT home">
+            <img src="{{ 'logo.svg'|media }}" alt="GREEN TALENT" class="gt-header__logo">
+        </a>
+
+        <div id="menuToggle">
+            <input type="checkbox" id="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="headerNavbarNav" />
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            {% component 'menu' %}
+        </div>
+
+        <div class="navbar-collapse collapse center-xs gt-header__nav" id="headerNavbarNav" role="menu" aria-hidden="true" style="display: none;">
+            {% component 'menu' %}
+        </div>
+
+        {% if user %}
+        <a href="/profile" class="gt-header__profile" aria-label="Profile of {{ user.name }} {{ user.surname }}">
+            {% if user.avatar %}
+                <img alt="{{ user.name }} {{ user.surname }}"
+                     src="{{ user.avatar.getThumb(59, 59, { mode: 'crop' }) }}"
+                     class="gt-header__avatar">
+            {% else %}
+                <img alt="{{ user.name }} {{ user.surname }}"
+                     src="{{ 'CMS_icons_avatar_white.svg'|media }}"
+                     class="gt-header__avatar gt-header__avatar--placeholder">
+            {% endif %}
+            <span class="gt-header__pill">
+                {{ user.name }}{% if user.surname %} {{ user.surname|first }}{% endif %}
+            </span>
+        </a>
+        {% endif %}
+
+    </nav>
+
+    {% if page_id == 'event' and event %}
+            <div class="gt-hero container">
+                <h1 class="event-detail__hero-title" data-aos="fade-up" data-aos-duration="1000">
+                    {{ event.title }}
+                </h1>
+                {% if user and event.url %}
+                    <a href="{{ event.url }}" class="event-detail__subscribe" target="_blank" rel="noopener" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="150">
+                        <span class="event-detail__subscribe-label">Subscribe to event</span>
+                        <span class="event-detail__subscribe-arrow" aria-hidden="true">
+                            <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="#8AC53E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 10h10M11 6l4 4-4 4"/>
+                            </svg>
+                        </span>
+                    </a>
+                {% elseif not user %}
+                    <a href="#" class="event-detail__subscribe" data-signup-trigger data-aos="fade-up" data-aos-duration="1000" data-aos-delay="150">
+                        <span class="event-detail__subscribe-label">Subscribe to event</span>
+                        <span class="event-detail__subscribe-arrow" aria-hidden="true">
+                            <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="#8AC53E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 10h10M11 6l4 4-4 4"/>
+                            </svg>
+                        </span>
+                    </a>
+                {% endif %}
+            </div>
+    {% elseif page_id == 'job-opportunities' %}
+        {# Active job-type tab — taken from the URL query string (?job_type=N).
+           `this.param` only resolves route/path parameters, so we read the
+           query string with the get() helper instead. Defaults to "1"
+           (Job positions) when the param is absent, matching the jobs page
+           which lands the user on the first tab by default. #}
+        {% set _jobType = get('job_type')|default('1') %}
+        <div class="gt-hero container">
+            <div class="jobs-hero__text" data-aos="fade-up" data-aos-duration="1000">
+                <h1 class="event-detail__hero-title">
+                    {% if _jobType == '2' %}
+                        Explore <span class="jobs-hero__accent">Secondment</span> Positions
+                    {% else %}
+                        Explore <span class="jobs-hero__accent">Many</span> Job Opportunities
+
+                    {% endif %}
+                </h1>
+
+                    {% if _jobType == '2' %}
+
+                    {% else %}
+                        <p class="jobs-hero__sub">
+                                Discover jobs and secondments across the network
+                        </p>
+                    {% endif %}
+
+            </div>
+            {% if user %}
+                <a href="/post-job" class="event-detail__subscribe" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="150">
+                    <span class="event-detail__subscribe-label">Create a position</span>
+                    <span class="event-detail__subscribe-arrow" aria-hidden="true">
+                        <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="#8AC53E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 10h10M11 6l4 4-4 4"/>
+                        </svg>
+                    </span>
+                </a>
+            {% else %}
+                <a href="#" class="event-detail__subscribe" data-signup-trigger data-aos="fade-up" data-aos-duration="1000" data-aos-delay="150">
+                    <span class="event-detail__subscribe-label">Create a position</span>
+                    <span class="event-detail__subscribe-arrow" aria-hidden="true">
+                        <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="#8AC53E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 10h10M11 6l4 4-4 4"/>
+                        </svg>
+                    </span>
+                </a>
+            {% endif %}
+        </div>
+
+
+    {% elseif not _compact %}
+        <div class="gt-hero container">
+            <div class="container">
+                <h1 class="gt-hero__title" data-aos="fade-up" data-aos-duration="1000">
+                    {{ page_title|default(site_name) }}
+                </h1>
+                {% if page_subtitle %}
+                    <p class="gt-hero__subtitle" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="150">
+                        {{ page_subtitle|raw }}
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+{% endif %}
+
+<main id="main-content" role="main"></main>
+
+{% if user %}
+<script>$(document).trigger('profile')</script>
+<script>$(document).trigger('signout')</script>
+{% else %}
+<script>$(document).trigger('signin')</script>
+{% endif %}

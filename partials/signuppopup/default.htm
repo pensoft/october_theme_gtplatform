@@ -1,0 +1,49 @@
+<div class="signup-popup" id="signupPopup" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="signupPopupTitle">
+    <div class="signup-popup__backdrop" data-signup-close></div>
+
+    <div class="signup-popup__dialog" role="document">
+        <button type="button" class="signup-popup__close" data-signup-close aria-label="Close">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#182D10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18"/>
+            </svg>
+        </button>
+
+        <div class="signup-popup__media" aria-hidden="true"></div>
+
+        <div class="signup-popup__body">
+            <div class="signup-popup__text">
+                <h2 id="signupPopupTitle" class="signup-popup__title">Sign up to get involved</h2>
+                <p class="signup-popup__sub">
+                    Create an account to join discussions, register interest in opportunities, and make full use of the platform&rsquo;s features.
+                </p>
+            </div>
+            <a href="#" class="signup-popup__cta" data-pgt-step="reasons" data-signup-close>Create an account</a>
+            <div class="signup-popup__login">
+                Already have an account? <a href="#" data-pgt-step="login" data-signup-close>Log in</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    'use strict';
+    var modal = document.getElementById('signupPopup');
+    if (!modal || modal.dataset.bound) return;
+    modal.dataset.bound = '1';
+
+    function open()  { modal.classList.add('is-open');    modal.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; }
+    function close() { modal.classList.remove('is-open'); modal.setAttribute('aria-hidden', 'true');  document.body.style.overflow = ''; }
+
+    document.addEventListener('click', function (e) {
+        var trigger = e.target.closest('[data-signup-trigger]');
+        if (trigger) { e.preventDefault(); open(); return; }
+        var closer  = e.target.closest('[data-signup-close]');
+        if (closer)  { e.preventDefault(); close(); }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('is-open')) close();
+    });
+})();
+</script>

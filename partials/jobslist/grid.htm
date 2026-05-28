@@ -1,0 +1,115 @@
+{% if jobs.isEmpty() %}
+    <div class="jobs-page__empty">No jobs match your filters.</div>
+{% else %}
+    <div class="jobs-grid">
+        {% for j in jobs %}
+            <a class="job-card" href="/jobs/{{ j.slug }}">
+                <div class="job-card__head">
+                    <div class="job-card__logo">
+                        {% if j.organiser_logo %}
+                            <img src="{{ j.organiser_logo.getThumb(48, 48, { mode: 'crop' }) }}" alt="{{ j.organiser }}">
+                        {% else %}
+                            <span class="job-card__logo-stub">{{ (j.organiser|default(j.title))|first|upper }}</span>
+                        {% endif %}
+                    </div>
+                    {% if j.job_type %}
+                        <span class="job-card__type">{{ j.job_type.title }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="job-card__title-block">
+                    <h3 class="job-card__title">{{ j.title }}</h3>
+                    {% if j.organiser or j.location %}
+                        <div class="job-card__sub">
+                            {% if j.organiser %}<span>{{ j.organiser }}</span>{% endif %}
+                            {% if j.organiser and j.location %}<span class="job-card__dot" aria-hidden="true"></span>{% endif %}
+                            {% if j.location %}<span>{{ j.location }}</span>{% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if j.description %}
+                    <p class="job-card__desc">{{ j.description|striptags|slice(0, 90) }}{% if j.description|length > 90 %}…{% endif %}</p>
+                {% endif %}
+
+                {% if j.funding|length or j.work_modes|length or j.work_physical_presence %}
+                    <div class="job-card__chips">
+                        {% for f in j.funding %}
+                            <span class="job-card__chip job-card__chip--funding">{{ f.title }}</span>
+                        {% endfor %}
+                        {% for w in j.work_modes %}
+                            {% set _slug = w.title|lower %}
+                            <span class="job-card__chip job-card__chip--mode {{ _slug == 'on-location' or _slug == 'on location' ? 'job-card__chip--mode-onsite' : 'job-card__chip--mode-remote' }}">{{ w.title }}</span>
+                        {% endfor %}
+                        {% if j.work_physical_presence %}
+                            {# Reuse the work-mode colour palette so the presence
+                               chip matches the design (Figma 251:13505 / 251:15651):
+                               Remote → light indigo, On-location → light blue-gray,
+                               Hybrid → its own warm tint. #}
+                            {% set _pslug = j.work_physical_presence.title|lower %}
+                            {% set _pmod  = 'job-card__chip--mode-remote' %}
+                            {% if _pslug == 'on-location' or _pslug == 'on location' %}
+                                {% set _pmod = 'job-card__chip--mode-onsite' %}
+                            {% elseif _pslug == 'hybrid' %}
+                                {% set _pmod = 'job-card__chip--mode-hybrid' %}
+                            {% endif %}
+                            <span class="job-card__chip {{ _pmod }}">{{ j.work_physical_presence.title }}</span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                <span class="job-card__link">
+                    Job details
+                    <svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true">
+                        <path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M4 5l3 3 3-3"/>
+                    </svg>
+                </span>
+            </a>
+        {% endfor %}
+    </div>
+
+    {% if jobs.hasPages() %}
+        {% set _current = jobs.currentPage %}
+        {% set _last    = jobs.lastPage %}
+        {% set _window  = 2 %}
+        {% set _from    = max(1, _current - _window) %}
+        {% set _to      = min(_last, _current + _window) %}
+        {% if _to - _from < 4 %}
+            {% if _from == 1 %}{% set _to = min(_last, _from + 4) %}
+            {% elseif _to == _last %}{% set _from = max(1, _to - 4) %}{% endif %}
+        {% endif %}
+
+        <nav class="events-pager" aria-label="Pagination">
+            <ul class="events-pager__list">
+                <li class="events-pager__item events-pager__item--nav">
+                    {% if jobs.onFirstPage %}
+                        <span class="events-pager__btn is-disabled"><svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M15.4 7.4L14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></svg></span>
+                    {% else %}
+                        <a class="events-pager__btn" href="{{ jobs.previousPageUrl() }}"><svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M15.4 7.4L14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></svg></a>
+                    {% endif %}
+                </li>
+                {% if _from > 1 %}
+                    <li class="events-pager__item"><a class="events-pager__page" href="{{ jobs.url(1) }}">1</a></li>
+                    {% if _from > 2 %}<li class="events-pager__item events-pager__item--gap">…</li>{% endif %}
+                {% endif %}
+                {% for p in _from.._to %}
+                    <li class="events-pager__item">
+                        {% if p == _current %}<span class="events-pager__page is-active">{{ p }}</span>
+                        {% else %}<a class="events-pager__page" href="{{ jobs.url(p) }}">{{ p }}</a>{% endif %}
+                    </li>
+                {% endfor %}
+                {% if _to < _last %}
+                    {% if _to < _last - 1 %}<li class="events-pager__item events-pager__item--gap">…</li>{% endif %}
+                    <li class="events-pager__item"><a class="events-pager__page" href="{{ jobs.url(_last) }}">{{ _last }}</a></li>
+                {% endif %}
+                <li class="events-pager__item events-pager__item--nav">
+                    {% if jobs.hasMorePages %}
+                        <a class="events-pager__btn" href="{{ jobs.nextPageUrl() }}"><svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M8.6 16.6L10 18l6-6-6-6-1.4 1.4L13.2 12z"/></svg></a>
+                    {% else %}
+                        <span class="events-pager__btn is-disabled"><svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M8.6 16.6L10 18l6-6-6-6-1.4 1.4L13.2 12z"/></svg></span>
+                    {% endif %}
+                </li>
+            </ul>
+        </nav>
+    {% endif %}
+{% endif %}

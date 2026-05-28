@@ -1,0 +1,21 @@
+title = "Login"
+url = "/login"
+layout = "default"
+is_hidden = 0
+robot_index = "noindex"
+robot_follow = "nofollow"
+==
+<?php
+function onStart()
+{
+    // The dedicated /login page has been replaced by the auth-flow popup.
+    // Send visitors to the homepage; guests get the login popup auto-opened
+    // there via ?login=1 (handled in pgt-auth-flow.js), while logged-in
+    // visitors simply land on the homepage.
+    if (\Auth::check()) {
+        return \Redirect::to('/');
+    }
+
+    return \Redirect::to('/?login=1');
+}
+==

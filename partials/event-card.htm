@@ -1,0 +1,66 @@
+{# Shared event-card markup used by every events grid:
+   - pages/exchange-forum.htm (Section 2: Upcoming events)
+   - partials/eventslist/grid.htm (the public /events listing)
+   - partials/savedevents/default.htm (profile saved-events list)
+   - partials/savedcontent/body.htm (saved-content search results)
+
+   The card's visual style lives in assets/less/pages/events.less under
+   `.event-card` (badges, overlay, location, title) and the surrounding
+   `.events-grid` — so every consumer renders identically.
+
+   Variables:
+     ev          — event model (required)
+     saved       — bool, render the saved bookmark + .event-card--saved class
+     detailPage  — CMS page key for the detail URL (default 'event' → /events/:slug)
+#}
+{% set _saved  = saved|default(false) %}
+{% set _detail = detailPage|default('event') %}
+{% set _href   = '/' ~ (_detail == 'event' ? 'events/' : _detail ~ '/') ~ ev.slug %}
+
+<a class="event-card{{ _saved ? ' event-card--saved' : '' }}" href="{{ _href }}">
+    <div class="event-card__media">
+        {% if ev.image %}
+            <img src="{{ ev.image.getThumb(820, 520, { mode: 'crop' }) }}" alt="{{ ev.title }}">
+        {% else %}
+            <div class="event-card__placeholder" aria-hidden="true"></div>
+        {% endif %}
+
+        <span class="event-card__overlay" aria-hidden="true"></span>
+
+        <div class="event-card__badges">
+            {% if ev.start_date %}
+                <span class="event-card__date-pill">{{ ev.start_date|date('d M')|upper }}</span>
+            {% endif %}
+
+            {% if ev.online %}
+                <span class="event-card__online">
+                    <span class="event-card__online-dot" aria-hidden="true"></span>
+                    Online event
+                </span>
+            {% endif %}
+        </div>
+
+        {% if _saved %}
+            <span class="event-card__saved-mark" aria-label="Saved" title="Saved">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+                    <path d="M6 4.5A1.5 1.5 0 017.5 3h9A1.5 1.5 0 0118 4.5V21l-6-3.75L6 21V4.5z" fill="#52843E"/>
+                </svg>
+            </span>
+        {% endif %}
+    </div>
+
+    {% if ev.location or ev.country %}
+        <div class="event-card__location">
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
+                <path fill="#8AC53E" d="M10 1.7c-3.3 0-6 2.7-6 6 0 4.4 5.4 10.1 5.6 10.4.2.2.6.2.8 0 .2-.3 5.6-6 5.6-10.4 0-3.3-2.7-6-6-6zm0 8.8a2.8 2.8 0 110-5.5 2.8 2.8 0 010 5.5z"/>
+            </svg>
+            <span>
+                {%- if ev.location %}{{ ev.location }}{% endif -%}
+                {%- if ev.location and ev.country %}, {% endif -%}
+                {%- if ev.country %}{{ ev.country.name }}{% endif -%}
+            </span>
+        </div>
+    {% endif %}
+
+    <h3 class="event-card__title">{{ ev.title }}</h3>
+</a>

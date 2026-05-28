@@ -1,0 +1,18 @@
+url = "/jobs/:slug"
+layout = "default"
+title = "Job"
+is_hidden = 0
+
+[jobDetail]
+slug = "{{ :slug }}"
+detailPage = "job"
+
+[saveButton]
+type = "job"
+
+[savedJobs]
+perPage = 12
+==
+<div class="container job-detail-container">
+    {% component 'jobDetail' %}
+</div>

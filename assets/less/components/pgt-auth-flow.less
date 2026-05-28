@@ -1,0 +1,1860 @@
+// =====================================================
+//  Pensoft Green Talent auth flow styles
+// =====================================================
+
+@pgt-green:        #8AC53E;
+@pgt-green-2:      #8fda4a;
+@pgt-green-3:      #7ec53b;
+@pgt-green-dark:   #0e4f0e;
+@pgt-dark:         #0c2a0c;
+@pgt-dark-hover:   #1d3f1d;
+@pgt-text-dark:    #0b1f0b;
+@pgt-muted:        #5d6b5d;
+@pgt-card-radius:  15px;
+@pgt-border:       #d9dfd9;
+@pgt-checkbox-border: #b9c3b9;
+
+// ----- Hero -----
+// ----- Welcome window hero (Figma node 3:19510) -----
+.pgt-hero {
+    position: relative;
+    //height: calc(~'100vh - 200px');
+    //height: 100vh;
+    height: fit-content;
+    background: #0C1808;
+    color: #FEFFFD;
+    text-align: center;
+    //overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 65px;
+    //padding: 112px 20px;
+
+    // Decorative neonflower at 35% opacity
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: url("../../assets/images/neonflower.svg") center no-repeat;
+        background-size: 100%;
+        opacity: .35;
+        pointer-events: none;
+    }
+
+    &__inner {
+        position: relative;
+        z-index: 2;
+        //max-width: 1057px;
+        width: 100%;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 35px; // logo / title / subtitle / pills row spacing
+    }
+
+    &__logo {
+        display: inline-flex;
+        text-decoration: none;
+        margin-bottom: 70px; // 105px between logo and title (gap 35 + this 70)
+
+        img {
+            width: 208px;
+            height: 73px;
+            object-fit: contain;
+            display: block;
+        }
+    }
+
+    &__title {
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-size: 55px;
+        font-weight: 600;
+        line-height: 1.45;
+        color: #FEFFFD;
+        margin: 0;
+        text-align: center;
+
+        &--accent { color: @pgt-green; }
+
+        .breakpoint-large-down({
+            font-size: 36px;
+        });
+    }
+
+    &__subtitle {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 32px;
+        font-weight: 400;
+        line-height: 1.45;
+        color: #FEFFFD;
+        margin: 0;
+        max-width: 1057px;
+        text-align: center;
+
+        .breakpoint-large-down({
+            font-size: 18px;
+        });
+    }
+
+    &__buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 18px;
+        position: relative;
+        z-index: 2;
+    }
+}
+
+// ----- Guest hero (Figma 1122:4730): centered logo + welcome card on a
+//        full-height dark background. .pgt-hero already centers its children
+//        as a flex column; here we make it fill the viewport and tighten the
+//        logo → card spacing to match the design. -----
+.pgt-hero--guest {
+    min-height: 100vh;
+    height: auto;
+    gap: 51px;             // logo → card
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    //padding: 60px 20px;
+
+    .pgt-hero__logo {
+        margin-bottom: 0;  // reset the logged-in 70px; flex gap handles spacing
+        position: relative;
+        z-index: 2;
+    }
+
+    .breakpoint-large-down({
+        gap: 36px;
+        padding: 40px 16px;
+    });
+}
+
+// ----- Hero buttons row (Figma node 274:2022) -----
+.pgt-hero__buttons {
+    gap: 15px;          // Figma exact
+    margin-top: 24px;
+    flex-wrap: wrap;
+}
+
+.pgt-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;                                                   // icon → text
+    padding: 12px 25px;
+    border-radius: 900px;
+    border: 1px solid #f5faff;                                  // subtle white outline
+    background: linear-gradient(115.24deg,
+        rgba(138, 197, 62, 0) 0%,
+        rgba(47, 85, 32, .30) 100%);
+    backdrop-filter: blur(20.924px);
+    -webkit-backdrop-filter: blur(20.924px);
+    color: #fff;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: normal;
+    letter-spacing: -0.32px;
+    text-decoration: none;
+    transition: background .2s ease, transform .15s ease, border-color .2s ease;
+
+    &:hover {
+        //background: linear-gradient(115.24deg,
+        //    rgba(138, 197, 62, .15) 0%,
+        //    rgba(47, 85, 32, .45) 100%);
+        //transform: translateY(-1px);
+        background: #8AC53E;
+        border-color: #8AC53E;
+        color: #fff;
+        text-decoration: none;
+    }
+
+    // Active state (solid green pill — Figma "Frame 2085661065")
+    &--active {
+        background: #8AC53E;
+        border-color: #8AC53E;
+        color: #fff;
+
+        &:hover {
+            background: #7ab632;
+            border-color: #7ab632;
+            color: #fff;
+        }
+    }
+
+    &__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+
+        svg { display: block; }
+    }
+}
+
+// ----- Floating welcome card (Figma node 6:19568) -----
+@pgt-forest:       #2F5520;   // Deep forest green (Register button)
+@pgt-welcome-text: #182D10;   // Dark green text inside the card
+
+.pgt-floating-welcome {
+    position: relative;
+    z-index: 2;
+    width: 562px;
+    max-width: calc(100% - 32px);
+    padding: 48px;
+    background: @pgt-green;
+    color: @pgt-welcome-text;
+    border-radius: 15px;
+    overflow: hidden;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 39px;
+
+    // Decorative neonflower in the bottom-right area, rotated like the Figma
+    &::after {
+        content: "";
+        position: absolute;
+        right: -0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        background: url("../../assets/images/neonflower1.png") bottom right no-repeat;
+        background-size: contain;
+        //transform: rotate(43.61deg);
+        //opacity: .55;
+        //pointer-events: none;
+    }
+
+    .breakpoint-large-down({
+        padding: 40px 28px;
+        min-height: 0;
+        gap: 40px;
+    });
+}
+
+.pgt-welcome {
+    &__close {
+        position: absolute;
+        top: 27px;
+        right: 31px;
+        z-index: 2;
+        background: transparent;
+        border: 0;
+        padding: 6px;
+        cursor: pointer;
+        color: @pgt-welcome-text;
+        line-height: 0;
+        transition: opacity .15s ease;
+
+        svg { display: block; }
+        &:hover { opacity: .7; }
+    }
+
+    &__body {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        max-width: 466px;
+    }
+
+    // Small "Welcome to the" line above the title
+    &__eyebrow {
+        margin: 0;
+        color: @pgt-welcome-text;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 20px;
+        font-weight: 400;
+        line-height: 1.45;
+
+        .breakpoint-large-down({ font-size: 16px; });
+    }
+
+    // Title + intro sit tightly together (10px), directly under the eyebrow
+    &__headgroup {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    &__title {
+        margin: 0;
+        color: @pgt-welcome-text;
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-size: 32px;
+        font-weight: 500;
+        line-height: 1.35;
+        text-align: left;
+
+        .breakpoint-large-down({ font-size: 26px; });
+    }
+
+    &__intro {
+        margin: 0;
+        color: @pgt-welcome-text;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 20px;
+        font-weight: 400;
+        line-height: 1.45;
+        max-width: 402px;
+
+        .breakpoint-large-down({ font-size: 16px; });
+    }
+
+    &__footer {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    &__actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    &__login {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        color: @pgt-welcome-text;
+        padding: 2px;
+
+        a {
+            color: @pgt-welcome-text;
+            text-decoration: underline;
+        }
+    }
+}
+
+// ----- Buttons (Figma 6:19575 / 6:19577) -----
+.pgt-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    padding: 12px 25px;
+    border-radius: 900px;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.32px;
+    text-decoration: none;
+    transition: background .15s ease, transform .15s ease, box-shadow .15s ease, color .15s ease;
+
+    &--primary {
+        background: @pgt-green-2;
+        color: @pgt-text-dark;
+        &:hover { background: @pgt-green-3; }
+    }
+
+    // Register button: deep forest green
+    &--dark {
+        background: @pgt-forest;
+        color: #fff;
+        &:hover { background: darken(@pgt-forest, 4%); color: #fff; }
+    }
+
+    // Continue as viewer: translucent green gradient pill with subtle border + backdrop blur
+    &--ghost {
+        background: linear-gradient(115.24deg,
+            rgba(138, 197, 62, 0)  0%,
+            rgba(137, 196, 62, .3) 100%);
+        backdrop-filter: blur(20.924px);
+        -webkit-backdrop-filter: blur(20.924px);
+        color: @pgt-welcome-text;
+        border: .5px solid #F5FAFF;
+
+        &:hover {
+            background: linear-gradient(115.24deg,
+                rgba(138, 197, 62, .15) 0%,
+                rgba(137, 196, 62, .45) 100%);
+            color: @pgt-welcome-text;
+        }
+    }
+
+    &--block {
+        width: 100%;
+        padding: 12px 16px;
+        font-size: 15px;
+    }
+}
+
+// ----- Modal shell -----
+.pgt-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    z-index: 10000;
+    padding: 40px 16px;
+    overflow-y: auto;
+
+    &.is-open {
+        display: flex;
+    }
+
+    &__backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(236, 246, 230, .55);
+        backdrop-filter: blur(2px);
+    }
+
+    &__dialog {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+        margin: auto;
+        z-index: 1;
+    }
+
+    &__logo {
+        text-align: center;
+        margin-bottom: 18px;
+
+        img {
+            max-height: 64px;
+        }
+    }
+
+    &__content {
+        position: relative;
+    }
+}
+
+// ----- Modal cards -----
+.pgt-modal-card {
+    position: relative;
+    background: #fff;
+    border-radius: @pgt-card-radius;
+    padding: 32px 32px 28px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, .45);
+    color: @pgt-text-dark;
+
+    &--center {
+        text-align: center;
+    }
+}
+
+.pgt-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: transparent;
+    border: 0;
+    color: inherit;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: .65;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.pgt-modal-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 14px;
+    border-radius: 14px;
+    background: #e7f7d6;
+    color: @pgt-green-dark;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &--success{
+        background: url("../../assets/images/ready.png") center no-repeat;
+        background-size: contain;
+    }
+}
+
+.pgt-modal-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 6px 0 12px;
+    text-align: center;
+
+    &--left {
+        text-align: left;
+    }
+}
+
+.pgt-modal-sub {
+    font-size: 14px;
+    color: @pgt-muted;
+    text-align: center;
+    margin: 0 0 22px;
+}
+
+.pgt-modal-actions {
+    margin-top: 18px;
+    text-align: center;
+
+    &--row {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+}
+
+.pgt-modal-foot {
+    text-align: center;
+    color: @pgt-muted;
+    font-size: 13px;
+    margin: 18px 0 0;
+
+    a {
+        color: @pgt-green-dark;
+        font-weight: 600;
+        text-decoration: underline;
+    }
+}
+
+// ----- Coming soon popup card (Figma node 440:7446) -----
+.pgt-modal--coming {
+    align-items: center;
+
+    .pgt-modal__backdrop {
+        background: rgba(236, 246, 230, .55);
+    }
+
+    .pgt-modal__dialog {
+        max-width: 560px;
+    }
+}
+
+.pgt-coming-soon {
+    background: #fff;
+    border-radius: 20px;
+    padding: 55px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 35px;
+    text-align: center;
+    filter: drop-shadow(-6px 4px 12.5px rgba(85, 85, 85, .06));
+
+    @media (max-width: 560px) {
+        padding: 36px 24px;
+        gap: 24px;
+    }
+
+    &__icon {
+        width: 90px;
+        height: 90px;
+        border-radius: 10px;
+        background: #E9F8DC;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    &__text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    &__title {
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-weight: 500;
+        font-size: 32px;
+        line-height: 1.45;
+        color: #182D10;
+        margin: 0;
+
+        @media (max-width: 560px) { font-size: 26px; }
+    }
+
+    &__sub {
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 400;
+        font-size: 18px;
+        line-height: 1.45;
+        color: #798972;
+        margin: 0;
+        max-width: 422px;
+
+        @media (max-width: 560px) { font-size: 15px; }
+    }
+
+    &__btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 25px;
+        border-radius: 60px;
+        background: #8AC53E;
+        color: #fff;
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 600;
+        font-size: 16px;
+        letter-spacing: -.32px;
+        line-height: normal;
+        border: 0;
+        cursor: pointer;
+        box-shadow: 0 39px 88px rgba(0, 0, 0, .10),
+                    0 14px 22px rgba(0, 0, 0, .05);
+        transition: background .15s ease, transform .15s ease;
+
+        &:hover { background: #7ab632; transform: translateY(-1px); }
+    }
+}
+
+// ----- "Why are you joining" reasons card (Figma node 301:1607) -----
+.pgt-reasons {
+    padding: 55px;
+    border-radius: 15px;
+    color: #182D10;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    align-items: flex-start;
+    text-align: left;
+
+    .breakpoint-large-down({
+        padding: 32px 24px;
+        gap: 24px;
+    });
+
+    &__icon {
+        width: 110px;
+        height: 110px;
+        border-radius: 10px;
+        background: url("../../assets/images/reason.png") center no-repeat;
+        background-size: contain;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        svg { display: block; }
+    }
+
+    &__head {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        width: 100%;
+    }
+
+    &__title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 32px;
+        font-weight: 600;
+        line-height: normal;
+        color: #182D10;
+        margin: 0;
+        max-width: 486px;
+        text-align: left;
+
+        .breakpoint-large-down({
+            font-size: 24px;
+        });
+    }
+
+    &__form { margin: 0; }
+
+    &__actions { width: 100%; }
+
+    &__continue, button.pgt-reasons__continue {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #8AC53E;
+        color: #fff;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: -0.32px;
+        line-height: 1;
+        padding: 12px 25px;
+        border: 0;
+        border-radius: 900px;
+        cursor: pointer;
+        transition: background .15s ease;
+
+        &:hover { background: darken(#8AC53E, 6%); }
+    }
+}
+
+// ----- Reason list (minimal checkbox style — Figma) -----
+.pgt-reason-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 0;
+}
+
+.pgt-reason {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0;
+    border-radius: 0;
+    cursor: pointer;
+    background: transparent;
+    transition: opacity .15s ease;
+
+    &:hover {
+        background: transparent;
+        opacity: .85;
+    }
+
+    input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+
+        &:checked + .pgt-reason__box {
+            background: #8AC53E;
+            border-color: #8AC53E;
+            opacity: 1;
+        }
+    }
+
+    &__box {
+        width: 12px;
+        height: 12px;
+        border-radius: 1px;
+        border: 1px solid #182D10;
+        opacity: .35;
+        background: transparent;
+        flex-shrink: 0;
+        position: relative;
+        transition: background .15s ease, opacity .15s ease, border-color .15s ease;
+    }
+
+    &__label {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        color: #182D10;
+        line-height: normal;
+    }
+}
+
+// ----- "Create an account" register card (Figma node 440:6305) -----
+.pgt-register {
+    padding: 55px;
+    border-radius: 15px;
+    color: #182D10;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    align-items: flex-start;
+    text-align: left;
+
+    .breakpoint-large-down({
+        padding: 32px 24px;
+        gap: 24px;
+    });
+
+    a{
+        text-decoration: underline;
+    }
+
+    &__head {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+
+    &__title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 32px;
+        font-weight: 600;
+        line-height: normal;
+        color: #182D10;
+        margin: 0;
+        text-align: left;
+
+        .breakpoint-large-down({
+            font-size: 24px;
+        });
+    }
+
+    &__login {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        color: #182D10;
+        margin: 0;
+        padding: 2px 0;
+
+        a {
+            color: #182D10;
+            text-decoration: underline;
+            font-weight: 400;
+        }
+
+        &--bottom { margin-top: 4px; }
+    }
+
+    &__form {
+        margin: 0;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+    }
+
+    &__fields {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        max-width: 473px;
+        width: 100%;
+    }
+
+    &__terms {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 1.45;
+        color: #666;
+        margin: 0;
+        max-width: 363px;
+        padding: 8px 8px 8px 0;
+
+        a {
+            color: #182D10;
+            text-decoration: underline;
+        }
+    }
+
+    &__actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    &__submit, button.pgt-register__submit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #8AC53E;
+        color: #fff;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: -0.32px;
+        line-height: 1;
+        padding: 12px 25px;
+        border: 0;
+        border-radius: 900px;
+        cursor: pointer;
+        transition: background .15s ease;
+
+        &:hover { background: darken(#8AC53E, 6%); }
+    }
+
+    // Field overrides scoped to the register card (Figma spec)
+    .pgt-field {
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        position: relative;
+
+        label {
+            font-family: Fustat, Arial, sans-serif;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: normal;
+            color: #666;
+            margin: 0;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            box-sizing: border-box;
+            height: 56px;
+            padding: 0 16px;
+            border: 1px solid rgba(102, 102, 102, .35);
+            border-radius: 12px;
+            font-family: Fustat, Arial, sans-serif;
+            font-size: 16px;
+            color: #182D10;
+            background: #fff;
+
+            &:focus {
+                outline: none;
+                border-color: #8AC53E;
+                box-shadow: 0 0 0 3px rgba(138, 197, 62, .18);
+            }
+        }
+    }
+
+    .pgt-field__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .pgt-field--password .pgt-password-toggle {
+        position: static;
+        transform: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: transparent;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 400;
+        line-height: normal;
+        color: rgba(102, 102, 102, .8);
+
+        &__icon {
+            display: inline-block;
+            color: rgba(102, 102, 102, .8);
+        }
+    }
+
+    .pgt-help {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.45;
+        color: #666;
+        margin: 4px 0 0;
+    }
+}
+
+// ----- "Check your email" confirmation card (Figma node 300:1545) -----
+.pgt-checkemail {
+    padding: 55px;
+    border-radius: 15px;
+    background: #fff;
+    color: #182D10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 32px;
+
+    .breakpoint-large-down({
+        padding: 32px 24px;
+        gap: 24px;
+    });
+
+    &__icon {
+        width: 110px;
+        height: 110px;
+        border-radius: 10px;
+        background: url("../../assets/images/email.png") center no-repeat;
+        background-size: contain;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+
+
+        svg { display: block; }
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        color: #182D10;
+        white-space: normal;
+    }
+
+    &__title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 32px;
+        font-weight: 600;
+        line-height: normal;
+        color: #182D10;
+        margin: 0;
+        text-align: center;
+
+        .breakpoint-large-down({
+            font-size: 24px;
+        });
+    }
+
+    &__text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: normal;
+        color: #182D10;
+    }
+
+    &__line {
+        margin: 0;
+
+        strong {
+            font-family: Fustat, Arial, sans-serif;
+            font-weight: 600;
+            color: #182D10;
+        }
+
+        &--faded { opacity: .45; }
+    }
+
+    &__muted { color: #97A093; }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    &__resend, button.pgt-checkemail__resend {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #8AC53E;
+        color: #fff;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: -0.32px;
+        line-height: 1;
+        padding: 12px 25px;
+        border: 0;
+        border-radius: 900px;
+        cursor: pointer;
+        transition: background .15s ease;
+
+        &:hover { background: darken(#8AC53E, 6%); color: #fff; }
+    }
+
+    &__alt, button.pgt-checkemail__alt {
+        background: transparent;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: normal;
+        color: #182D10;
+        text-decoration: none;
+        transition: opacity .15s ease;
+
+        &:hover { opacity: .7; }
+    }
+}
+
+// ----- "You're ready to go!" activation success card (Figma node 301:1566) -----
+.pgt-activated {
+    padding: 55px;
+    border-radius: 15px;
+    background: #fff;
+    color: #182D10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 32px;
+
+    .breakpoint-large-down({
+        padding: 32px 24px;
+        gap: 24px;
+    });
+
+    &__icon {
+        width: 110px;
+        height: 110px;
+        border-radius: 10px;
+        background: url("../../assets/images/ready.png") center no-repeat;
+        background-size: contain;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+
+        svg { display: block; }
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        color: #182D10;
+    }
+
+    &__title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 32px;
+        font-weight: 600;
+        line-height: normal;
+        color: #182D10;
+        margin: 0;
+        text-align: center;
+        white-space: nowrap;
+
+        .breakpoint-large-down({
+            font-size: 24px;
+            white-space: normal;
+        });
+    }
+
+    &__sub {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: normal;
+        color: #182D10;
+        opacity: .45;
+        margin: 0;
+        max-width: 406px;
+        text-align: center;
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__continue, a.pgt-activated__continue {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #8AC53E;
+        color: #fff;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: -0.32px;
+        line-height: 1;
+        padding: 12px 25px;
+        border: 0;
+        border-radius: 900px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background .15s ease;
+
+        &:hover { background: darken(#8AC53E, 6%); color: #fff; text-decoration: none; }
+    }
+}
+
+// ----- "Log in" card (Figma node 440:6459) -----
+.pgt-login {
+    padding: 55px;
+    border-radius: 15px;
+    background: #fff;
+    color: #182D10;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 32px;
+    text-align: left;
+
+    .breakpoint-large-down({
+        padding: 32px 24px;
+        gap: 24px;
+    });
+
+    &__title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 32px;
+        font-weight: 500;
+        line-height: normal;
+        color: #182D10;
+        margin: 0;
+        text-align: left;
+
+        .breakpoint-large-down({
+            font-size: 24px;
+        });
+    }
+
+    &__form {
+        margin: 0;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+    }
+
+    &__fields {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        max-width: 473px;
+        width: 100%;
+    }
+
+    &__actions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        max-width: 473px;
+        width: 100%;
+    }
+
+    &__submit, button.pgt-login__submit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #8AC53E;
+        color: #fff;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: -0.32px;
+        line-height: 1;
+        width: 100%;
+        padding: 12px 25px;
+        border: 0;
+        border-radius: 900px;
+        cursor: pointer;
+        transition: background .15s ease;
+
+        &:hover { background: darken(#8AC53E, 6%); color: #fff; }
+    }
+
+    &__extra {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        width: 100%;
+    }
+
+    &__remember.pgt-checkbox {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 8px 8px 0;
+        cursor: pointer;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        color: #333;
+        position: relative;
+
+        input { position: absolute; opacity: 0; pointer-events: none; }
+
+        .pgt-checkbox__box {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 1.5px solid rgba(102, 102, 102, .45);
+            background: #fff;
+            position: relative;
+            transition: background .15s ease, border-color .15s ease;
+        }
+
+        input:checked + .pgt-checkbox__box {
+            background: #8AC53E;
+            border-color: #8AC53E;
+
+            &::after {
+                content: '';
+                position: absolute;
+                top: 4px;
+                left: 8px;
+                width: 6px;
+                height: 11px;
+                border: solid #fff;
+                border-width: 0 2px 2px 0;
+                transform: rotate(45deg);
+            }
+        }
+    }
+
+    &__help {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        color: #333;
+        text-decoration: none;
+        padding: 2px;
+        transition: color .15s ease;
+
+        &:hover { color: #182D10; text-decoration: underline; }
+    }
+
+    &__signup {
+        margin: 0;
+        padding: 2px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        color: #666;
+        text-align: left;
+
+        a {
+            color: #182D10;
+            font-weight: 500;
+            text-decoration: underline;
+        }
+    }
+
+    // Reuse the same field/input/toggle styling pattern as the register card
+    .pgt-field {
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        position: relative;
+
+        label {
+            font-family: Fustat, Arial, sans-serif;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: normal;
+            color: #666;
+            margin: 0;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            box-sizing: border-box;
+            height: 56px;
+            padding: 0 16px;
+            border: 1px solid rgba(102, 102, 102, .35);
+            border-radius: 12px;
+            font-family: Fustat, Arial, sans-serif;
+            font-size: 16px;
+            color: #182D10;
+            background: #fff;
+
+            &:focus {
+                outline: none;
+                border-color: #8AC53E;
+                box-shadow: 0 0 0 3px rgba(138, 197, 62, .18);
+            }
+        }
+    }
+
+    .pgt-field__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .pgt-field--password .pgt-password-toggle {
+        position: static;
+        transform: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: transparent;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 400;
+        line-height: normal;
+        color: rgba(102, 102, 102, .8);
+
+        &__icon {
+            display: inline-block;
+            color: rgba(102, 102, 102, .8);
+        }
+    }
+}
+
+// ----- "Forgot password?" card (matches Log in card layout) -----
+.pgt-forgot {
+    padding: 55px;
+    border-radius: 15px;
+    background: #fff;
+    color: #182D10;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 32px;
+    text-align: left;
+
+    .breakpoint-large-down({
+        padding: 32px 24px;
+        gap: 24px;
+    });
+
+    &__head {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 473px;
+        width: 100%;
+    }
+
+    &__title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 32px;
+        font-weight: 500;
+        line-height: normal;
+        color: #182D10;
+        margin: 0;
+        text-align: left;
+
+        .breakpoint-large-down({
+            font-size: 24px;
+        });
+    }
+
+    &__lead {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 1.45;
+        color: #666;
+        margin: 0;
+    }
+
+    &__form {
+        margin: 0;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+    }
+
+    &__fields {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        max-width: 473px;
+        width: 100%;
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        max-width: 473px;
+        width: 100%;
+    }
+
+    &__submit, button.pgt-forgot__submit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #8AC53E;
+        color: #fff;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: -0.32px;
+        line-height: 1;
+        width: 100%;
+        padding: 12px 25px;
+        border: 0;
+        border-radius: 900px;
+        cursor: pointer;
+        transition: background .15s ease;
+
+        &:hover { background: darken(#8AC53E, 6%); color: #fff; }
+    }
+
+    &__back {
+        margin: 0;
+        padding: 2px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        color: #666;
+        text-align: left;
+
+        a {
+            color: #182D10;
+            font-weight: 500;
+            text-decoration: underline;
+        }
+    }
+
+    .pgt-field {
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        position: relative;
+
+        label {
+            font-family: Fustat, Arial, sans-serif;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: normal;
+            color: #666;
+            margin: 0;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            box-sizing: border-box;
+            height: 56px;
+            padding: 0 16px;
+            border: 1px solid rgba(102, 102, 102, .35);
+            border-radius: 12px;
+            font-family: Fustat, Arial, sans-serif;
+            font-size: 16px;
+            color: #182D10;
+            background: #fff;
+
+            &:focus {
+                outline: none;
+                border-color: #8AC53E;
+                box-shadow: 0 0 0 3px rgba(138, 197, 62, .18);
+            }
+        }
+    }
+}
+
+// ----- "Set a new password" reset card -----
+.pgt-reset {
+    padding: 55px;
+    border-radius: 15px;
+    background: #fff;
+    color: #182D10;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 32px;
+    text-align: left;
+
+    .breakpoint-large-down({
+        padding: 32px 24px;
+        gap: 24px;
+    });
+
+    &__head {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 473px;
+        width: 100%;
+    }
+
+    &__title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 32px;
+        font-weight: 500;
+        line-height: normal;
+        color: #182D10;
+        margin: 0;
+        text-align: left;
+
+        .breakpoint-large-down({
+            font-size: 24px;
+        });
+    }
+
+    &__lead {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 1.45;
+        color: #666;
+        margin: 0;
+    }
+
+    &__form {
+        margin: 0;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+    }
+
+    &__fields {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        max-width: 473px;
+        width: 100%;
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        max-width: 473px;
+        width: 100%;
+    }
+
+    &__submit, button.pgt-reset__submit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #8AC53E;
+        color: #fff;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: -0.32px;
+        line-height: 1;
+        width: 100%;
+        padding: 12px 25px;
+        border: 0;
+        border-radius: 900px;
+        cursor: pointer;
+        transition: background .15s ease;
+
+        &:hover { background: darken(#8AC53E, 6%); color: #fff; }
+    }
+
+    &__back {
+        margin: 0;
+        padding: 2px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        color: #666;
+        text-align: left;
+
+        a {
+            color: #182D10;
+            font-weight: 500;
+            text-decoration: underline;
+        }
+    }
+
+    .pgt-field {
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        position: relative;
+
+        label {
+            font-family: Fustat, Arial, sans-serif;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: normal;
+            color: #666;
+            margin: 0;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            box-sizing: border-box;
+            height: 56px;
+            padding: 0 16px;
+            border: 1px solid rgba(102, 102, 102, .35);
+            border-radius: 12px;
+            font-family: Fustat, Arial, sans-serif;
+            font-size: 16px;
+            color: #182D10;
+            background: #fff;
+
+            &:focus {
+                outline: none;
+                border-color: #8AC53E;
+                box-shadow: 0 0 0 3px rgba(138, 197, 62, .18);
+            }
+        }
+    }
+
+    .pgt-field__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .pgt-field--password .pgt-password-toggle {
+        position: static;
+        transform: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: transparent;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 400;
+        line-height: normal;
+        color: rgba(102, 102, 102, .8);
+
+        &__icon {
+            display: inline-block;
+            color: rgba(102, 102, 102, .8);
+        }
+    }
+
+    .pgt-help {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.45;
+        color: #666;
+        margin: 4px 0 0;
+    }
+}
+
+// ----- Form fields -----
+.pgt-field {
+    margin-bottom: 14px;
+
+    label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: @pgt-text-dark;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px 12px;
+        border: 1px solid @pgt-border;
+        border-radius: 8px;
+        font-size: 14px;
+        background: #fff;
+        color: @pgt-text-dark;
+
+        &:focus {
+            outline: none;
+            border-color: @pgt-green-2;
+            box-shadow: 0 0 0 3px rgba(143, 218, 74, .25);
+        }
+    }
+}
+
+.pgt-password-wrap {
+    position: relative;
+}
+
+.pgt-password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    font-size: 12px;
+    color: @pgt-muted;
+}
+
+.pgt-help {
+    font-size: 12px;
+    color: @pgt-muted;
+    margin: 6px 0 0;
+}
+
+.pgt-terms {
+    font-size: 12px;
+    color: @pgt-muted;
+    margin: 4px 0 16px;
+
+    a {
+        color: @pgt-green-dark;
+    }
+}
+
+// ----- Checkbox / login extras -----
+.pgt-login-extra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+
+    &__help {
+        font-size: 13px;
+        color: @pgt-muted;
+    }
+}
+
+.pgt-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    position: relative;
+
+    input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+
+        &:checked + .pgt-checkbox__box {
+            background: @pgt-green-2;
+            border-color: @pgt-green-2;
+
+            &::after {
+                content: '';
+                position: absolute;
+                top: 1px;
+                left: 4px;
+                width: 4px;
+                height: 8px;
+                border: solid #fff;
+                border-width: 0 2px 2px 0;
+                transform: rotate(45deg);
+            }
+        }
+    }
+
+    &__box {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        border: 1.5px solid @pgt-checkbox-border;
+        position: relative;
+    }
+}

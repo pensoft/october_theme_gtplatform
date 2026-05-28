@@ -1,0 +1,121 @@
+[cookieConsent]
+message = "This website uses cookies to ensure you get the best experience on our website."
+dismiss = "Got it!"
+learnMore = "Opt-out here"
+link = "/privacy-policy#cookies"
+theme = "dark-bottom"
+==
+{% component 'cookieConsent' %}
+
+<footer class="footer-new" role="contentinfo" aria-label="Site footer">
+    <div class="footer-new__top">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 col-xs-12 footer-new__brand">
+                    <a href="{{'home'|page}}" aria-label="Return to homepage">
+                        <img src="{{ 'logo.png'|theme }}"
+                             onerror="this.onerror=null;this.src='{{ 'assets/images/logo.svg'|theme }}'"
+                             alt="GREEN TALENT" class="footer-new__logo">
+                    </a>
+                </div>
+
+                <div class="col-md-3 col-xs-12 footer-new__col">
+                    <h4 class="footer-new__col-title">Exchange forum</h4>
+                    <ul class="footer-new__links">
+                        <li><a href="/events">Events</a></li>
+                        <li><a href="#" data-coming-soon="">Collaboration corner</a></li>
+                        <li><a href="/job-opportunities">Job opportunities</a></li>
+                        <li>
+                            {% if user %}
+                            <a data-request="onLogout" data-request-data="redirect: '/'" class="footer-new__links--accent">Sign out</a>
+                            {% else %}
+                            <a href="#" class="footer-new__links--accent" data-pgt-step="login">Sign in</a>
+<!--                                <a href="#" class="footer-new__links&#45;&#45;accent" data-pgt-step="reasons">Sign up</a>-->
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="col-md-3 col-xs-12 footer-new__col">
+                    <h4 class="footer-new__col-title">Platform</h4>
+                    <ul class="footer-new__links">
+                        <li><a href="#" data-coming-soon="">Training corner</a></li>
+                        <li><a href="#" data-coming-soon="">R&amp;I best practices</a></li>
+                        <li><a href="#" data-coming-soon="">Needs Assessment Tool</a></li>
+                        <li><a href="#" data-coming-soon="">Roadmap</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-md-3 col-xs-12 footer-new__designed">
+                    <span class="footer-new__designed-label">Designed by</span>
+                    <a href="https://pensoft.net/" target="_blank" rel="noopener noreferrer"
+                       aria-label="Pensoft website (opens in new window)">
+                        <img class="footer-new__pensoft" src="{{ 'assets/images/pensoft-logo.svg'|theme }}" alt="Pensoft logo" />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-new__middle">
+        <div class="container">
+            <div class="row middle-xs">
+                <div class="col-md-6 col-xs-12 footer-new__social">
+                    {% if enable_facebook and facebook_url %}
+                    <a href="{{facebook_url}}" target="_blank" rel="noopener noreferrer" class="pr p-secondary p-facebook normal" aria-label="Follow us on Facebook (opens in new window)">
+                        <span class="visually-hidden">Facebook</span>
+                    </a>
+                    {% endif %}
+                    {% if enable_twitter and twitter_url %}
+                    <a href="{{twitter_url}}" target="_blank" rel="noopener noreferrer" class="pr p-secondary p-twitter normal" aria-label="Follow us on Twitter (opens in new window)">
+                        <span class="visually-hidden">Twitter</span>
+                    </a>
+                    {% endif %}
+                    {% if enable_linkedin and linkedin_url %}
+                    <a href="{{linkedin_url}}" target="_blank" rel="noopener noreferrer" class="pr p-secondary p-linkedin normal" aria-label="Follow us on LinkedIn (opens in new window)">
+                        <span class="visually-hidden">LinkedIn</span>
+                    </a>
+                    {% endif %}
+                    {% if enable_youtube and youtube_url %}
+                    <a href="{{youtube_url}}" target="_blank" rel="noopener noreferrer" class="pr p-secondary p-youtube normal" aria-label="Follow us on YouTube (opens in new window)">
+                        <span class="visually-hidden">YouTube</span>
+                    </a>
+                    {% endif %}
+                    {% if enable_bluesky and bluesky_url %}
+                    <a href="{{bluesky_url}}" target="_blank" rel="noopener noreferrer" class="pr p-secondary p-bluesky normal" aria-label="Follow us on Bluesky (opens in new window)">
+                        <span class="visually-hidden">Bluesky</span>
+                    </a>
+                    {% endif %}
+                    {% if enable_instagram and instagram_url %}
+                    <a href="{{instagram_url}}" target="_blank" rel="noopener noreferrer" class="pr p-secondary p-instagram normal" aria-label="Follow us on Instagram (opens in new window)">
+                        <span class="visually-hidden">Instagram</span>
+                    </a>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6 col-xs-12 footer-new__legal">
+                    <a href="/privacy-policy">Privacy Policy</a>
+                    <span class="footer-new__legal-sep"></span>
+                    <a href="/terms-conditions">Terms &amp; Conditions</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if footer_funds_flag or footer_funds_text %}
+    <div class="footer-new__bottom">
+        <div class="container">
+            <div class="row middle-xs">
+                {% if footer_funds_flag %}
+                <div class="col-md-2 col-xs-12 footer-new__flag">
+                    <img src="{{ footer_funds_flag }}" alt="European Union funding logo" />
+                </div>
+                {% endif %}
+                <div class="col-md-10 col-xs-12 footer-new__disclaimer">
+                    {{ footer_funds_text|raw }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</footer>

@@ -1,0 +1,1577 @@
+// =====================================================
+//  Profile area (Figma node 251:19209)
+// =====================================================
+
+@pf-green:        #8AC53E;
+@pf-green-dark:   #5d9e1f;
+@pf-earth:        #52843E;
+@pf-text:         #182D10;
+@pf-muted:        #6b7a6b;
+@pf-border:       #E7E7F1;
+@pf-bg-soft:      #f7f9f9;
+@pf-bg-tile:      #e7f5d0;
+@pf-bg-tile-2:    #dff1e8;
+@pf-soft-green:   #E9F8DC;
+@pf-orange:       #EB8533;
+
+.profile-container {
+    padding: 40px 16px 80px;
+    max-width: 1385px;
+    margin: 0 auto;
+}
+
+.profile-layout {
+    max-width: 1320px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 306px minmax(0, 1fr);
+    gap: 58px;
+
+    @media (max-width: 880px) {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    &__main { min-width: 0; }
+}
+
+// ---- Sidebar menu (Figma 251:19214) ----
+.profile-menu {
+    background: #fff;
+    border: 1px solid @pf-border;
+    border-radius: 20px;
+    padding: 28px 20px 45px 45px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+
+    @media (max-width: 880px) {
+        padding: 24px 20px;
+    }
+
+    &__heading {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: normal;
+        color: @pf-text;
+        margin: 0;
+        text-transform: none;
+    }
+
+    &__list {
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+        margin: 0;
+    }
+
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 8px 12px;
+        border-radius: 100px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        line-height: normal;
+        color: @pf-text;
+        text-decoration: none;
+        opacity: .25;
+        transition: background .15s ease, color .15s ease, opacity .15s ease;
+
+        svg { flex-shrink: 0; color: currentColor; }
+
+        &:hover {
+            opacity: 1;
+            color: @pf-text;
+            text-decoration: none;
+        }
+
+        &.is-active {
+            background: @pf-soft-green;
+            color: @pf-earth;
+            font-weight: 700;
+            opacity: 1;
+
+            svg { color: @pf-earth; }
+            &:hover { background: darken(@pf-soft-green, 3%); }
+        }
+
+        &--signout {
+            color: @pf-orange;
+            opacity: 1;
+            svg { color: @pf-orange; }
+            &:hover { color: @pf-orange; }
+        }
+    }
+}
+
+// ---- Page head ----
+.profile-head {
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &__title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 32px;
+        font-weight: 700;
+        line-height: 1.55;
+        color: @pf-text;
+        margin: 0;
+        text-align: left;
+    }
+
+    &__sub {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 20px;
+        font-weight: 500;
+        line-height: 1.55;
+        color: @pf-text;
+        opacity: .45;
+        margin: 0;
+    }
+}
+
+// ---- Profile form (stack of cards) ----
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.profile-card {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    padding: 35px;
+    background: #fff;
+    border: 1px solid @pf-border;
+    border-radius: 20px;
+
+    @media (max-width: 720px) {
+        padding: 24px;
+    }
+
+    &__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    &__title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1.55;
+        color: @pf-text;
+        margin: 0;
+    }
+
+    &__action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 8px 25px;
+        background: #fff;
+        border: 1px solid rgba(24, 45, 16, .15);
+        border-radius: 100px;
+        color: #192E11;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: -0.32px;
+        line-height: normal;
+        text-align: center;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background .15s ease, border-color .15s ease, transform .15s ease;
+
+        svg { display: block; flex-shrink: 0; }
+
+        &:hover {
+            background: #fafbfd;
+            border-color: rgba(24, 45, 16, .3);
+            color: #192E11;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        // Cancel state — Figma's Cancel pill has no icon and uses semibold,
+        // matching the adjacent "Save changes" button's weight.
+        &.is-cancel {
+            font-weight: 600;
+            gap: 0;
+            svg { display: none; }
+        }
+    }
+
+    &__file {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        height: 0;
+    }
+
+    &__actions {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        justify-content: flex-end;
+    }
+}
+
+// Honour the [hidden] HTML attribute everywhere inside the profile form,
+// even on elements whose author CSS sets a non-`none` display (e.g.
+// .profile-btn, .profile-card__action, .profile-photo, .profile-edit-target).
+.profile-form [hidden] { display: none !important; }
+
+// =====================================================
+//  Delete account confirmation popup (Figma 440:9310)
+// =====================================================
+.delete-account-popup {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 10000;
+
+    &.is-open { display: flex; }
+
+    &__backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(10, 20, 10, .55);
+        backdrop-filter: blur(2px);
+    }
+
+    &__dialog {
+        position: relative;
+        z-index: 1;
+        background: #fff;
+        border-radius: 20px;
+        padding: 55px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 35px;
+        max-width: 560px;
+        width: 100%;
+        text-align: center;
+        filter: drop-shadow(-6px 4px 12.5px rgba(85, 85, 85, .06));
+        box-shadow: 0 30px 60px rgba(0, 0, 0, .25);
+
+        @media (max-width: 560px) {
+            padding: 36px 24px;
+            gap: 24px;
+        }
+    }
+
+    &__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 110px;
+        height: 110px;
+
+        svg { display: block; }
+    }
+
+    &__text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    &__title {
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-size: 32px;
+        font-weight: 500;
+        line-height: 1.45;
+        color: @pf-text;
+        margin: 0;
+        max-width: 447px;
+
+        @media (max-width: 560px) { font-size: 24px; }
+    }
+
+    &__sub {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 1.45;
+        color: #798972;
+        margin: 0;
+        max-width: 422px;
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    &__btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 25px;
+        border-radius: 60px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: -0.32px;
+        line-height: normal;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background .15s ease, transform .15s ease, border-color .15s ease, color .15s ease;
+
+        &--danger {
+            background: @pf-orange;
+            color: #fff;
+            border: 0;
+            box-shadow:
+                0 39px 88px rgba(0, 0, 0, .10),
+                0 14px 22px rgba(0, 0, 0, .05);
+
+            &:hover {
+                background: darken(@pf-orange, 6%);
+                color: #fff;
+                text-decoration: none;
+                transform: translateY(-1px);
+            }
+        }
+
+        &--ghost {
+            background: #fff;
+            color: @pf-text;
+            border: 1px solid @pf-border;
+            box-shadow:
+                0 39px 44px rgba(0, 0, 0, .10),
+                0 14px 16px rgba(0, 0, 0, .05);
+
+            &:hover {
+                background: @pf-bg-soft;
+                color: @pf-text;
+                text-decoration: none;
+                border-color: darken(@pf-border, 6%);
+                transform: translateY(-1px);
+            }
+        }
+    }
+}
+
+// The "Delete account" row is a <button>, so strip the native button chrome
+// and let it inherit the default .profile-menu__item styling (Figma 251:19215
+// renders it as dark green at 25% opacity in its inactive state — matching
+// "Saved content" — not as a danger-coloured row).
+.profile-menu__item--danger {
+    background: transparent;
+    border: 0;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+// ---- Profile photo card edit state (Figma 209:841) ----
+// Soft green wash + accent on the Save button (the Save button itself is
+// already styled via .profile-btn--primary). Only flips when JS toggles
+// the `is-editing` class on the section in response to the Edit button.
+.profile-card--photo.is-editing {
+    background:
+        linear-gradient(9.66deg, #E9F8DC 16%, rgba(239, 255, 238, 0) 114%),
+        #ffffff;
+    border-color: transparent;
+}
+
+// ---- Avatar upload dropzone (Figma 209:841) ----
+.profile-dropzone {
+    flex: 1 1 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 24px;
+    margin: 0;
+    border: 1.5px dashed rgba(24, 45, 16, .22);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .5);
+    cursor: pointer;
+    text-align: center;
+    transition: background .15s ease, border-color .15s ease;
+
+    &:hover,
+    &.is-dragover {
+        background: #fff;
+        border-color: @pf-green;
+    }
+
+    &__icon { display: block; opacity: .85; }
+
+    &__text {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        line-height: 1.35;
+        color: @pf-text;
+    }
+    &__cta {
+        color: @pf-green;
+        font-weight: 600;
+    }
+    &__or { font-weight: 400; }
+
+    &__hint {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        line-height: 1.35;
+        color: @pf-text;
+        opacity: .45;
+    }
+
+    &__input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        height: 0;
+    }
+
+    @media (max-width: 560px) {
+        &__text, &__hint { font-size: 15px; }
+    }
+}
+
+.profile-photo--edit {
+    gap: 60px;
+
+    @media (max-width: 720px) {
+        gap: 24px;
+    }
+}
+
+// ---- Profile photo row ----
+.profile-photo {
+    display: flex;
+    align-items: center;
+    gap: 27px;
+    flex-wrap: wrap;
+
+    // `display: flex` above overrides the UA stylesheet's `[hidden]
+    // { display: none }`, so re-assert hidden with matching specificity.
+    &[hidden] { display: none; }
+
+    &__avatar {
+        width: 118px;
+        height: 118px;
+        border-radius: 1800px;
+        overflow: hidden;
+        background: #c3eb91;
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    }
+
+    &__initials {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 36px;
+        font-weight: 700;
+        color: @pf-earth;
+    }
+
+    &__name {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: -0.48px;
+        line-height: normal;
+        color: @pf-text;
+    }
+
+    &__remove {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        color: @pf-orange;
+        text-decoration: underline;
+        cursor: pointer;
+        margin-left: auto;
+
+        &:hover { color: darken(@pf-orange, 6%); }
+    }
+}
+
+// ---- Personal info read-out group: icon-label + value panel pairs (Figma 251:17693) ----
+.profile-readout-group {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    width: 100%;
+
+    > .profile-readout { padding: 15px 25px; }
+
+    .profile-info-label + .profile-readout { margin-top: -15px; }
+}
+
+.profile-info-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: @pf-text;
+
+    svg { display: block; flex-shrink: 0; }
+}
+
+// ---- Personal info "Saved" confirmation (Figma 251:19507) ----
+.profile-saved-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 25px;
+    border-radius: 100px;
+    background: @pf-green;
+    color: #fff;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.32px;
+    line-height: normal;
+    box-shadow:
+        0 39px 88px rgba(0, 0, 0, .10),
+        0 160px 160px rgba(0, 0, 0, .09);
+}
+
+.profile-saved-state {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    width: 100%;
+}
+
+.profile-saved-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 35px;
+    border-radius: 20px;
+    background:
+        linear-gradient(3.97deg, #E9F8DC 16%, rgba(239, 255, 238, 0) 114%),
+        #fff;
+
+    @media (max-width: 720px) { padding: 24px; }
+
+    &__text {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1.55;
+        color: @pf-text;
+    }
+
+    &__check {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 29px;
+        height: 29px;
+        border-radius: 90px;
+        background: @pf-green;
+        flex-shrink: 0;
+
+        svg { display: block; }
+    }
+}
+
+// ---- Read-only display block (matches the design's #F7F9F9 panel) ----
+.profile-readout {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 25px;
+    background: #F7F9F9;
+    border-radius: 5px;
+
+    &__text {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 1.55;
+        color: @pf-text;
+        opacity: .45;
+        margin: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+}
+
+// ---- Field group / label / input ----
+.profile-edit-target{
+    gap: 30px;
+    display: flex;
+    flex-direction: column;
+}
+.profile-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.profile-field-label {
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: @pf-text;
+}
+
+.profile-field-required {
+    color: #c0392b;
+    margin-left: 4px;
+    font-weight: 500;
+}
+
+.profile-field-hint {
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 13px;
+    color: @pf-muted;
+    margin: 0;
+}
+
+.profile-field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+
+    @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.profile-field {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 15px 25px;
+    background: #F7F9F9;
+    border: 0;
+    border-radius: 5px;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.35;
+    color: @pf-text;
+
+    &::placeholder { color: @pf-text; opacity: .45; }
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(138, 197, 62, .3);
+        background: #fff;
+    }
+
+    &--textarea {
+        min-height: 140px;
+        resize: vertical;
+        font-family: Fustat, Arial, sans-serif;
+    }
+}
+
+// ---- Card buttons (Save changes / Cancel) ----
+.profile-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 25px;
+    border-radius: 100px;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.32px;
+    line-height: normal;
+    cursor: pointer;
+    text-decoration: none;
+    backdrop-filter: blur(20.924px);
+    -webkit-backdrop-filter: blur(20.924px);
+    transition: background .15s ease, border-color .15s ease, transform .15s ease, color .15s ease;
+
+    &--primary {
+        background: @pf-green;
+        color: #fff;
+        border: 0;
+        box-shadow:
+            0 39px 88px rgba(0, 0, 0, .10),
+            0 160px 160px rgba(0, 0, 0, .09);
+
+        &:hover {
+            background: darken(@pf-green, 6%);
+            color: #fff;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+    }
+
+    &--ghost {
+        background: #fff;
+        color: @pf-text;
+        border: 1px solid @pf-border;
+        box-shadow:
+            0 39px 44px rgba(0, 0, 0, .10),
+            0 160px 80px rgba(0, 0, 0, .09);
+
+        &:hover {
+            background: @pf-bg-soft;
+            color: @pf-text;
+            text-decoration: none;
+            border-color: darken(@pf-border, 6%);
+            transform: translateY(-1px);
+        }
+    }
+}
+
+// ---- Search bar inside profile pages ----
+.profile-search {
+    position: relative;
+    margin-bottom: 28px;
+
+    &__form { margin: 0; }
+
+    &__icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: @pf-muted;
+        pointer-events: none;
+    }
+
+    &__input {
+        width: 100%;
+        height: 46px;
+        box-sizing: border-box;
+        padding: 0 18px 0 44px;
+        border: 1px solid @pf-border;
+        border-radius: 999px;
+        background: #fff;
+        font-size: 14px;
+        color: @pf-text;
+
+        &:focus {
+            outline: none;
+            border-color: @pf-green;
+            box-shadow: 0 0 0 3px rgba(143, 218, 74, .2);
+        }
+    }
+}
+
+// ---- Saved-content hub (Figma node 564:2020) ----
+.saved-content {
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
+
+    // Top search bar — same pattern as events/jobs listing
+    &__search {
+        position: relative;
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: -6px 4px 25px rgba(85, 85, 85, .06);
+        width: 100%;
+        max-width: 974px;
+    }
+
+    &__search-icon {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        background: transparent;
+        border: 0;
+        border-radius: 50%;
+        color: @pf-text;
+        opacity: .45;
+        cursor: pointer;
+        z-index: 2;
+        transition: background .15s ease, opacity .15s ease;
+
+        svg { display: block; }
+
+        &:hover  { opacity: 1; background: rgba(24, 45, 16, .06); }
+        &:active { background: rgba(24, 45, 16, .12); }
+        &:focus-visible { outline: 2px solid @pf-green; outline-offset: 2px; }
+    }
+
+    &__search-input {
+        width: 100%;
+        height: 70px;
+        box-sizing: border-box;
+        padding: 0 60px 0 25px;
+        border: 0;
+        border-radius: 15px;
+        background: transparent;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 20px;
+        letter-spacing: -0.4px;
+        color: @pf-text;
+
+        &::placeholder { color: @pf-text; opacity: .45; }
+        &:focus { outline: none; }
+    }
+
+    &__head {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    &__title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 32px;
+        font-weight: 700;
+        line-height: 1.55;
+        color: @pf-text;
+        margin: 0;
+        text-align: left;
+    }
+
+    &__sub {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 20px;
+        font-weight: 500;
+        line-height: 1.55;
+        color: @pf-text;
+        opacity: .45;
+        margin: 0;
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+
+        @media (max-width: 880px) { grid-template-columns: 1fr; }
+    }
+
+    // Inline search results (Events / Job offers groups + cards).
+    &__group {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 25px;
+        font-weight: 700;
+        line-height: 1.55;
+        color: @pf-text;
+        margin: 40px 0 20px;
+    }
+
+    &__results {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    &__result {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 22px;
+        background: #fff;
+        border: 1px solid @pf-border;
+        border-radius: 14px;
+        text-decoration: none;
+        color: @pf-text;
+        transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, .04);
+            border-color: rgba(82, 132, 62, .35);
+            color: @pf-text;
+            text-decoration: none;
+        }
+    }
+
+    &__result-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: @pf-soft-green;
+        flex-shrink: 0;
+    }
+
+    &__result-body {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+    }
+
+    &__result-title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.35;
+        color: @pf-text;
+    }
+
+    &__result-meta {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1.35;
+        color: @pf-text;
+        opacity: .55;
+    }
+
+    &__empty {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.55;
+        color: @pf-text;
+        opacity: .55;
+        margin: 0;
+        padding: 24px 0;
+    }
+}
+
+// ---- Tile (per-section card) ----
+.saved-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+    padding: 35px;
+    width: calc(~'100% - 70px');
+    max-width: 470px;
+    border-radius: 20px;
+    text-align: center;
+    text-decoration: none;
+    color: @pf-text;
+    transition: transform .2s ease, box-shadow .2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 30px rgba(0, 0, 0, .06);
+        color: @pf-text;
+        text-decoration: none;
+    }
+
+    // Events tile — lime tint
+    &--events {
+        background: linear-gradient(19.56deg, rgba(233, 248, 220, 1) 16%, rgba(233, 248, 220, 0) 114%);
+    }
+    &--events .saved-tile__icon { background: #DFF3CD; }
+    &--events .saved-tile__cta   { background: #52843E; }
+    &--events .saved-tile__cta:hover { background: darken(#52843E, 4%); }
+
+    // Jobs tile — sage tint
+    &--jobs {
+        background: linear-gradient(19.56deg, rgba(235, 255, 244, 1) 16%, rgba(235, 255, 244, 0) 114%);
+    }
+    &--jobs .saved-tile__icon { background: #DDF6E8; }
+    &--jobs .saved-tile__cta  { background: #5C7B6A; }
+    &--jobs .saved-tile__cta:hover { background: darken(#5C7B6A, 4%); }
+
+    &__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        border-radius: 10px;
+
+        svg { display: block; }
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        color: @pf-text;
+    }
+
+    &__title {
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-size: 24px;
+        font-weight: 500;
+        line-height: 1.55;
+        color: @pf-text;
+        margin: 0;
+        text-align: center;
+    }
+
+    &__count {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 1.55;
+        color: @pf-text;
+        opacity: .45;
+        margin: 0;
+    }
+
+    &__cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 16px;
+        border-radius: 80px;
+        color: #fff;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.6;
+        transition: background .15s ease;
+    }
+}
+
+// ---- Saved list page (Figma node 210:3540) ----
+.saved-list {
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
+
+    &__search-form { margin: 0; }
+
+    &__search {
+        position: relative;
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: -6px 4px 25px rgba(85, 85, 85, .06);
+        width: 100%;
+        max-width: 974px;
+    }
+
+    &__search-icon {
+        position: absolute;
+        right: 25px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: @pf-text;
+        opacity: .45;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    &__search-input {
+        width: 100%;
+        height: 70px;
+        box-sizing: border-box;
+        padding: 0 60px 0 25px;
+        border: 0;
+        border-radius: 15px;
+        background: transparent;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 20px;
+        letter-spacing: -0.4px;
+        color: @pf-text;
+
+        &::placeholder { color: @pf-text; opacity: .45; }
+        &:focus { outline: none; }
+    }
+
+    &__head {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    &__title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 32px;
+        font-weight: 700;
+        line-height: 1.55;
+        color: @pf-text;
+        margin: 0;
+        text-align: left;
+    }
+
+    &__sub {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 20px;
+        font-weight: 500;
+        line-height: 1.55;
+        color: @pf-text;
+        opacity: .45;
+        margin: 0;
+    }
+
+    &__empty {
+        background: #fff;
+        border: 1px dashed @pf-border;
+        border-radius: 15px;
+        padding: 40px;
+        text-align: center;
+        color: @pf-muted;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+    }
+}
+
+// Saved-state overlay on event cards: floats the date/online badges to the TOP of the image,
+// then drops a small white bookmark tile at the bottom-left.
+.event-card--saved {
+    .event-card__badges--top {
+        top: 18px;
+        bottom: auto;
+    }
+
+    .event-card__saved-mark {
+        position: absolute;
+        left: 16px;
+        bottom: 14px;
+        z-index: 2;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 6px 14px rgba(0, 0, 0, .12);
+
+        svg { display: block; }
+    }
+}
+
+// ---- Saved jobs breadcrumb pills (Figma 564:3600) ----
+.saved-list__crumbs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.saved-list__pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 29px;
+    padding: 6px 12px;
+    border-radius: 100px;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: normal;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background .15s ease, color .15s ease;
+
+    &--parent {
+        background: #E9F8DC;
+        color: #52843E;
+
+        &:hover {
+            background: darken(#E9F8DC, 3%);
+            color: #52843E;
+            text-decoration: none;
+        }
+    }
+
+    &--active {
+        background: #EBFFF4;
+        color: @pf-text;
+    }
+}
+
+// ---- Saved jobs grid (Figma 210:4897) ----
+.saved-jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+
+    .breakpoint-large-down({ grid-template-columns: repeat(2, 1fr); });
+    @media (max-width: 640px) { grid-template-columns: 1fr; }
+}
+
+// ---- Saved-state job card (smaller variant — Figma 210:5106) ----
+.job-card--saved {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0;
+    height: 200px;
+    padding: 20px 27px;
+    background: #fff;
+    border: 1px solid @pf-border;
+    border-radius: 15px;
+    color: @pf-text;
+    text-decoration: none;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .06);
+        border-color: rgba(138, 197, 62, .5);
+        color: @pf-text;
+        text-decoration: none;
+    }
+
+    .job-card__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 0;
+    }
+
+    .job-card__logo {
+        width: 48px;
+        height: 48px;
+        border-radius: 90px;
+        background: #000;
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        img { width: 100%; height: 100%; object-fit: cover; }
+    }
+
+    .job-card__logo-stub {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        color: #fff;
+        line-height: 1.6;
+    }
+
+    .job-card__saved-mark {
+        position: static;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 6px;
+        background: #E9F8DC;
+        border-radius: 10px;
+        flex-shrink: 0;
+        box-shadow: none;
+
+        svg { display: block; }
+    }
+
+    .job-card__title-block {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .job-card__title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1.6;
+        color: @pf-text;
+        margin: 0;
+        max-width: 240px;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .job-card__desc {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.5;
+        color: @pf-text;
+        opacity: .45;
+        margin: 0;
+        max-width: 240px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .job-card__link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.6;
+        color: @pf-text;
+        margin: 0;
+
+        svg { display: block; flex-shrink: 0; transition: transform .2s ease; }
+    }
+
+    &:hover .job-card__link svg { transform: translateY(2px); }
+}
+
+// ---- Legacy saved list breadcrumb (kept for backwards compatibility) ----
+.saved-list__breadcrumb {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin: 4px 0 22px;
+}
+
+.saved-list__crumb {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #ecf6dc;
+    color: @pf-green-dark;
+    text-decoration: none;
+
+    &--active {
+        background: #fff;
+        color: @pf-muted;
+        border: 1px solid @pf-border;
+    }
+}
+
+// ---- Save tag (bookmark) button — matches tag.png ----
+.save-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    border: 0;
+    background: #e7f5d0;        // soft green tint
+    color: @pf-green-dark;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .15s ease, color .15s ease, transform .15s ease;
+
+    svg { display: block; }
+
+    .save-tag__icon--on  { display: none; }
+    .save-tag__icon--off { display: block; }
+
+    &.is-saved {
+        background: @pf-green-dark;
+        color: #fff;
+
+        .save-tag__icon--on  { display: block; }
+        .save-tag__icon--off { display: none; }
+    }
+
+    &:hover {
+        background: darken(#e7f5d0, 4%);
+    }
+
+    &.is-saved:hover {
+        background: darken(@pf-green-dark, 4%);
+    }
+}
+
+// ---- Sign-up popup (Figma node 440:14426) ----
+.signup-popup {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 10000;
+
+    &.is-open { display: flex; }
+
+    &__backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(236, 246, 230, .55);
+        backdrop-filter: blur(2px);
+    }
+
+    &__dialog {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 55px;
+        background: #fff;
+        border-radius: 20px;
+        padding: 55px;
+        max-width: 30vw;
+        width: 100%;
+        max-height: calc(~'100vh - 110px');
+        //overflow: auto;
+        filter: drop-shadow(-6px 4px 12.5px rgba(85, 85, 85, .06));
+        box-shadow: 0 30px 60px rgba(0, 0, 0, .35);
+
+        @media (max-width: 1440px) {
+            max-width: 50vw;
+        }
+        @media (max-width: 880px) {
+            flex-direction: column;
+            gap: 32px;
+            padding: 36px 28px;
+        }
+    }
+
+    &__close {
+        position: absolute;
+        top: 55px;
+        right: 55px;
+        z-index: 2;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        background: transparent;
+        border: 0;
+        cursor: pointer;
+        color: #182D10;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity .15s ease;
+
+        svg { display: block; }
+        &:hover { opacity: .65; }
+
+        @media (max-width: 880px) {
+            top: 16px;
+            right: 16px;
+        }
+    }
+
+    &__media {
+        flex-shrink: 0;
+        width: 450px;
+        max-width: 50%;
+        height: stretch;
+        min-height: 450px;
+        border-radius: 20px;
+        background: url("../../assets/images/signup-bird.jpg") center center no-repeat;
+        background-size: cover;
+
+        @media (max-width: 880px) {
+            width: 100%;
+            height: 240px;
+        }
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 25px;
+    }
+
+    &__text {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    &__title {
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-size: 32px;
+        font-weight: 500;
+        line-height: 1.45;
+        color: #182D10;
+        margin: 0;
+        text-align: left;
+
+        @media (max-width: 560px) { font-size: 26px; }
+    }
+
+    &__sub {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 400;
+        line-height: 1.45;
+        color: #798972;
+        margin: 0;
+        max-width: 345px;
+
+        @media (max-width: 560px) { font-size: 15px; }
+    }
+
+    &__cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 25px;
+        background: #8AC53E;
+        color: #fff;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: -0.32px;
+        line-height: normal;
+        border: 0;
+        border-radius: 60px;
+        text-decoration: none;
+        box-shadow: 0 39px 88px rgba(0, 0, 0, .10),
+                    0 14px 22px rgba(0, 0, 0, .05);
+        transition: background .15s ease, transform .15s ease;
+
+        &:hover {
+            background: #7ab632;
+            color: #fff;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+    }
+
+    // "Already have an account? Log in" link under the primary CTA — mirrors
+    // the same affordance on the welcome hero (pgt-welcome__login).
+    &__login {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 15px;
+        font-weight: 400;
+        line-height: 1.45;
+        color: #798972;
+
+        a {
+            color: #52843E;
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+
+            &:hover { color: #182D10; }
+        }
+    }
+}
+
+// ---- Title row on event detail with save button ----
+.event-detail__title-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    justify-content: space-between;
+}
+
+.job-aside__bookmark-wrap .save-tag {
+    width: 44px; height: 44px;
+}

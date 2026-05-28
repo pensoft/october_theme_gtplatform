@@ -1,0 +1,356 @@
+{% if not user %}
+    {# The signup popup itself is rendered by partials/site/header.htm for all
+       anonymous visitors. We just auto-open it here since an anonymous user
+       landed directly on /post-job. #}
+    <script>
+        (function () {
+            function autoOpen() {
+                var modal = document.getElementById('signupPopup');
+                if (!modal) return;
+                modal.classList.add('is-open');
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', autoOpen);
+            } else {
+                autoOpen();
+            }
+        })();
+    </script>
+{% else %}
+
+<div class="post-job-page">
+    <a class="post-job-page__back" href="/job-opportunities">
+        <svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true">
+            <path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M8.5 3.5l-3 3.5 3 3.5"/>
+        </svg>
+        <span>Back to jobs</span>
+    </a>
+
+    <form id="postJobForm"
+          data-request="{{ __SELF__ }}::onPost"
+          data-request-validate
+          data-request-files
+          data-request-success="window.PJ_JOB_POSTED && window.PJ_JOB_POSTED(data)"
+          enctype="multipart/form-data"
+          autocomplete="off">
+
+        <section class="post-job-page__section">
+            <h2 class="post-job-page__section-title">Basic info</h2>
+
+            <div class="pj-field pj-field--full">
+                <label for="pjTitle" class="pj-label">Job Title</label>
+                <input id="pjTitle" name="title" type="text" class="pj-input" placeholder="Add job title, role vacancies etc">
+                <span data-validate-for="title" class="pj-error"></span>
+            </div>
+
+            <div class="pj-field pj-field--full">
+                <label for="pjTags" class="pj-label">Tags</label>
+                <input id="pjTags" name="tags" type="text" class="pj-input" placeholder="Job keyword, tags etc..">
+            </div>
+        </section>
+
+        <section class="post-job-page__section">
+            <h2 class="post-job-page__section-title">Organiser</h2>
+
+            <div class="pj-grid">
+                <div class="pj-field">
+                    <label for="pjOrganiser" class="pj-label">Organiser</label>
+                    <input id="pjOrganiser" name="organiser" type="text" class="pj-input" placeholder="Company / institution name">
+                    <span data-validate-for="organiser" class="pj-error"></span>
+                </div>
+
+                <div class="pj-field">
+                    <label for="pjOrganiserLogo" class="pj-label">Organiser logo</label>
+                    <input id="pjOrganiserLogo" name="organiser_logo" type="file" class="pj-input pj-input--file" accept="image/*">
+                    <span data-validate-for="organiser_logo" class="pj-error"></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="post-job-page__section">
+            <h2 class="post-job-page__section-title">Job details</h2>
+
+            <div class="pj-grid">
+                <div class="pj-field">
+                    <label for="pjJobType" class="pj-label">Type</label>
+                    <select id="pjJobType" name="job_type_id" class="pj-select">
+                        {% for t in jobTypes %}
+                            <option value="{{ t.id }}"{% if loop.first %} selected{% endif %}>{{ t.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="pj-field">
+                    <label for="pjJobRole" class="pj-label">Job role</label>
+                    <select id="pjJobRole" name="job_role" class="pj-select">
+                        <option value="">Job role...</option>
+                        {% for r in jobRoles %}
+                            <option value="{{ r.id }}">{{ r.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="pj-field">
+                    <label for="pjJobLevel" class="pj-label">Job level</label>
+                    <select id="pjJobLevel" name="job_level" class="pj-select">
+                        <option value="">Select...</option>
+                        {% for l in jobLevels %}
+                            <option value="{{ l.id }}">{{ l.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="pj-field">
+                    <label for="pjWorkMode" class="pj-label">Work mode</label>
+                    <select id="pjWorkMode" name="work_mode" class="pj-select">
+                        <option value="">Select...</option>
+                        {% for w in workModes %}
+                            <option value="{{ w.id }}">{{ w.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="pj-field">
+                    <label for="pjWorkPresence" class="pj-label">Work physical presence</label>
+                    <select id="pjWorkPresence" name="work_physical_presence_id" class="pj-select">
+                        <option value="">Select...</option>
+                        {% for p in workPhysicalPresences %}
+                            <option value="{{ p.id }}">{{ p.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="pj-field">
+                    <label for="pjFunding" class="pj-label">Funding</label>
+                    <select id="pjFunding" name="funding" class="pj-select">
+                        <option value="">Select...</option>
+                        {% for f in fundings %}
+                            <option value="{{ f.id }}">{{ f.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="pj-field">
+                    <label for="pjVacancies" class="pj-label">Vacancies</label>
+                    <input id="pjVacancies" name="vacancies" type="number" min="1" class="pj-input" placeholder="Number">
+                </div>
+
+                <div class="pj-field">
+                    <label for="pjExperience" class="pj-label">Experience</label>
+                    <input id="pjExperience" name="experience" type="text" class="pj-input" placeholder="e.g. 3+ years, PhD candidate…">
+                </div>
+
+                <div class="pj-field">
+                    <label for="pjDegree" class="pj-label">Degree</label>
+                    <input id="pjDegree" name="degree" type="text" class="pj-input" placeholder="e.g. BSc, MSc, PhD">
+                </div>
+
+                <div class="pj-field">
+                    <label for="pjSalary" class="pj-label">Salary</label>
+                    <input id="pjSalary" name="salary" type="text" class="pj-input" placeholder="e.g. €45,000 – €55,000 / year">
+                </div>
+            </div>
+        </section>
+
+        <section class="post-job-page__section">
+            <h2 class="post-job-page__section-title">Key responsibilities</h2>
+
+            <div class="pj-field pj-field--full">
+                <label for="pjResponsibilities" class="pj-label">Key responsibilities</label>
+                <textarea id="pjResponsibilities" name="key_responsibilities" class="pj-textarea" rows="6" placeholder="One responsibility per line"></textarea>
+                <span class="pj-help">Add one responsibility per line — each line is stored as a separate bullet.</span>
+            </div>
+        </section>
+
+        <section class="post-job-page__section">
+            <h2 class="post-job-page__section-title">Location</h2>
+
+            <div class="pj-grid">
+                <div class="pj-field">
+                    <label for="pjCountry" class="pj-label">Country</label>
+                    <select id="pjCountry" name="country_id" class="pj-select">
+                        <option value="">Select...</option>
+                        {% for c in countries %}
+                            <option value="{{ c.id }}">{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="pj-field">
+                    <label for="pjCity" class="pj-label">City</label>
+                    <input id="pjCity" name="city" type="text" class="pj-input" placeholder="Enter city...">
+                </div>
+
+                <div class="pj-field">
+                    <label for="pjLatitude" class="pj-label">Latitude</label>
+                    <input id="pjLatitude" name="latitude" type="number" step="any" min="-90" max="90" class="pj-input" placeholder="e.g. 42.6977">
+                </div>
+
+                <div class="pj-field">
+                    <label for="pjLongitude" class="pj-label">Longitude</label>
+                    <input id="pjLongitude" name="longitude" type="number" step="any" min="-180" max="180" class="pj-input" placeholder="e.g. 23.3219">
+                </div>
+            </div>
+        </section>
+
+        <section class="post-job-page__section">
+            <h2 class="post-job-page__section-title">Contact</h2>
+
+            <div class="pj-grid">
+                <div class="pj-field">
+                    <label for="pjContactPerson" class="pj-label">Contact person</label>
+                    <input id="pjContactPerson" name="contact_person" type="text" class="pj-input"
+                           value="{{ (user.name ~ (user.surname ? ' ' ~ user.surname : ''))|trim }}"
+                           placeholder="Full name">
+                </div>
+
+                <div class="pj-field">
+                    <label for="pjContactEmail" class="pj-label">Contact email</label>
+                    <input id="pjContactEmail" name="email" type="email" class="pj-input"
+                           value="{{ user.email }}"
+                           placeholder="name@example.com">
+                    <span data-validate-for="email" class="pj-error"></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="post-job-page__section">
+            <h2 class="post-job-page__section-title">Job description</h2>
+
+            <div class="pj-field pj-field--full">
+                <label for="pjDesc" class="pj-label pj-label--sr">Job description</label>
+                <textarea id="pjDesc" name="description" class="pj-textarea pj-textarea--richeditor" rows="8" placeholder="Add your description..."></textarea>
+            </div>
+        </section>
+
+        <div class="post-job-page__submit">
+            <button type="submit" class="pj-btn pj-btn--primary">Post job</button>
+        </div>
+    </form>
+</div>
+
+{# ---------- Job posted success popup (Figma 440:8627) ---------- #}
+<div class="job-posted-popup" id="jobPostedPopup" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="jobPostedPopupTitle">
+    <div class="job-posted-popup__backdrop" data-job-posted-close></div>
+    <div class="job-posted-popup__dialog" role="document">
+        <h2 id="jobPostedPopupTitle" class="job-posted-popup__title">Job posted!</h2>
+        <p class="job-posted-popup__sub">
+            Your job offer has been submitted and is not visible yet. It will be reviewed
+            internally by our team before it can be published. Once it&rsquo;s
+            approved it will appear in the job listings.
+        </p>
+        <div class="job-posted-popup__actions">
+            <a href="/job-opportunities" class="job-posted-popup__btn job-posted-popup__btn--primary">Done</a>
+            <button type="button" class="job-posted-popup__btn job-posted-popup__btn--ghost" data-job-posted-reset>Create another position</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var modal = document.getElementById('jobPostedPopup');
+        if (!modal) return;
+
+        function open() {
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+        function close() {
+            modal.classList.remove('is-open');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        // Exposed to the form's data-request-success — called with the AJAX
+        // response payload from PostJob::onPost (which returns { posted, job_id, ... }).
+        window.PJ_JOB_POSTED = function (data) {
+            if (data && data.posted) open();
+        };
+
+        document.addEventListener('click', function (e) {
+            if (e.target.closest && e.target.closest('[data-job-posted-close]')) {
+                e.preventDefault();
+                close();
+                return;
+            }
+            if (e.target.closest && e.target.closest('[data-job-posted-reset]')) {
+                e.preventDefault();
+                var form = document.getElementById('postJobForm');
+                if (form) {
+                    form.reset();
+                    if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances && CKEDITOR.instances.pjDesc) {
+                        CKEDITOR.instances.pjDesc.setData('');
+                    }
+                }
+                close();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && modal.classList.contains('is-open')) close();
+        });
+    })();
+</script>
+
+<script src="{{ 'assets/js/ckeditor/ckeditor.js'|theme }}"></script>
+<script>
+    (function () {
+        function initRichEditor() {
+            if (typeof CKEDITOR === 'undefined') return;
+            if (CKEDITOR.instances && CKEDITOR.instances.pjDesc) return;
+
+            CKEDITOR.replace('pjDesc', {
+                // Minimal toolbar: bold, italic, ordered list, bulleted list.
+                toolbar: [
+                    { name: 'basicstyles', items: ['Bold', 'Italic'] },
+                    { name: 'paragraph',   items: ['NumberedList', 'BulletedList'] }
+                ],
+                removePlugins: 'elementspath',
+                resize_enabled: false,
+                height: 220,
+                // Strip everything except the elements the toolbar above can produce.
+                allowedContent: 'p br strong em b i ol ul li'
+            });
+
+            // Match the surrounding .pj-textarea card typography inside the iframe.
+            CKEDITOR.instances.pjDesc.on('instanceReady', function (ev) {
+                var doc = ev.editor.document;
+                if (doc && doc.appendStyleText) {
+                    doc.appendStyleText(
+                        'body{font-family:Fustat,Arial,sans-serif;font-size:14px;color:#182d10;line-height:1.4;margin:16px 20px;}' +
+                        'p{margin:0 0 .6em;}' +
+                        'ul,ol{margin:.2em 0 .8em 1.2em;padding:0;}' +
+                        'li{margin-bottom:.2em;}'
+                    );
+                }
+            });
+
+            // Keep the underlying <textarea> in sync so the OctoberCMS AJAX
+            // submit picks up the latest content (CKEditor 4 doesn't auto-sync
+            // when the form is submitted via fetch/XHR instead of a real submit).
+            CKEDITOR.instances.pjDesc.on('change', function () {
+                CKEDITOR.instances.pjDesc.updateElement();
+            });
+
+            var form = document.getElementById('postJobForm');
+            if (form) {
+                form.addEventListener('submit', function () {
+                    if (CKEDITOR.instances.pjDesc) {
+                        CKEDITOR.instances.pjDesc.updateElement();
+                    }
+                }, true);
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initRichEditor);
+        } else {
+            initRichEditor();
+        }
+    })();
+</script>
+{% endif %}

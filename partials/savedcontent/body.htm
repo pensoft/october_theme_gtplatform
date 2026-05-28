@@ -1,0 +1,116 @@
+{# Swappable body of the saved-content overview.
+   Default view: two tile shortcuts to Events / Job offers + their counts.
+   Search view : results lists of matching saved events and jobs — rendered
+   with the same .event-card--saved and .job-card--saved markup used on the
+   dedicated /profile/saved/events and /profile/saved/jobs pages
+   (Figma 210:3743 / 210:5106).
+   Swapped in via AJAX from SavedContent::onSearch → '#savedContentBody'. #}
+
+{% set _query = (query|default(''))|trim %}
+
+{% if _query is not empty %}
+    {% set _eventsHits = searchEvents|default([])|length %}
+    {% set _jobsHits   = searchJobs|default([])|length %}
+    {% set _total      = _eventsHits + _jobsHits %}
+
+    <div class="saved-content__head">
+        <h2 class="saved-content__title">Results for &ldquo;{{ _query }}&rdquo;</h2>
+        <p class="saved-content__sub">
+            {% if _total == 0 %}
+                No matches in your saved content.
+            {% elseif _total == 1 %}
+                1 match across your saved content
+            {% else %}
+                {{ _total }} matches across your saved content
+            {% endif %}
+        </p>
+    </div>
+
+    {% if _eventsHits > 0 %}
+        <h3 class="saved-content__group">Events</h3>
+        <div class="events-grid">
+            {% for ev in searchEvents %}
+                {% partial 'event-card' ev=ev saved=true %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if _jobsHits > 0 %}
+        <h3 class="saved-content__group">Job offers</h3>
+        <div class="saved-jobs-grid">
+            {% for j in searchJobs %}
+                <a class="job-card job-card--saved" href="/jobs/{{ j.slug }}">
+                    <div class="job-card__head">
+                        <div class="job-card__logo">
+                            {% if j.organiser_logo %}
+                                <img src="{{ j.organiser_logo.getThumb(48, 48, { mode: 'crop' }) }}" alt="{{ j.organiser }}">
+                            {% else %}
+                                <span class="job-card__logo-stub">{{ (j.organiser|default(j.title))|first|upper }}</span>
+                            {% endif %}
+                        </div>
+                        <span class="job-card__saved-mark" aria-label="Saved" title="Saved">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+                                <path d="M6 4.5A1.5 1.5 0 017.5 3h9A1.5 1.5 0 0118 4.5V21l-6-3.75L6 21V4.5z" fill="#52843E"/>
+                            </svg>
+                        </span>
+                    </div>
+
+                    <div class="job-card__title-block">
+                        <h3 class="job-card__title">{{ j.title }}</h3>
+                        {% if j.description %}
+                            <p class="job-card__desc">{{ j.description|striptags|slice(0, 80) }}{% if j.description|length > 80 %}…{% endif %}</p>
+                        {% endif %}
+                    </div>
+
+                    <span class="job-card__link">
+                        Job details
+                        <svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true">
+                            <path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M4 5l3 3 3-3"/>
+                        </svg>
+                    </span>
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if _total == 0 %}
+        <p class="saved-content__empty">Try a different keyword — nothing in your saved events or jobs matches &ldquo;{{ _query }}&rdquo;.</p>
+    {% endif %}
+{% else %}
+    <div class="saved-content__head">
+        <h2 class="saved-content__title">Saved content</h2>
+        <p class="saved-content__sub">All your saved and unfinished content</p>
+    </div>
+
+    <div class="saved-content__grid">
+        <a class="saved-tile saved-tile--events" href="/profile/saved/events">
+            <span class="saved-tile__icon">
+                <svg viewBox="0 0 32 32" width="32" height="32" fill="none" aria-hidden="true">
+                    <rect x="5" y="7" width="22" height="20" rx="2.5" stroke="#52843E" stroke-width="2"/>
+                    <path stroke="#52843E" stroke-width="2" stroke-linecap="round" d="M5 13h22"/>
+                    <path stroke="#52843E" stroke-width="2" stroke-linecap="round" d="M11 4v6M21 4v6"/>
+                </svg>
+            </span>
+            <div class="saved-tile__body">
+                <h3 class="saved-tile__title">Events</h3>
+                <p class="saved-tile__count">{{ eventsCount|default(0) }} items</p>
+            </div>
+            <span class="saved-tile__cta">View events</span>
+        </a>
+
+        <a class="saved-tile saved-tile--jobs" href="/profile/saved/jobs">
+            <span class="saved-tile__icon">
+                <svg viewBox="0 0 32 32" width="32" height="32" fill="none" aria-hidden="true">
+                    <rect x="4" y="10" width="24" height="17" rx="2.5" stroke="#5C7B6A" stroke-width="2"/>
+                    <path stroke="#5C7B6A" stroke-width="2" stroke-linecap="round" d="M11 10V7.5A2.5 2.5 0 0113.5 5h5A2.5 2.5 0 0121 7.5V10"/>
+                    <path stroke="#5C7B6A" stroke-width="2" stroke-linecap="round" d="M4 16h24"/>
+                </svg>
+            </span>
+            <div class="saved-tile__body">
+                <h3 class="saved-tile__title">Job offers</h3>
+                <p class="saved-tile__count">{{ jobsCount|default(0) }} items</p>
+            </div>
+            <span class="saved-tile__cta">View jobs</span>
+        </a>
+    </div>
+{% endif %}

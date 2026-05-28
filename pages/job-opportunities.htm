@@ -1,0 +1,26 @@
+title = "Explore over 200+ Job Opportunities"
+subtitle = "Discover jobs and secondments across the network"
+layout = "default"
+url = "/job-opportunities"
+
+[jobsList]
+perPage = "12"
+detailPage = "job"
+==
+<?php
+function onStart()
+{
+    $count = \Pensoft\Jobs\Models\Job::where('is_active', true)->count();
+    // Cosmetic banding (50, 100, 200, 500, …) so the hero reads as a round figure.
+    $bands = [50, 100, 200, 500, 1000, 2000, 5000];
+    $display = 0;
+    foreach ($bands as $b) {
+        if ($count >= $b) { $display = $b; }
+    }
+    $this['jobsCountDisplay'] = $display ? ($display . '+') : (string) $count;
+}
+?>
+==
+<div class="container jobs-container">
+    {% component 'jobsList' %}
+</div>

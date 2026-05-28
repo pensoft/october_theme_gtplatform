@@ -1,0 +1,55 @@
+{% if canRegister %}
+    <h3>Create your account</h3>
+
+    <form role="form" method="post" data-request="onRegister" data-request-success="window.PGT_AUTH.loadStep('login');">
+        {# redirect=0 tells RainLab's Account::onRegister not to redirect server-side
+           (it would otherwise bounce to /profile → /login); we open the login popup instead. #}
+        <input type="hidden" name="redirect" value="0">
+        <div class="ui form">
+            <div class="fields">
+                <div class="field">
+                    <label for="registerName">Full Name</label>
+                    <input
+                        name="name"
+                        type="text"
+                        id="registerName"
+                        placeholder="Enter your full name" />
+                </div>
+                <div class="field">
+                    <label for="registerEmail">Email</label>
+                    <input
+                        name="email"
+                        type="email"
+                        id="registerEmail"
+                        placeholder="Enter your email" />
+                </div>
+                {% if loginAttribute == "username" %}
+                    <div class="field">
+                        <label for="registerUsername">Username</label>
+                        <input
+                            name="username"
+                            type="text"
+                            id="registerUsername"
+                            placeholder="Enter your username" />
+                    </div>
+                {% endif %}
+                <div class="field">
+                    <label for="registerPassword">Password</label>
+                    <input
+                        name="password"
+                        type="password"
+                        id="registerPassword"
+                        placeholder="Choose a password" />
+                </div>
+            </div>
+        </div>
+        <div class="row middle-xs mt-1">
+			<div class="col-xs-12 mb-1 d-flex justify-content-center">            <button type="submit" class="btn btn-primary btn-slide btn-ghost">Register</button>
+			</div>
+			<div class="col-xs-12 d-flex justify-content-center">            <a class="btn btn-link" href="/login" data-pgt-step="login">I already have an account</a>
+			</div>
+        </div>
+    </form>
+{% else %}
+    <!-- Registration is disabled. -->
+{% endif %}
