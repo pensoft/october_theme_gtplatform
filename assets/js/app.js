@@ -61,7 +61,7 @@ $(document).ready(function () {
         .find('a[href*="https://green-talent.eu"]');
     $greenTalent.closest('.nav-item').addClass('green-talent');
     if (!$greenTalent.find('.green-talent__logo').length) {
-        $greenTalent.prepend('<img class="green-talent__logo" src="/storage/app/media/logo.svg" alt="Green Talent Project website">');
+        $greenTalent.prepend('<img class="green-talent__logo" src="/storage/app/media/logo_gt.svg" alt="Green Talent Project website">');
     }
     $('<div class="calendar-top"></div>').insertBefore("#calendar");
     $('<div class="card-profile-top"></div>').insertBefore(".card.profile.card-profile");
