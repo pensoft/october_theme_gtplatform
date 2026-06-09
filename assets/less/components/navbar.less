@@ -493,7 +493,8 @@
         height: 100vh;
         margin: -40px 0 0 -93vw;
         padding: 100px 0 0 0;
-        background: #182D10;
+        //background: #182D10;
+        background: radial-gradient(ellipse 80% 60% at 50% 30%, lighten(@gt-header-bg, 6%) 0%, @gt-header-bg-2 75%);
         color: @white-color!important;
         font-size: 16px!important;
         -webkit-font-smoothing: antialiased;
@@ -526,6 +527,13 @@
 
     #menu li.sign-in a{
         color: @white-color !important;
+    }
+
+    // The Green Talent logo (injected in app.js) is a desktop-only flourish —
+    // hide it in the mobile menu so the item reads as plain text.
+    #menu .green-talent__logo,
+    #menuToggle .green-talent__logo{
+        display: none;
     }
 
     #menu li a{

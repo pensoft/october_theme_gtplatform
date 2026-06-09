@@ -587,6 +587,14 @@ ul.pagination{
         text-decoration: none;
 
         &:hover { opacity: .92; }
+
+        // The hamburger toggle is absolutely positioned (right: 24px) and out
+        // of flow, so the avatar — the rightmost flex item once the nav is
+        // hidden — would sit underneath it. Reserve space so they don't collide.
+        .breakpoint-large-down({
+            margin-right: 0;
+            margin-top: 20px;
+        });
     }
 
     &__avatar {
@@ -596,6 +604,11 @@ ul.pagination{
         object-fit: contain;
         //border: 2px solid rgba(255, 255, 255, .12);
         //background: #fff;
+
+        .breakpoint-large-down({
+            width: 44px;
+            height: 44px;
+        });
 
         &--placeholder {
             //background: rgba(255, 255, 255, .15);
@@ -626,6 +639,22 @@ ul.pagination{
         });
     }
 }
+
+// The mobile menu (#menu) is rendered inside .gt-header-wrap, which clips its
+// children (overflow: hidden + border-radius + margin). That confined the open
+// menu to the small header card. Pin it to the viewport with position: fixed so
+// it escapes the clip and fills the full screen height.
+.breakpoint-large-down({
+    .gt-header #menuToggle #menu {
+        position: fixed;
+        top: 20px;
+        left: 19px;
+        width: 91vw;
+        height: 80vh;
+        border-radius: 20px;
+        margin: 0;
+    }
+});
 
 .home{
     .pgt-hero{

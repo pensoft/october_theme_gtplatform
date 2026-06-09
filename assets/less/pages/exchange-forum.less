@@ -545,7 +545,18 @@
     padding: 60px 24px;
     min-height: 597px;
 
-    @media (max-width: 980px) { min-height: 0; padding: 60px 20px; }
+    @media (max-width: 980px) {
+        min-height: 0;
+        padding: 50px 20px;
+        // On mobile the illustration can't overlap the text (it would hide
+        // behind the z-index:2 header), so the card becomes a flex column and
+        // the illustration is ordered to the bottom of the container.
+        display: flex;
+        flex-direction: column;
+
+        .ef-conv-card__head { order: 1; }
+        .ef-conv-illustration { order: 2; }
+    }
 
     // Faint background flourish (replaces decorative Figma SVG wave)
     &__wave {
@@ -677,6 +688,17 @@
     pointer-events: none;
     z-index: 0;
     line-height: 0;
+
+    // On mobile, drop out of absolute positioning so the flex column places
+    // it at the bottom of the card (below the text) instead of behind it.
+    @media (max-width: 980px) {
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        width: 100%;
+        margin-top: 36px;
+    }
 
     .ef-conv-svg {
         display: block;
