@@ -505,7 +505,14 @@
                                     <span class="job-card__chip job-card__chip--mode-accent">{{ w.title }}</span>
                                 {% endfor %}
                                 {% if j.work_physical_presence %}
-                                    <span class="job-card__chip job-card__chip--presence">{{ j.work_physical_presence.title }}</span>
+                                    {% set _pslug = j.work_physical_presence.title|lower %}
+                                    {% set _pmod  = 'job-card__chip--mode-remote' %}
+                                    {% if _pslug == 'on-location' or _pslug == 'on location' %}
+                                        {% set _pmod = 'job-card__chip--mode-onsite' %}
+                                    {% elseif _pslug == 'hybrid' %}
+                                        {% set _pmod = 'job-card__chip--mode-hybrid' %}
+                                    {% endif %}
+                                    <span class="job-card__chip {{ _pmod }}">{{ j.work_physical_presence.title }}</span>
                                 {% endif %}
                             </div>
                         {% endif %}
