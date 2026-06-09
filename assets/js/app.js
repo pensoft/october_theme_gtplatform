@@ -49,9 +49,20 @@ $(document).ready(function () {
     // for. Its delegated click handler then opens the "Coming soon" popup and
     // prevents navigation. Covers both the desktop and mobile nav.
     $('#headerNavbarNav, #menuToggle')
-        .find('a[href*="exchange-forum"]')
+        .find('a[href*="collaboration-corner"]')
         .attr('data-coming-soon', '')
-        .attr('data-month', 'September');
+        .attr('data-month', 'July');
+
+    // The "Green Talent" item links out to the main project site. Markup is
+    // plugin-rendered, so we tag it here (matched by href): flag the <li> for
+    // distinct styling and prepend the project logo inside its link. Covers
+    // both the desktop and mobile nav.
+    var $greenTalent = $('#headerNavbarNav, #menuToggle')
+        .find('a[href*="green-talent.eu"]');
+    $greenTalent.closest('.nav-item').addClass('green-talent');
+    if (!$greenTalent.find('.green-talent__logo').length) {
+        $greenTalent.prepend('<img class="green-talent__logo" src="/storage/app/media/logo.svg" alt="Green Talent Project website">');
+    }
     $('<div class="calendar-top"></div>').insertBefore("#calendar");
     $('<div class="card-profile-top"></div>').insertBefore(".card.profile.card-profile");
     var divs = $(".card-profiles > div");

@@ -369,6 +369,24 @@
                             //color: #182D10!important;
                         }
                     }
+
+                    // External link to the main Green Talent site — set apart
+                    // from the platform nav items and prefixed with the logo
+                    // (both injected in app.js since the markup is plugin-rendered).
+                    &.green-talent{
+                        a{
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 8px;
+                            font-weight: 600;
+                            color: #88c23d !important;
+                        }
+                        .green-talent__logo{
+                            //width: 22px;
+                            height: 22px;
+                            flex: 0 0 auto;
+                        }
+                    }
                 }
             }
         }

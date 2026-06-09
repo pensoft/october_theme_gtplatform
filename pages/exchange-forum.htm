@@ -183,9 +183,14 @@ function onStart()
             if (!el) return;
 
             // Split into word-spans once, preserving whitespace.
+            // A few keywords ("exchange", "learning", "collaboration") get a
+            // green modifier so they stand out regardless of the scroll fill.
+            var greenWords = { exchange: 1, learning: 1, collaboration: 1 };
             var words = el.textContent.trim().split(/\s+/);
             el.innerHTML = words.map(function (w) {
-                return '<span class="ef-quote__word">' + w + '</span>';
+                var key = w.toLowerCase().replace(/[^a-z]/g, '');
+                var cls = greenWords[key] ? 'ef-quote__word ef-quote__word--green' : 'ef-quote__word';
+                return '<span class="' + cls + '">' + w + '</span>';
             }).join(' ');
             var spans = el.querySelectorAll('.ef-quote__word');
 

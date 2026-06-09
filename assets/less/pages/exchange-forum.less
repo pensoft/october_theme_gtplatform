@@ -493,7 +493,7 @@
 //  Section 3: Quote with scroll-driven text fill (Figma 274:2197)
 // =====================================================
 .ef-quote {
-    padding: 120px 0;
+    padding: 50px 0 70px 0;
     text-align: center;
 
     &__text {
@@ -514,6 +514,10 @@
         transition: color .35s ease;
 
         &.is-filled { color: #182d10; }
+
+        // Keyword highlights ("exchange", "learning", "collaboration") fill to
+        // green instead of dark once the scroll animation reaches them.
+        &--green.is-filled { color: #8AC53E; }
     }
 }
 
