@@ -58,7 +58,7 @@ $(document).ready(function () {
     // distinct styling and prepend the project logo inside its link. Covers
     // both the desktop and mobile nav.
     var $greenTalent = $('#headerNavbarNav, #menuToggle')
-        .find('a[href*="green-talent.eu"]');
+        .find('a[href*="https://green-talent.eu"]');
     $greenTalent.closest('.nav-item').addClass('green-talent');
     if (!$greenTalent.find('.green-talent__logo').length) {
         $greenTalent.prepend('<img class="green-talent__logo" src="/storage/app/media/logo.svg" alt="Green Talent Project website">');
