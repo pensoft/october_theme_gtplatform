@@ -85,7 +85,7 @@
                 <div class="pj-field">
                     <label for="pjJobRole" class="pj-label">Job role</label>
                     <select id="pjJobRole" name="job_role" class="pj-select">
-                        <option value="">Job role...</option>
+                        <option value="">Select...</option>
                         {% for r in jobRoles %}
                             <option value="{{ r.id }}">{{ r.title }}</option>
                         {% endfor %}
@@ -200,14 +200,14 @@
 
             <div class="pj-grid">
                 <div class="pj-field">
-                    <label for="pjContactPerson" class="pj-label">Contact person</label>
+                    <label for="pjContactPerson" class="pj-label">Name</label>
                     <input id="pjContactPerson" name="contact_person" type="text" class="pj-input"
                            value="{{ (user.name ~ (user.surname ? ' ' ~ user.surname : ''))|trim }}"
                            placeholder="Full name">
                 </div>
 
                 <div class="pj-field">
-                    <label for="pjContactEmail" class="pj-label">Contact email</label>
+                    <label for="pjContactEmail" class="pj-label">Email</label>
                     <input id="pjContactEmail" name="email" type="email" class="pj-input"
                            value="{{ user.email }}"
                            placeholder="name@example.com">
