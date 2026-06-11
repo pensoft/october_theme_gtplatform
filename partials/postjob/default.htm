@@ -1,3 +1,9 @@
+[jumbotron disclaimer]
+jumbotron = "post-job-disclaimer"
+background = "transperant"
+templates = "template3"
+description_limit = 0
+==
 {% if not user %}
     {# The signup popup itself is rendered by partials/site/header.htm for all
        anonymous visitors. We just auto-open it here since an anonymous user
@@ -28,6 +34,8 @@
         <span>Back to jobs</span>
     </a>
 
+    {% component 'disclaimer' %}
+
     <form id="postJobForm"
           data-request="{{ __SELF__ }}::onPost"
           data-request-validate
@@ -51,23 +59,7 @@
             </div>
         </section>
 
-        <section class="post-job-page__section">
-            <h2 class="post-job-page__section-title">Organiser</h2>
 
-            <div class="pj-grid">
-                <div class="pj-field">
-                    <label for="pjOrganiser" class="pj-label">Organiser</label>
-                    <input id="pjOrganiser" name="organiser" type="text" class="pj-input" placeholder="Company / institution name">
-                    <span data-validate-for="organiser" class="pj-error"></span>
-                </div>
-
-                <div class="pj-field">
-                    <label for="pjOrganiserLogo" class="pj-label">Organiser logo</label>
-                    <input id="pjOrganiserLogo" name="organiser_logo" type="file" class="pj-input pj-input--file" accept="image/*">
-                    <span data-validate-for="organiser_logo" class="pj-error"></span>
-                </div>
-            </div>
-        </section>
 
         <section class="post-job-page__section">
             <h2 class="post-job-page__section-title">Job details</h2>
@@ -152,15 +144,15 @@
                     <input id="pjSalary" name="salary" type="text" class="pj-input" placeholder="e.g. €45,000 – €55,000 / year">
                 </div>
             </div>
-        </section>
-
-        <section class="post-job-page__section">
-            <h2 class="post-job-page__section-title">Key responsibilities</h2>
-
             <div class="pj-field pj-field--full">
                 <label for="pjResponsibilities" class="pj-label">Key responsibilities</label>
                 <textarea id="pjResponsibilities" name="key_responsibilities" class="pj-textarea" rows="6" placeholder="One responsibility per line"></textarea>
-                <span class="pj-help">Add one responsibility per line — each line is stored as a separate bullet.</span>
+                <span class="pj-help">Add one responsibility per line - each line is stored as a separate bullet.</span>
+            </div>
+
+            <div class="pj-field pj-field--full">
+                <label for="pjDesc" class="pj-label pj-label--sr">Job description</label>
+                <textarea id="pjDesc" name="description" class="pj-textarea pj-textarea--richeditor" rows="8" placeholder="Add your description..."></textarea>
             </div>
         </section>
 
@@ -196,6 +188,24 @@
         </section>
 
         <section class="post-job-page__section">
+            <h2 class="post-job-page__section-title">Organiser info</h2>
+
+            <div class="pj-grid">
+                <div class="pj-field">
+                    <label for="pjOrganiser" class="pj-label">Company / institution name</label>
+                    <input id="pjOrganiser" name="organiser" type="text" class="pj-input" placeholder="Company / institution name">
+                    <span data-validate-for="organiser" class="pj-error"></span>
+                </div>
+
+                <div class="pj-field">
+                    <label for="pjOrganiserLogo" class="pj-label">Organiser logo</label>
+                    <input id="pjOrganiserLogo" name="organiser_logo" type="file" class="pj-input pj-input--file" accept="image/*">
+                    <span data-validate-for="organiser_logo" class="pj-error"></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="post-job-page__section">
             <h2 class="post-job-page__section-title">Contact</h2>
 
             <div class="pj-grid">
@@ -216,14 +226,7 @@
             </div>
         </section>
 
-        <section class="post-job-page__section">
-            <h2 class="post-job-page__section-title">Job description</h2>
 
-            <div class="pj-field pj-field--full">
-                <label for="pjDesc" class="pj-label pj-label--sr">Job description</label>
-                <textarea id="pjDesc" name="description" class="pj-textarea pj-textarea--richeditor" rows="8" placeholder="Add your description..."></textarea>
-            </div>
-        </section>
 
         <div class="post-job-page__submit">
             <button type="submit" class="pj-btn pj-btn--primary">Post job</button>

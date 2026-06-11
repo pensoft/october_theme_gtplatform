@@ -165,40 +165,53 @@
     }
 
     // --- Active-filter chips (mirrors .jobs-page__active-filters) ---
-    // One chip per filter section that has any selection. Clicking a chip
-    // un-checks all of that section's inputs in the drawer form and re-applies.
+    // One chip per *selected value* across all filter sections — labelled with
+    // the option's own text (e.g. "Climate", "Jan", "Bulgaria"), not the
+    // section name. Clicking a chip un-checks just that one input and re-applies.
     var $chipBar  = $('#eventsActiveFilters');
     var $chipList = $chipBar.find('.events-page__active-filters-chips');
 
-    var CHIP_SECTIONS = [
-        { key: 'topics',    label: 'Topic' },
-        { key: 'months',    label: 'Month' },
-        { key: 'countries', label: 'Location' }
-    ];
+    var CHIP_SECTIONS = ['topics', 'months', 'countries'];
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
+    // The visible label for a checkbox lives in a sibling span inside its
+    // wrapping <label> — a check row for topics/countries, a pill for months.
+    function labelForInput(input) {
+        var wrap = input.closest('label');
+        var el   = wrap && wrap.querySelector('.events-filter-check__label, .events-filter-month__pill');
+        return el ? el.textContent.trim() : input.value;
+    }
 
     function renderChips() {
         var html = '';
-        CHIP_SECTIONS.forEach(function (s) {
-            if ($fForm.find('input[name="' + s.key + '[]"]:checked').length) {
+        CHIP_SECTIONS.forEach(function (key) {
+            $fForm.find('input[name="' + key + '[]"]:checked').each(function () {
                 html +=
-                    '<a href="#" class="events-page__active-filter-chip" data-events-remove-filter="' + s.key + '">' +
-                        '<span>' + s.label + '</span>' +
+                    '<a href="#" class="events-page__active-filter-chip" ' +
+                       'data-events-remove-filter="' + key + '" data-events-remove-value="' + escapeHtml(this.value) + '">' +
+                        '<span>' + escapeHtml(labelForInput(this)) + '</span>' +
                         '<svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">' +
                             '<path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" d="M4 4l8 8M12 4l-8 8"/>' +
                         '</svg>' +
                     '</a>';
-            }
+            });
         });
         $chipList.html(html);
         if (html) { $chipBar.removeAttr('hidden'); }
         else      { $chipBar.attr('hidden', 'hidden'); }
     }
 
-    // Remove one chip → uncheck that section's inputs and re-apply.
+    // Remove one chip → uncheck just that one value and re-apply.
     $(document).on('click', '[data-events-remove-filter]', function (e) {
         e.preventDefault();
         var key = this.getAttribute('data-events-remove-filter');
-        $fForm.find('input[name="' + key + '[]"]:checked').prop('checked', false);
+        var val = this.getAttribute('data-events-remove-value');
+        $fForm.find('input[name="' + key + '[]"][value="' + val + '"]').prop('checked', false);
         applyFilters();
     });
 

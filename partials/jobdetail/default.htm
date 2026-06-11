@@ -129,9 +129,9 @@
 
                     <div class="job-aside__chip-cell">
                         <span class="job-chip job-chip--green">
-                            <svg viewBox="0 0 18 18" width="18" height="18" fill="none" aria-hidden="true">
-                                <circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.5"/>
-                                <path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M11.25 7.1c-.4-.6-1.2-1-2.25-1-1.5 0-2.6.8-2.6 2 0 1.1 1.1 1.6 2.6 1.9 1.5.3 2.6.9 2.6 2 0 1.2-1.1 2-2.6 2-1.05 0-1.85-.4-2.25-1M9 4.85V6.1M9 11.9v1.25"/>
+                            {# Euro-circle icon (Figma 1000:3796) — euro symbol inside a circle. #}
+                            <svg viewBox="0 0 15 15" width="18" height="18" fill="none" aria-hidden="true">
+                                <path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M10.5 5.208c-.612-.887-1.572-1.458-2.651-1.458C5.999 3.75 4.5 5.429 4.5 7.5s1.499 3.75 3.349 3.75c1.079 0 2.039-.571 2.651-1.458M3.75 6.375h3M3.75 8.625h3M14.25 7.5a6.75 6.75 0 1 1-13.5 0 6.75 6.75 0 0 1 13.5 0z"/>
                             </svg>
                             Funding
                         </span>
@@ -159,7 +159,7 @@
                                 <path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M2.5 15.5h13M3.75 15.5V7.25L9 3.5l5.25 3.75v8.25"/>
                                 <path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M7.25 15.5v-4h3.5v4"/>
                             </svg>
-                            Physical presence
+                            Presence
                         </span>
                         <span class="job-aside__value">
                             {%- if job.work_physical_presence -%}{{ job.work_physical_presence.title }}{%- else -%}&mdash;{%- endif -%}
