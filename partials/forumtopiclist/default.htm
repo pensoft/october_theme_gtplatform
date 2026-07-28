@@ -1,0 +1,156 @@
+{# Theme override of the forumTopicList component markup — Discussions feed
+   (Figma 1479:8416). "Start new topic" links to the create-post page.
+   Data from Pensoft\Forum\Components\TopicList: `topics`, `sort`, __SELF__.topicUrl(topic). #}
+{% set sortLabels = { newest: 'Newest', oldest: 'Oldest', popular: 'Most liked', active: 'Most active' } %}
+
+<div class="forum {{ gridCards ? 'forum--grid' : '' }}" data-forum>
+    {% if gridCards %}
+        {% partial __SELF__ ~ '::grid'
+            topics=topics tags=tags sort=sort currentTags=currentTags
+            isLoggedIn=isLoggedIn savedIds=savedIds emptyMessage=emptyMessage %}
+    {% else %}
+    {% if showToolbar %}
+    <div class="forum-toolbar">
+        <div class="forum-toolbar__actions">
+            {% if isLoggedIn %}
+                <a href="/profile/create-post" class="forum-new-btn">
+                    <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                        <path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                    </svg>
+                    Start new topic
+                </a>
+            {% else %}
+                <button type="button" class="forum-new-btn" data-signup-trigger>
+                    <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                        <path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                    </svg>
+                    Start new topic
+                </button>
+            {% endif %}
+        </div>
+
+        <details class="forum-sort" data-forum-sort>
+            <summary class="forum-sort__current">
+                <span>{{ sortLabels[sort] ?? 'Newest' }}</span>
+                <svg class="forum-sort__chevron" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                    <path d="M3.5 5.25 7 8.75l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </summary>
+            <div class="forum-sort__menu">
+                {% for key, label in sortLabels %}
+                    <a class="forum-sort__option {{ sort == key ? 'is-active' : '' }}" href="?sort={{ key }}">{{ label }}</a>
+                {% endfor %}
+            </div>
+        </details>
+    </div>
+    {% endif %}
+
+    <div class="forum-list">
+        {% for topic in topics %}
+            <article class="forum-card">
+                <div class="forum-card__head">
+                    <div class="forum-card__author">
+                        <span class="forum-card__avatar">
+                            {% if topic.user and topic.user.avatar %}
+                                <img src="{{ topic.user.avatar.getThumb(59, 59, { mode: 'crop' }) }}" alt="{{ topic.user.name }}">
+                            {% else %}
+                                <span class="forum-card__initials">
+                                    {{ topic.user ? (topic.user.name|first ~ topic.user.surname|first)|upper : '?' }}
+                                </span>
+                            {% endif %}
+                        </span>
+                        <span class="forum-card__name">
+                            {{ topic.user ? (topic.user.name ~ ' ' ~ topic.user.surname)|trim : 'Guest' }}
+                        </span>
+                        <span class="forum-card__dot" aria-hidden="true"></span>
+                        <span class="forum-card__time">
+                            <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                                <rect x="2.5" y="3.5" width="13" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/>
+                                <path d="M2.5 7h13M6 2.5v2M12 2.5v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            </svg>
+                            {{ topic.created_at.diffForHumans }}
+                        </span>
+                    </div>
+                    {% if isLoggedIn %}
+                        <button type="button" class="forum-card__bookmark {{ topic.id in savedIds ? 'is-saved' : '' }}"
+                                data-request="{{ __SELF__ }}::onToggleBookmark" data-request-data="id: {{ topic.id }}"
+                                data-request-success="$(this).toggleClass('is-saved', !!data.saved)"
+                                aria-label="Save to my activity" aria-pressed="{{ topic.id in savedIds ? 'true' : 'false' }}">
+                            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                                <path d="M15 17.5 10 14.375 5 17.5V3.75c0-.166.066-.325.183-.442A.625.625 0 0 1 5.625 3.125h8.75c.166 0 .325.066.442.183.117.117.183.276.183.442V17.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    {% else %}
+                        <button type="button" class="forum-card__bookmark" data-signup-trigger aria-label="Sign in to save">
+                            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                                <path d="M15 17.5 10 14.375 5 17.5V3.75c0-.166.066-.325.183-.442A.625.625 0 0 1 5.625 3.125h8.75c.166 0 .325.066.442.183.117.117.183.276.183.442V17.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    {% endif %}
+                </div>
+
+                {% if topic.is_best_practice or topic.is_shared_document or topic.tags.count %}
+                    <div class="forum-card__tags">
+                        {% if topic.is_best_practice %}
+                            <span class="forum-tag forum-tag--best">Best practices</span>
+                        {% endif %}
+                        {% if topic.is_shared_document %}
+                            <span class="forum-tag forum-tag--doc">Shared documents</span>
+                        {% endif %}
+                        {% for tag in topic.tags %}
+                            <span class="forum-tag">{{ tag.name }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <a class="forum-card__title" href="{{ __SELF__.topicUrl(topic) }}">{{ topic.title }}</a>
+
+                {% if topic.body %}
+                    {% set excerpt = topic.body|striptags|trim %}
+                    {% if excerpt %}
+                        <p class="forum-card__excerpt">{{ excerpt|slice(0, 220) }}{{ excerpt|length > 220 ? '…' }}</p>
+                    {% endif %}
+                {% endif %}
+
+                <div class="forum-card__actions">
+                    {% if isLoggedIn %}
+                        <button type="button" class="forum-pill forum-pill--like {{ topic.id in likedIds ? 'is-liked' : '' }}"
+                                data-request="{{ __SELF__ }}::onToggleTopicLike" data-request-data="id: {{ topic.id }}"
+                                data-request-success="$(this).toggleClass('is-liked', !!data.liked).find('[data-topic-like-count]').text(data.count)"
+                                title="Like" aria-pressed="{{ topic.id in likedIds ? 'true' : 'false' }}">
+                            <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                                <path d="M9 15.5C9 15.5 2.4 11.6 2.4 7A3.3 3.3 0 0 1 9 5.7 3.3 3.3 0 0 1 15.6 7c0 4.6-6.6 8.5-6.6 8.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            </svg>
+                            <span data-topic-like-count>{{ topic.likes_count }}</span>
+                        </button>
+                    {% else %}
+                        <button type="button" class="forum-pill" data-signup-trigger title="Sign in to like">
+                            <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                                <path d="M9 15.5C9 15.5 2.4 11.6 2.4 7A3.3 3.3 0 0 1 9 5.7 3.3 3.3 0 0 1 15.6 7c0 4.6-6.6 8.5-6.6 8.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            </svg>
+                            {{ topic.likes_count }}
+                        </button>
+                    {% endif %}
+                    <a class="forum-pill" href="{{ __SELF__.topicUrl(topic) }}" title="Replies">
+                        <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                            <path d="M15.5 11.5a1.5 1.5 0 0 1-1.5 1.5H6l-3 3V4a1.5 1.5 0 0 1 1.5-1.5h9.5A1.5 1.5 0 0 1 15.5 4v7.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                        </svg>
+                        {{ topic.messages_count }}
+                    </a>
+                </div>
+            </article>
+        {% else %}
+            <p class="forum-empty">{{ emptyMessage ?: 'No discussions yet. Be the first to start one.' }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if topics.lastPage > 1 %}
+        <div class="forum-pagination">{{ topics.render()|raw }}</div>
+    {% endif %}
+
+    {% if not isLoggedIn %}
+        {# Guests can read but not post — "Start new topic" opens the sign-up popup. #}
+        {% partial 'signuppopup/default' %}
+    {% endif %}
+</div>

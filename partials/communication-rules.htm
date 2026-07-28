@@ -1,0 +1,48 @@
+{# Left content sidebar — "Communication rules" accordion (Figma 1479:5438).
+   Native <details>/<summary> gives an accessible, JS-free accordion; the
+   chevron rotates via the `[open]` CSS rule. #}
+<aside class="comm-rules" aria-label="Communication rules">
+    <h4 class="comm-rules__title">Communication rules</h4>
+
+    <div class="comm-rules__list">
+        <details class="comm-rules__item" open>
+            <summary class="comm-rules__pill">
+                <span class="comm-rules__label"><span class="comm-rules__num">1</span>Respect others</span>
+                <svg class="comm-rules__chevron" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                    <path d="M3.5 5.25 7 8.75l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </summary>
+            <p class="comm-rules__body">Treat every member with courtesy. Challenge ideas, not people, and keep the conversation constructive and welcoming.</p>
+        </details>
+
+        <details class="comm-rules__item">
+            <summary class="comm-rules__pill">
+                <span class="comm-rules__label"><span class="comm-rules__num">2</span>No harassment</span>
+                <svg class="comm-rules__chevron" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                    <path d="M3.5 5.25 7 8.75l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </summary>
+            <p class="comm-rules__body">Harassment, hate speech, threats or personal attacks of any kind are not tolerated and may lead to removal from the platform.</p>
+        </details>
+
+        <details class="comm-rules__item">
+            <summary class="comm-rules__pill">
+                <span class="comm-rules__label"><span class="comm-rules__num">3</span>No spam</span>
+                <svg class="comm-rules__chevron" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                    <path d="M3.5 5.25 7 8.75l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </summary>
+            <p class="comm-rules__body">Avoid repetitive posts, irrelevant links and self-promotion. Keep each topic focused and on-subject.</p>
+        </details>
+
+        <details class="comm-rules__item">
+            <summary class="comm-rules__pill">
+                <span class="comm-rules__label"><span class="comm-rules__num">4</span>No propaganda</span>
+                <svg class="comm-rules__chevron" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                    <path d="M3.5 5.25 7 8.75l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </summary>
+            <p class="comm-rules__body">This space is for knowledge exchange, not political or commercial propaganda. Keep contributions factual and relevant.</p>
+        </details>
+    </div>
+</aside>

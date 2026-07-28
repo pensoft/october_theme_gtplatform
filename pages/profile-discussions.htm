@@ -1,0 +1,29 @@
+url = "/profile/discussions"
+layout = "default"
+title = "Discussions"
+is_hidden = 0
+
+[session]
+security = "all"
+
+[profileMenu]
+active = "discussions"
+
+[forumTopicList]
+perPage = "20"
+detailPage = "profile-discussion"
+==
+<div class="container profile-container">
+    <div class="profile-layout {{ user ? '' : 'profile-layout--guest' }}">
+        {% if user %}{% component 'profileMenu' %}{% endif %}
+        <div class="profile-workspace">
+            <div class="profile-workspace__aside">
+                {% partial 'communication-rules' %}
+            </div>
+            <div class="profile-workspace__divider" aria-hidden="true"></div>
+            <main class="profile-layout__main profile-workspace__content">
+            {% component 'forumTopicList' %}
+        </main>
+        </div>
+    </div>
+</div>

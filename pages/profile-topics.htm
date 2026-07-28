@@ -1,0 +1,30 @@
+url = "/profile/topics"
+layout = "default"
+title = "Topics"
+is_hidden = 0
+
+[session]
+security = "user"
+redirect = "login"
+
+[profileMenu]
+active = "topics"
+
+[forumTagList]
+discussionsPage = "profile-discussions"
+==
+<div class="container profile-container">
+    <div class="profile-layout">
+        {% component 'profileMenu' %}
+        <div class="profile-workspace">
+
+            <main class="profile-layout__main profile-workspace__content">
+            <header class="profile-head">
+                <h1 class="profile-head__title">Topics</h1>
+                <p class="profile-head__sub">Browse topics across the platform.</p>
+            </header>
+            {% component 'forumTagList' %}
+        </main>
+        </div>
+    </div>
+</div>

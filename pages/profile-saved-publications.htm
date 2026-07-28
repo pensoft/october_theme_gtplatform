@@ -1,0 +1,31 @@
+url = "/profile/saved/publications"
+layout = "default"
+title = "Saved publications"
+is_hidden = 0
+
+[session]
+security = "user"
+redirect = "login"
+
+[profileMenu]
+active = "saved"
+
+[forumTopicList]
+savedByUser = 1
+showToolbar = 0
+detailPage = "profile-discussion"
+perPage = "12"
+emptyMessage = "You haven't saved any discussions yet. Bookmark a post to see it here."
+==
+<div class="container profile-container">
+    <div class="profile-layout">
+        {% component 'profileMenu' %}
+        <main class="profile-layout__main">
+            <header class="profile-head">
+                <h1 class="profile-head__title">Saved publications</h1>
+                <p class="profile-head__sub">Discussions you've bookmarked from the community.</p>
+            </header>
+            {% component 'forumTopicList' %}
+        </main>
+    </div>
+</div>

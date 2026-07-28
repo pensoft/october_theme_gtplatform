@@ -1,0 +1,31 @@
+url = "/profile/drafts"
+layout = "default"
+title = "My drafts"
+is_hidden = 0
+
+[session]
+security = "user"
+redirect = "login"
+
+[profileMenu]
+active = "discussions"
+
+[forumTopicList]
+draftsByUser = 1
+showToolbar = 0
+detailPage = "profile-discussion"
+perPage = "12"
+emptyMessage = "You have no drafts yet. Start a post and choose Save draft to keep it here."
+==
+<div class="container profile-container">
+    <div class="profile-layout">
+        {% component 'profileMenu' %}
+        <main class="profile-layout__main">
+            <header class="profile-head">
+                <h1 class="profile-head__title">My drafts</h1>
+                <p class="profile-head__sub">Posts you've saved but not published yet.</p>
+            </header>
+            {% component 'forumTopicList' %}
+        </main>
+    </div>
+</div>

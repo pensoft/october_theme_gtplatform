@@ -1,6 +1,6 @@
-url = "/profile/jobs"
+url = "/profile/best-practices"
 layout = "default"
-title = "My activity"
+title = "Best practices"
 is_hidden = 0
 
 [session]
@@ -8,20 +8,24 @@ security = "user"
 redirect = "login"
 
 [profileMenu]
-active = "jobs"
+active = "best-practices"
 
-[forumMyActivity]
+[forumTopicList]
+perPage = "24"
 detailPage = "profile-discussion"
+onlyBestPractices = 1
+gridCards = 1
+showToolbar = 0
 ==
 <div class="container profile-container">
     <div class="profile-layout">
         {% component 'profileMenu' %}
         <main class="profile-layout__main">
             <header class="profile-head">
-                <h1 class="profile-head__title">My activity</h1>
-                <p class="profile-head__sub">Everything you've posted across GREEN TALENT.</p>
+                <h1 class="profile-head__title">Best practices</h1>
+                <p class="profile-head__sub">Browse useful examples and shared approaches</p>
             </header>
-            {% component 'forumMyActivity' %}
+            {% component 'forumTopicList' %}
         </main>
     </div>
 </div>

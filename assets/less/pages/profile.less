@@ -33,6 +33,2386 @@
     }
 
     &__main { min-width: 0; }
+
+    // Guests (not signed in) have no profile menu, so the content spans full width.
+    &--guest { grid-template-columns: minmax(0, 1fr); }
+}
+
+// ---- Content workspace: rules sidebar + gradient divider + main content
+//      (Figma 1479:5438 panel / 1479:5369 divider) ----
+.profile-workspace {
+    display: flex;
+    // Content sits in the middle-left column; the rules panel is on the right.
+    flex-direction: row-reverse;
+    align-items: stretch;
+    gap: 35px;
+    min-width: 0;
+
+    @media (max-width: 1080px) {
+        // Stack with the primary content first, rules panel beneath it.
+        flex-direction: column-reverse;
+        gap: 28px;
+    }
+
+    &__aside {
+        flex: 0 0 300px;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+
+        @media (max-width: 1080px) {
+            flex: 0 0 auto;
+        }
+    }
+
+    // Vertical gradient rule fading to white at the bottom.
+    &__divider {
+        flex: 0 0 2px;
+        align-self: stretch;
+        border-radius: 98px;
+        background: linear-gradient(to bottom, #e6eae6 42%, #fff);
+
+        @media (max-width: 1080px) {
+            display: none;
+        }
+    }
+
+    &__content { min-width: 0; flex: 1 1 auto; }
+}
+
+// ---- "Communication rules" accordion panel (Figma 1479:5438) ----
+.comm-rules {
+    background: #fff;
+    // Panel sits on the right edge: round the right corners, cast the shadow outward (right).
+    //box-shadow: 6px 4px 12.5px rgba(85, 85, 85, .06);
+    border-radius: 15px 0 0 15px;
+    //background: #FFF;
+    box-shadow: -6px 4px 25px 0 rgba(85, 85, 85, 0.06);
+    //border-radius: 0 15px 15px 0;
+    padding: 35px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    @media (max-width: 1080px) {
+        border-radius: 15px;
+    }
+
+    &__title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 32px;
+        color: @pf-text;
+        margin: 0;
+        text-transform: none;
+    }
+
+    &__list {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    &__pill {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 20px;
+        border-radius: 900px;
+        background: rgba(24, 45, 16, .05);
+        cursor: pointer;
+        list-style: none;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: -0.28px;
+        color: @pf-text;
+        transition: background .15s ease;
+
+        &::-webkit-details-marker { display: none; }
+        &:hover { background: rgba(24, 45, 16, .08); }
+    }
+
+    &__label {
+        flex: 1 1 auto;
+        opacity: .5;
+    }
+
+    &__num { margin-right: 12px; }
+
+    &__chevron {
+        flex-shrink: 0;
+        color: @pf-text;
+        opacity: .5;
+        transition: transform .2s ease;
+    }
+
+    &__body {
+        margin: 8px 0 0;
+        padding: 0 20px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 12px;
+        font-weight: 400;
+        line-height: normal;
+        letter-spacing: -0.24px;
+        color: @pf-text;
+        opacity: .5;
+    }
+
+    &__item[open] &__chevron { transform: rotate(180deg); }
+}
+
+// ---- Sidebar panels: Active in the discussion / Upcoming events
+//      (Figma 1275:4443 / 1268:3384) ----
+.side-panel {
+    background: #fff;
+    border-radius: 15px 0 0 15px;
+    box-shadow: -6px 4px 25px 0 rgba(85, 85, 85, 0.06);
+    padding: 35px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    @media (max-width: 1080px) {
+        border-radius: 15px;
+    }
+
+    &__title {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin: 0;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 32px;
+        color: @pf-text;
+        text-transform: none;
+    }
+
+    &__icon {
+        flex-shrink: 0;
+        width: 24px;
+        height: 24px;
+        color: @pf-green;
+    }
+
+    &__empty {
+        margin: 0;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        color: rgba(24, 45, 16, .5);
+    }
+}
+
+.active-user {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    &__who {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+    }
+
+    &__avatar {
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        overflow: hidden;
+        background: rgba(129, 190, 28, .2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img { width: 100%; height: 100%; object-fit: cover; }
+    }
+
+    &__initials {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        color: #81be1c;
+    }
+
+    &__name {
+        min-width: 0;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        color: #000;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__count {
+        flex-shrink: 0;
+        min-width: 40px;
+        //padding: 5px 8px;
+        border-radius: 5px;
+        background: @pf-green;
+        color: #fff;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: -0.28px;
+        text-align: center;
+    }
+}
+
+.upcoming-event {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-decoration: none;
+
+    &:hover { text-decoration: none; }
+    &:hover .upcoming-event__title { color: @pf-earth; }
+
+    &__title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.35;
+        color: #000;
+    }
+
+    &__meta {
+        display: flex;
+        align-items: center;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 12px;
+        line-height: 16px;
+        color: #808080;
+    }
+
+    &__loc::before {
+        content: '•';
+        margin: 0 6px;
+    }
+}
+
+// ---- Discussions feed (Figma 1479:8416) ----
+.forum {
+    display: flex;
+    flex-direction: column;
+    gap: 39px;
+}
+
+.forum-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.forum-new-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    border: 0;
+    border-radius: 900px;
+    background: @pf-green;
+    color: #fff;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.32px;
+    cursor: pointer;
+    box-shadow: 0 18px 40px rgba(138, 197, 62, .25);
+    transition: background .15s ease;
+
+    svg { width: 12px; height: 12px; flex-shrink: 0; }
+    &:hover { background: darken(@pf-green, 6%); color: #fff; text-decoration: none; }
+}
+
+.forum-ghost-btn {
+    padding: 8px 20px;
+    border-radius: 900px;
+    border: 1px solid @pf-border;
+    background: #fff;
+    color: @pf-text;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover { background: @pf-bg-soft; }
+}
+
+// Sort dropdown (native <details>)
+.forum-sort {
+    position: relative;
+
+    &__current {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 20px;
+        border-radius: 15px;
+        background: rgba(24, 45, 16, .05);
+        color: @pf-text;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: -0.32px;
+        list-style: none;
+        cursor: pointer;
+
+        span { opacity: .5; }
+        &::-webkit-details-marker { display: none; }
+    }
+
+    &__chevron { width: 14px; height: 14px; opacity: .5; transition: transform .2s ease; }
+    &[open] &__chevron { transform: rotate(180deg); }
+
+    &__menu {
+        position: absolute;
+        right: 0;
+        z-index: 5;
+        margin-top: 6px;
+        min-width: 160px;
+        padding: 6px;
+        background: #fff;
+        border: 1px solid @pf-border;
+        border-radius: 12px;
+        box-shadow: 0 12px 30px rgba(24, 45, 16, .08);
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__option {
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        color: @pf-text;
+        text-decoration: none;
+
+        &:hover { background: @pf-bg-soft; text-decoration: none; }
+        &.is-active { background: @pf-soft-green; color: @pf-earth; }
+    }
+}
+
+.forum-composer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 25px 35px;
+    background: #fff;
+    border: 1px solid @pf-border;
+    border-radius: 15px;
+
+    &__title,
+    &__body {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid @pf-border;
+        border-radius: 10px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        color: @pf-text;
+
+        &::placeholder { color: @pf-text; opacity: .4; }
+        &:focus { outline: none; border-color: darken(@pf-border, 12%); }
+    }
+
+    &__body { resize: vertical; min-height: 96px; }
+    &__error { color: @pf-orange; font-size: 13px; }
+    &__actions { display: flex; gap: 10px; align-items: center; }
+}
+
+.forum-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.forum-card {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 25px 35px;
+    background: #fff;
+    border: 1px solid @pf-border;
+    border-radius: 15px;
+
+    &__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+    &__author {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        min-width: 0;
+    }
+
+    &__avatar {
+        flex-shrink: 0;
+        width: 59px;
+        height: 59px;
+        border-radius: 900px;
+        overflow: hidden;
+        background: rgba(24, 45, 16, .08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img { width: 100%; height: 100%; object-fit: cover; }
+    }
+
+    &__initials {
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-size: 22px;
+        font-weight: 500;
+        color: @pf-text;
+    }
+
+    &__name {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 500;
+        letter-spacing: -0.36px;
+        color: @pf-text;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__dot {
+        flex-shrink: 0;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: rgba(24, 45, 16, .25);
+    }
+
+    &__time {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: -0.28px;
+        color: rgba(24, 45, 16, .5);
+        white-space: nowrap;
+
+        svg { width: 18px; height: 18px; }
+    }
+
+    &__bookmark {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px;
+        border: 0;
+        border-radius: 10px;
+        background: @pf-soft-green;
+        color: @pf-earth;
+        cursor: pointer;
+        transition: background .12s ease;
+
+        svg { width: 20px; height: 20px; }
+        &:hover { background: darken(@pf-soft-green, 4%); }
+
+        // Saved: fill the bookmark glyph.
+        &.is-saved svg path { fill: currentColor; }
+    }
+
+    &__title {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: -0.36px;
+        line-height: 1.35;
+        color: @pf-text;
+        text-decoration: none;
+
+        &:hover { color: @pf-earth; text-decoration: none; }
+    }
+
+    &__excerpt {
+        margin: 0;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: -0.32px;
+        line-height: 1.45;
+        color: rgba(24, 45, 16, .5);
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+}
+
+.forum-pill {
+    // A pill may be an <a>, <span> or <button>; pin the box model + line-height
+    // so every variant renders at exactly the same size.
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 30px;
+    padding: 0 15px;
+    margin: 0;
+    border: 0;
+    border-radius: 90px;
+    background: rgba(24, 45, 16, .05);
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1;
+    color: rgba(24, 45, 16, .5);
+    text-decoration: none;
+    vertical-align: middle;
+
+    svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    &--solid { background: rgba(24, 45, 16, .08); padding-left: 12px; padding-right: 12px; }
+
+    &[href]:hover { background: rgba(24, 45, 16, .09); color: rgba(24, 45, 16, .5); text-decoration: none; }
+
+    // Interactive pills (buttons) — like / share on the detail card.
+    button& { cursor: pointer; }
+    &[type]:hover { background: rgba(24, 45, 16, .12); }
+
+    // Liked state — green filled heart.
+    &--like.is-liked {
+        color: @pf-earth;
+        svg { fill: @pf-earth; stroke: @pf-earth; }
+    }
+}
+
+// ---- Discussion detail + comments (Figma 1479:8425) ----
+.discussion {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.discussion-toolbar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.discussion-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    padding: 50px 35px 35px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: -6px 4px 12.5px rgba(85, 85, 85, .06);
+
+    &__back {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px;
+        border-radius: 5px;
+        background: @pf-green;
+        color: #fff;
+        box-shadow: 0 18px 40px rgba(138, 197, 62, .25);
+
+        svg { width: 24px; height: 24px; }
+        &:hover { background: darken(@pf-green, 6%); color: #fff; }
+    }
+
+    &__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+    &__title {
+        margin: 0;
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 500;
+        letter-spacing: -0.36px;
+        line-height: 1.35;
+        color: @pf-text;
+    }
+
+    &__body {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: -0.32px;
+        line-height: 1.45;
+        color: #808080;
+
+        p { margin: 0 0 12px; }
+        p:last-child { margin-bottom: 0; }
+    }
+}
+
+// ---- Discussion attachments — file tiles (Figma 1234:3969) ----
+.discussion-files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.filetile {
+    width: 200px;
+    height: 130px;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    text-decoration: none;
+    transition: filter .12s ease;
+
+    &:hover { filter: brightness(.97); text-decoration: none; }
+
+    &--image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    &--video { object-fit: cover; background: #000; }
+
+    &--doc {
+        flex-direction: column;
+        gap: 10px;
+        padding: 16px;
+    }
+}
+
+// Full-colour brand file-type glyph (Word / Excel / PowerPoint / PDF / generic).
+.filetile__glyph {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    svg { width: auto; height: 58px; max-width: 62px; display: block; }
+}
+
+.filetile__name {
+    max-width: 100%;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.3;
+    color: @pf-text;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.discussion-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.discussion-linkchip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 100%;
+    padding: 8px 15px;
+    border-radius: 90px;
+    background: rgba(24, 45, 16, .05);
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 14px;
+    color: @pf-text;
+    text-decoration: none;
+
+    svg { width: 18px; height: 18px; flex-shrink: 0; color: @pf-earth; }
+    span { max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    &:hover { background: rgba(24, 45, 16, .09); color: @pf-text; text-decoration: none; }
+}
+
+.discussion-composer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 35px;
+    background: #fff;
+    border: 1.2px solid @pf-border;
+    border-radius: 15px;
+    box-shadow: -6px 4px 25px rgba(85, 85, 85, .06);
+
+    &__input {
+        width: 100%;
+        border: 0;
+        resize: vertical;
+        min-height: 48px;
+        padding: 0;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        letter-spacing: -0.32px;
+        color: @pf-text;
+
+        &::placeholder { color: rgba(24, 45, 16, .65); }
+        &:focus { outline: none; }
+    }
+
+    &__error { color: @pf-orange; font-size: 13px; }
+
+    &__bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+    &__tools {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: @pf-text;
+
+        svg { width: 18px; height: 18px; opacity: .5; }
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+}
+
+.discussion-btn {
+    padding: 8px 20px;
+    border: 0;
+    border-radius: 90px;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &--ghost {
+        background: rgba(24, 45, 16, .08);
+        color: rgba(24, 45, 16, .5);
+        &:hover { background: rgba(24, 45, 16, .12); }
+    }
+
+    &--primary {
+        background: @pf-green;
+        color: #fff;
+        &:hover { background: darken(@pf-green, 6%); }
+    }
+}
+
+.discussion-locked {
+    padding: 20px 35px;
+    background: @pf-bg-soft;
+    border: 1px solid @pf-border;
+    border-radius: 15px;
+    font-family: Fustat, Arial, sans-serif;
+    color: rgba(24, 45, 16, .6);
+}
+
+// Sign-in prompt shown to guests in place of the comment composer.
+.discussion-signin {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 25px 35px;
+    background: #fff;
+    border: 1.2px solid @pf-border;
+    border-radius: 15px;
+    box-shadow: -6px 4px 25px rgba(85, 85, 85, .06);
+
+    &__text {
+        margin: 0;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        color: rgba(24, 45, 16, .65);
+    }
+}
+
+.discussion-comments {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    margin-top: 32px;
+
+    &__head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    &__sortlabel {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        color: rgba(24, 45, 16, .5);
+    }
+}
+
+// ---- Comments (Figma 1234:4121 comment / 1234:4163 reply) ----
+.comment-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.comment-node { list-style: none; }
+
+// Each reply level sits a little further right than its parent (up to 5 deep;
+// the padding compounds through the recursive nesting).
+.comment-replies {
+    list-style: none;
+    margin: 20px 0 0;
+    padding: 0 0 0 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.comment {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+
+    &__avatar {
+        flex-shrink: 0;
+        width: 59px;
+        height: 59px;
+        border-radius: 900px;
+        overflow: hidden;
+        background: rgba(24, 45, 16, .08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img { width: 100%; height: 100%; object-fit: cover; }
+    }
+
+    &__initials {
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-size: 22px;
+        font-weight: 500;
+        color: @pf-text;
+    }
+
+    &__main {
+        min-width: 0;
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    &__head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    &__name {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 500;
+        letter-spacing: -0.36px;
+        color: @pf-text;
+    }
+
+    &__dot {
+        flex-shrink: 0;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: rgba(24, 45, 16, .25);
+    }
+
+    &__time {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: -0.32px;
+        color: rgba(24, 45, 16, .45);
+    }
+
+    &__body {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: -0.32px;
+        line-height: 1.45;
+        color: #808080;
+    }
+
+    &__actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+    }
+}
+
+// Like / Reply / Report pills.
+.comment-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border: 0;
+    border-radius: 90px;
+    background: rgba(24, 45, 16, .08);
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 14px;
+    color: rgba(24, 45, 16, .5);
+    cursor: pointer;
+    transition: background .12s ease, color .12s ease;
+
+    svg { width: 18px; height: 18px; opacity: .5; }
+
+    &:hover { background: rgba(24, 45, 16, .12); }
+
+    &--like.is-liked {
+        color: @pf-earth;
+        svg { opacity: 1; fill: @pf-earth; stroke: @pf-earth; }
+    }
+
+    &.is-reported {
+        color: @pf-orange;
+        cursor: default;
+        svg { opacity: 1; }
+        &:hover { background: rgba(24, 45, 16, .08); }
+    }
+}
+
+// Inline reply composer, aligned under the comment body. Hidden until the
+// "Reply" button is clicked (an explicit `display` would otherwise beat the
+// `hidden` attribute, so restore it here).
+.comment-replyform {
+    margin: 15px 0 0 74px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    &[hidden] { display: none; }
+
+    textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid @pf-border;
+        border-radius: 12px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 15px;
+        color: @pf-text;
+        resize: vertical;
+        min-height: 60px;
+
+        &:focus { outline: none; border-color: darken(@pf-border, 12%); }
+    }
+
+    &__actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+}
+
+.comment-empty {
+    padding: 20px 0;
+    font-family: Fustat, Arial, sans-serif;
+    color: rgba(24, 45, 16, .5);
+}
+
+// ---- Topic tag chips (Figma 1514:2365) ----
+.forum-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 15px;
+    border-radius: 90px;
+    background: #e7eeff;
+    color: #3d5692;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: -0.24px;
+    white-space: nowrap;
+
+    // Green editorial flag chips — Best practices / Shared documents (Figma 1514:2363).
+    &--best,
+    &--doc {
+        background: @pf-soft-green;
+        color: @pf-earth;
+        font-weight: 700;
+    }
+
+    // Removable selection chip on the create-post form (Figma 1479:7726).
+    &--removable { gap: 5px; }
+
+    &__remove {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 12px;
+        height: 12px;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+        line-height: 0;
+
+        svg { width: 12px; height: 12px; display: block; }
+        &:hover { opacity: .6; }
+    }
+}
+
+.forum-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+// ---- Topics page: tag chips with a discussion counter (Figma 1529:5541) ----
+.topic-chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px;
+}
+
+.topic-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 15px;
+    border-radius: 90px;
+    background: #e7eeff;
+    color: #3d5692;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.32px;
+    text-decoration: none;
+    transition: background .12s ease;
+
+    &:hover { background: darken(#e7eeff, 4%); color: #3d5692; text-decoration: none; }
+
+    &__count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 22px;
+        height: 22px;
+        padding: 0 6px;
+        border-radius: 900px;
+        background: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: -0.24px;
+        line-height: 1;
+        color: #3d5692;
+    }
+}
+
+// ---- Create topic / Add topics modals (Figma 1479:7444) ----
+.forum-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    padding: 24px;
+    overflow-y: auto;
+
+    &.is-open { display: flex; align-items: flex-start; justify-content: center; }
+
+    &__backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(24, 45, 16, .35);
+    }
+
+    &__dialog {
+        position: relative;
+        z-index: 1;
+        margin: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 30px 80px rgba(24, 45, 16, .18);
+
+        &--create { width: 640px; max-width: 100%; padding: 45px; }
+        &--topics { width: 545px; max-width: 100%; padding: 55px; }
+        &--topics .forum-modal__actions { margin-top: 12px; }
+    }
+
+    &__title {
+        margin: 0;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 22px;
+        font-weight: 600;
+        color: @pf-text;
+    }
+
+    &__error { margin: -12px 0 0; color: @pf-orange; font-size: 13px; }
+
+    &__footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin-top: 5px;
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        &--start { justify-content: flex-start; }
+    }
+}
+
+.forum-field {
+    width: calc(~'100% - 75px');
+    padding: 15px 25px;
+    border: 1.2px solid @pf-border;
+    border-radius: 15px;
+    box-shadow: -6px 4px 25px rgba(85, 85, 85, .06);
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 16px;
+    letter-spacing: -0.32px;
+    color: @pf-text;
+
+    &::placeholder { color: @pf-text; opacity: .45; }
+    &:focus { outline: none; border-color: darken(@pf-border, 12%); }
+
+    &--area { resize: vertical; min-height: 140px; }
+}
+
+.forum-topics-select {
+    // "Add topics" button on top, selected chips stacked underneath it.
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.forum-topics-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 15px;
+    border: 0;
+    border-radius: 90px;
+    background: rgba(24, 45, 16, .05);
+    color: rgba(24, 45, 16, .55);
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: -0.24px;
+    cursor: pointer;
+
+    svg { width: 11px; height: 11px; }
+    &:hover { background: rgba(24, 45, 16, .09); }
+}
+
+.forum-topics-selected {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    // No selection yet: collapse so it adds no gap under the button.
+    &:empty { display: none; }
+}
+
+.forum-search {
+    position: relative;
+    width: 100%;
+
+    &__input {
+        width: calc(~'100% - 75px');
+        padding: 15px 50px 15px 25px;
+        border: 1.2px solid @pf-border;
+        border-radius: 15px;
+        box-shadow: -6px 4px 25px rgba(85, 85, 85, .06);
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        letter-spacing: -0.32px;
+        color: @pf-text;
+
+        &::placeholder { color: @pf-text; opacity: .45; }
+        &:focus { outline: none; border-color: darken(@pf-border, 12%); }
+    }
+
+    &__icon {
+        position: absolute;
+        right: 25px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 18px;
+        height: 18px;
+        color: @pf-text;
+        opacity: .45;
+        pointer-events: none;
+    }
+}
+
+.forum-topics-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.forum-topic-chip {
+    padding: 5px 15px;
+    border: 0;
+    border-radius: 90px;
+    background: rgba(24, 45, 16, .05);
+    color: rgba(24, 45, 16, .5);
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: -0.24px;
+    cursor: pointer;
+    transition: background .12s ease, color .12s ease;
+
+    &:hover { background: rgba(24, 45, 16, .09); }
+    &.is-selected { background: #e7eeff; color: #3d5692; }
+}
+
+.forum-cancel-pill {
+    padding: 5px 20px;
+    border: 1px solid @pf-border;
+    border-radius: 100px;
+    background: #fff;
+    color: rgba(24, 45, 16, .5);
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.28px;
+    cursor: pointer;
+
+    &:hover { background: @pf-bg-soft; }
+}
+
+// Toolbar button group (Start new topic + Create post)
+.forum-toolbar__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.forum-secondary-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    border: 1px solid @pf-border;
+    border-radius: 900px;
+    background: #fff;
+    color: @pf-text;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.32px;
+    cursor: pointer;
+    text-decoration: none;
+
+    &:hover { background: @pf-bg-soft; color: @pf-text; text-decoration: none; }
+}
+
+// "Add topics" trigger chip (Figma 1479:7732)
+.forum-tag-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 15px;
+    border: 0;
+    border-radius: 90px;
+    background: #e7eeff;
+    color: #3d5692;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: -0.24px;
+    cursor: pointer;
+
+    &:hover { background: darken(#e7eeff, 4%); }
+}
+
+// ---- Create post page (Figma 1253:2833 heading / 3108 title / 3082 body) ----
+// "Draft saved successfully" banner (Figma 1479:5522).
+#create-post-banner:empty { display: none; }
+
+.draft-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 28px 35px;
+    border-radius: 20px;
+    background: linear-gradient(4deg, #e9f8dc 16%, rgba(239, 255, 238, 0) 114%), #fff;
+
+    &__msg {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    &__text {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1.55;
+        color: @pf-text;
+    }
+
+    &__check {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 29px;
+        height: 29px;
+        border-radius: 90px;
+        background: @pf-green;
+
+        svg { width: 15px; height: 15px; }
+    }
+
+    &__link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        color: @pf-earth;
+        text-decoration: none;
+
+        svg { width: 14px; height: 14px; }
+        &:hover { color: darken(@pf-earth, 8%); text-decoration: none; }
+    }
+
+    @media (max-width: 640px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 22px 24px;
+    }
+}
+
+.create-post {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+
+    &__title {
+        margin: 0;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 32px;
+        font-weight: 700;
+        line-height: 1.55;
+        color: @pf-text;
+    }
+
+    &__form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    &__title-field {
+        padding: 15px 35px;
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: -0.36px;
+
+        &::placeholder { opacity: .5; }
+    }
+
+    // Title + its character counter (Figma 1479:7546).
+    &__field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    &__counter {
+        text-align: right;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        letter-spacing: -0.28px;
+        color: @pf-text;
+        opacity: .5;
+    }
+
+    &__body-card {
+        display: flex;
+        flex-direction: column;
+        gap: 45px;
+        padding: 35px;
+        background: #fff;
+        border: 1.2px solid @pf-border;
+        border-radius: 15px;
+        box-shadow: -6px 4px 25px rgba(85, 85, 85, .06);
+    }
+
+    &__body {
+        width: 100%;
+        border: 0;
+        resize: vertical;
+        min-height: 150px;
+        padding: 0;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: -0.32px;
+        line-height: 1.45;
+        color: @pf-text;
+
+        &::placeholder { color: rgba(24, 45, 16, .5); }
+        &:focus { outline: none; }
+    }
+
+    &__bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    // Attach toolbar icons (image / video / link) — Figma 1479:7551.
+    &__tools {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    &__tool {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        padding: 0;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: @pf-text;
+        opacity: .5;
+        cursor: pointer;
+        transition: opacity .12s ease, background .12s ease;
+
+        svg { width: 18px; height: 18px; }
+        &:hover { opacity: 1; background: rgba(24, 45, 16, .05); }
+    }
+
+    // Selected attachment chips (file names + links).
+    &__attachments {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+
+        &:empty { display: none; }
+    }
+
+    &__attachment {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        max-width: 100%;
+        padding: 5px 12px;
+        border-radius: 90px;
+        background: rgba(24, 45, 16, .05);
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 13px;
+        color: @pf-text;
+
+        &-label {
+            max-width: 260px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        &-remove {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 12px;
+            height: 12px;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            color: inherit;
+            cursor: pointer;
+            line-height: 0;
+
+            svg { width: 12px; height: 12px; }
+            &:hover { opacity: .6; }
+        }
+    }
+
+    // Inline "paste a link" bar.
+    &__linkbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    &__linkinput {
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: 8px 14px;
+        border: 1px solid @pf-border;
+        border-radius: 10px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        color: @pf-text;
+
+        &::placeholder { color: @pf-text; opacity: .45; }
+        &:focus { outline: none; border-color: darken(@pf-border, 12%); }
+    }
+}
+
+.forum-empty {
+    padding: 40px 20px;
+    text-align: center;
+    font-family: Fustat, Arial, sans-serif;
+    color: rgba(24, 45, 16, .5);
+}
+
+.forum-pagination { margin-top: 4px; }
+
+// ---- Best practices "publication" grid (Figma 1479:8434) ----
+.bp-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+
+    &__filters {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+}
+
+// Selected topic, shown beside the picker trigger (Figma 1479:8345).
+.bp-activetag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 15px;
+    border-radius: 90px;
+    background: #e7eeff;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: -.24px;
+    color: #3d5692;
+
+    &__remove {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 12px;
+        height: 12px;
+        color: inherit;
+        opacity: .7;
+        text-decoration: none;
+
+        &:hover { opacity: 1; color: inherit; text-decoration: none; }
+
+        svg { width: 12px; height: 12px; }
+    }
+}
+
+.bp-dropdown {
+    position: relative;
+
+    &--right { margin-left: auto; }
+
+    summary {
+        list-style: none;
+        cursor: pointer;
+        &::-webkit-details-marker { display: none; }
+    }
+
+    &[open] .bp-sortpill svg { transform: rotate(180deg); }
+
+    &__menu {
+        position: absolute;
+        z-index: 20;
+        top: calc(100% + 6px);
+        left: 0;
+        min-width: 200px;
+        max-height: 280px;
+        overflow-y: auto;
+        padding: 6px;
+        background: #fff;
+        border: 1px solid @pf-border;
+        border-radius: 12px;
+        box-shadow: 0 12px 30px rgba(24, 45, 16, .1);
+
+        &--right { left: auto; right: 0; }
+    }
+
+    &__option {
+        display: block;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        color: @pf-text;
+        text-decoration: none;
+
+        &:hover { background: rgba(24, 45, 16, .05); text-decoration: none; }
+        &.is-active { background: #e9f8dc; color: @pf-earth; font-weight: 600; }
+    }
+}
+
+.bp-topicpill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 15px;
+    border: 0;
+    border-radius: 90px;
+    background: #e7eeff;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #3d5692;
+    cursor: pointer;
+
+    svg { width: 13px; height: 13px; }
+}
+
+.bp-sortpill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 18px;
+    border-radius: 15px;
+    background: rgba(24, 45, 16, .05);
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -.32px;
+    color: rgba(24, 45, 16, .5);
+
+    svg { width: 14px; height: 14px; transition: transform .15s ease; }
+}
+
+// ----- Topic filter modal (Figma 1479:7329) -----
+.pgt-modal--topicfilter {
+    align-items: center;
+
+    .pgt-modal__dialog { max-width: 545px; }
+}
+
+.bp-topicmodal {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding: 55px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 40px 44px rgba(0, 0, 0, .1);
+
+    @media (max-width: 560px) {
+        padding: 32px 22px;
+        gap: 24px;
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    &__title {
+        margin: 0;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 22px;
+        font-weight: 600;
+        color: @pf-text;
+    }
+
+    &__search { position: relative; }
+
+    &__input {
+        width: 100%;
+        padding: 15px 55px 15px 25px;
+        border: 1.2px solid @pf-border;
+        border-radius: 15px;
+        background: #fff;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        letter-spacing: -.32px;
+        color: @pf-text;
+        appearance: none;
+
+        &::placeholder { color: @pf-text; opacity: .5; }
+        &:focus { outline: none; border-color: @pf-earth; }
+        &::-webkit-search-cancel-button { -webkit-appearance: none; }
+    }
+
+    &__searchicon {
+        position: absolute;
+        top: 50%;
+        right: 25px;
+        transform: translateY(-50%);
+        width: 18px;
+        height: 18px;
+        color: @pf-text;
+        opacity: .5;
+        pointer-events: none;
+    }
+
+    &__tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    &__empty {
+        margin: 0;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        color: rgba(24, 45, 16, .5);
+
+        &[hidden] { display: none; }
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    &__cancel,
+    &__add {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    &__cancel {
+        padding: 5px 20px;
+        border: 1px solid @pf-border;
+        border-radius: 100px;
+        background: #fff;
+        letter-spacing: -.28px;
+        color: rgba(24, 45, 16, .5);
+
+        &:hover { background: rgba(24, 45, 16, .03); }
+    }
+
+    &__add {
+        height: 30px;
+        padding: 5px 20px;
+        border: 0;
+        border-radius: 900px;
+        background: #8ac53e;
+        line-height: 22px;
+        color: #fff;
+
+        &:hover { background: darken(#8ac53e, 6%); }
+    }
+}
+
+.bp-topicchip {
+    padding: 5px 15px;
+    border: 0;
+    border-radius: 90px;
+    background: rgba(24, 45, 16, .05);
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: -.24px;
+    color: rgba(24, 45, 16, .5);
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+
+    &:hover { background: rgba(24, 45, 16, .1); }
+
+    &.is-selected {
+        background: #e7eeff;
+        color: #3d5692;
+    }
+
+    &[hidden] { display: none; }
+}
+
+.bp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 15px;
+}
+
+.bp-card {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 30px 35px;
+    border: 1px solid #e7e7f1;
+    border-radius: 15px;
+    background: #fff;
+
+    &__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    &__author {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+    }
+
+    &__avatar {
+        flex-shrink: 0;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        overflow: hidden;
+        background: rgba(24, 45, 16, .08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img { width: 100%; height: 100%; object-fit: cover; }
+    }
+
+    &__initials {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        color: @pf-earth;
+    }
+
+    &__name {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: -.32px;
+        color: @pf-text;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__excerpt {
+        display: block;
+        font-family: Parkinsans, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.35;
+        letter-spacing: -.28px;
+        color: @pf-text;
+        text-decoration: none;
+
+        &:hover { text-decoration: none; opacity: .85; }
+    }
+
+    &__tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    &__files {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+    }
+
+    &__link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 2px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        color: @pf-earth;
+        text-decoration: none;
+
+        svg { width: 14px; height: 14px; }
+        &:hover { color: darken(@pf-earth, 8%); text-decoration: none; }
+    }
+}
+
+.bp-fileicon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 90px;
+    background: #e7eeff;
+
+    svg { width: 16px; height: 16px; display: block; }
+}
+
+// ---- My activity: filter chips + item list (Figma 1452:11671) ----
+.activity-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.activity-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 15px;
+    border-radius: 90px;
+    background: rgba(24, 45, 16, .05);
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -.32px;
+    color: rgba(24, 45, 16, .5);
+    text-decoration: none;
+    transition: background .12s ease;
+
+    &:hover { background: rgba(24, 45, 16, .09); color: rgba(24, 45, 16, .6); text-decoration: none; }
+
+    &__count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 22px;
+        height: 22px;
+        padding: 0 5px;
+        border-radius: 900px;
+        background: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: -.24px;
+        color: inherit;
+    }
+
+    &.is-active {
+        background: #e9f8dc;
+        color: @pf-earth;
+
+        .activity-chip__count { color: @pf-earth; }
+    }
+}
+
+.forum-tag--draft { background: rgba(24, 45, 16, .08); color: rgba(24, 45, 16, .55); }
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.activity-item {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 22px 25px;
+    border: 1px solid @pf-border;
+    border-radius: 15px;
+    background: #fff;
+    text-decoration: none;
+    transition: box-shadow .15s ease, border-color .15s ease;
+
+    &:hover { border-color: darken(@pf-border, 6%); box-shadow: 0 8px 22px rgba(24, 45, 16, .05); text-decoration: none; }
+
+    &__tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    &__title {
+        margin: 0;
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 500;
+        line-height: 1.35;
+        color: @pf-text;
+    }
+
+    &__excerpt {
+        margin: 0;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+        color: rgba(24, 45, 16, .7);
+    }
+
+    &__meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 14px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 13px;
+        color: rgba(24, 45, 16, .5);
+
+        span { position: relative; }
+        span + span::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 50%;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: currentColor;
+            transform: translateY(-50%);
+            opacity: .6;
+        }
+    }
+}
+
+// ---- My activity: comment cards (Figma 1452:7068) ----
+.comment-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.comment-card {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 30px 35px;
+    border: 1px solid #e7e7f1;
+    border-radius: 15px;
+    background: #fff;
+
+    &__top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+    &__who {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        min-width: 0;
+    }
+
+    &__avatar {
+        flex-shrink: 0;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        overflow: hidden;
+        background: rgba(24, 45, 16, .08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img { width: 100%; height: 100%; object-fit: cover; }
+    }
+
+    &__initials {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        color: @pf-earth;
+    }
+
+    &__body {
+        margin: 0;
+        min-width: 0;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: -.32px;
+        line-height: 1.35;
+        color: @pf-text;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__topictag { flex-shrink: 0; }
+
+    &__on {
+        margin: 0;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.35;
+        color: @pf-text;
+
+        a {
+            font-weight: 600;
+            color: @pf-earth;
+            text-decoration: none;
+            &:hover { text-decoration: underline; }
+        }
+    }
+
+    &__excerpt {
+        margin: 0;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.35;
+        color: rgba(24, 45, 16, .5);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    &__meta-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    &__dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: rgba(24, 45, 16, .2);
+    }
+
+    &__time {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: -.24px;
+        color: rgba(24, 45, 16, .5);
+
+        svg { width: 14px; height: 14px; }
+    }
+
+    &__replies { flex-shrink: 0; }
+
+    &__thread {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        flex-shrink: 0;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        color: @pf-earth;
+        text-decoration: none;
+
+        svg { width: 14px; height: 14px; }
+        &:hover { color: darken(@pf-earth, 8%); text-decoration: none; }
+    }
+}
+
+// ---- My activity: draft cards (Figma 1452:8100) ----
+.draft-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.draft-card {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 30px 35px;
+    border: 1px solid #e7e7f1;
+    border-radius: 15px;
+    background: #fff;
+
+    &__top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+    &__who {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+    }
+
+    &__avatar {
+        flex-shrink: 0;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        overflow: hidden;
+        background: rgba(24, 45, 16, .08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img { width: 100%; height: 100%; object-fit: cover; }
+    }
+
+    &__initials {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 15px;
+        font-weight: 700;
+        color: @pf-earth;
+    }
+
+    &__name {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: -.32px;
+        color: @pf-text;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__finish {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+        padding: 8px 18px;
+        border-radius: 90px;
+        background: #ece3d5;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        color: @pf-text;
+        text-decoration: none;
+
+        svg { width: 15px; height: 15px; }
+        &:hover { background: darken(#ece3d5, 4%); color: @pf-text; text-decoration: none; }
+    }
+
+    &__title {
+        margin: 0;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1.4;
+        color: @pf-text;
+    }
+
+    &__excerpt {
+        margin: 0;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.55;
+        color: rgba(24, 45, 16, .5);
+    }
+
+    &__meta {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+}
+
+// ---- My activity: pagination (Figma 1447:1248) ----
+.activity-pager {
+    width: fit-content!important;
+    max-width: 100%!important;
+    margin: 30px auto 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px solid @pf-border;
+    border-radius: 90px;
+    box-shadow: 0 12px 28px rgba(24, 45, 16, .06);
+
+    &__nav,
+    &__page {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border: 0;
+        border-radius: 50%;
+        background: transparent;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        color: rgba(24, 45, 16, .55);
+        text-decoration: none;
+        cursor: pointer;
+
+        &:hover { background: rgba(24, 45, 16, .05); color: @pf-text; text-decoration: none; }
+    }
+
+    &__nav svg { width: 15px; height: 15px; }
+    &__nav.is-disabled { opacity: .3; pointer-events: none; }
+
+    &__page.is-active,
+    &__page.is-active:hover {
+        background: @pf-text;
+        color: #fff;
+        font-weight: 700;
+    }
+
+    &__gap {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 20px;
+        color: rgba(24, 45, 16, .4);
+    }
 }
 
 // ---- Sidebar menu (Figma 251:19214) ----
@@ -867,7 +3247,7 @@
 
     &__grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr;
         gap: 30px;
 
         @media (max-width: 880px) { grid-template-columns: 1fr; }
@@ -994,6 +3374,14 @@
     &--jobs .saved-tile__icon { background: #DDF6E8; }
     &--jobs .saved-tile__cta  { background: #5C7B6A; }
     &--jobs .saved-tile__cta:hover { background: darken(#5C7B6A, 4%); }
+
+    // Publications tile — blue tint (Figma 1238:4381)
+    &--publications {
+        background: linear-gradient(19.56deg, rgba(231, 238, 255, 1) 16%, rgba(231, 238, 255, 0) 114%);
+    }
+    &--publications .saved-tile__icon { background: #DCE7FF; }
+    &--publications .saved-tile__cta  { background: #3D5692; }
+    &--publications .saved-tile__cta:hover { background: darken(#3D5692, 4%); }
 
     &__icon {
         display: inline-flex;

@@ -1,0 +1,32 @@
+{# Notification items. Var: notifications. #}
+{% set actionText = {
+    'comment':      'left a comment on',
+    'reply':        'replied to your comment on',
+    'like_topic':   'liked your post',
+    'like_comment': 'liked your comment on'
+} %}
+
+{% for n in notifications %}
+    <a class="gt-notif__item {{ n.is_read ? '' : 'is-unread' }}" href="{{ __SELF__.notifUrl(n) }}">
+        <span class="gt-notif__avatar">
+            {% if n.actor and n.actor.avatar %}
+                <img src="{{ n.actor.avatar.getThumb(40, 40, { mode: 'crop' }) }}" alt="">
+            {% else %}
+                <span class="gt-notif__initials">{{ n.actor ? (n.actor.name|first ~ n.actor.surname|first)|upper : '?' }}</span>
+            {% endif %}
+        </span>
+
+        <div class="gt-notif__content">
+            <p class="gt-notif__text">
+                <strong>{{ __SELF__.actorName(n) }}</strong>
+                {{ actionText[n.type] ?? 'interacted with your post' }}
+                {% if n.topic %}<strong>{{ n.topic.title }}</strong>{% endif %}
+            </p>
+            <p class="gt-notif__meta">{{ n.created_at.diffForHumans }}</p>
+        </div>
+
+        {% if not n.is_read %}<span class="gt-notif__dot" aria-hidden="true"></span>{% endif %}
+    </a>
+{% else %}
+    <p class="gt-notif__empty">You have no notifications yet.</p>
+{% endfor %}

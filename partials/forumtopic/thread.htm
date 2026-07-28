@@ -1,0 +1,27 @@
+{# One comment node, rendered recursively for nested replies.
+   Vars: message, isLoggedIn, likedIds, depth (0 = top-level). #}
+{% set depth = depth ?? 0 %}
+<li class="comment-node">
+    {% partial __SELF__ ~ '::comment' message=message isLoggedIn=isLoggedIn likedIds=likedIds %}
+
+    {% if isLoggedIn %}
+        <form class="comment-replyform" id="reply-{{ message.id }}" hidden
+              data-request="{{ __SELF__ }}::onReplyComment"
+              data-request-validate>
+            <input type="hidden" name="parent" value="{{ message.id }}">
+            <textarea name="body" rows="2" placeholder="Write a reply…" aria-label="Reply" required></textarea>
+            <div class="comment-replyform__actions">
+                <button type="button" class="forum-cancel-pill" data-reply-cancel>Cancel</button>
+                <button type="submit" class="discussion-btn discussion-btn--primary" data-attach-loading>Reply</button>
+            </div>
+        </form>
+    {% endif %}
+
+    {% if message.replies|length and depth < 5 %}
+        <ul class="comment-replies">
+            {% for reply in message.replies %}
+                {% partial __SELF__ ~ '::thread' message=reply isLoggedIn=isLoggedIn likedIds=likedIds depth=depth + 1 %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+</li>

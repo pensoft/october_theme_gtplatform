@@ -1,0 +1,19 @@
+{# "Upcoming events" sidebar panel (Figma 1268:3384). Var: events. #}
+<aside class="side-panel upcoming-events" aria-label="Upcoming events">
+    <h4 class="side-panel__title">Upcoming events</h4>
+
+    {% for event in events %}
+        <a class="upcoming-event" href="/events/{{ event.slug }}">
+            <span class="upcoming-event__title">{{ event.title }}</span>
+            <span class="upcoming-event__meta">
+                <span>{{ event.start_date|date('d M Y') }}</span>
+                {% set place = event.location ?: (event.country ? event.country.name : '') %}
+                {% if place %}
+                    <span class="upcoming-event__loc">{{ place }}</span>
+                {% endif %}
+            </span>
+        </a>
+    {% else %}
+        <p class="side-panel__empty">No upcoming events.</p>
+    {% endfor %}
+</aside>

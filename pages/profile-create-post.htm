@@ -1,0 +1,30 @@
+url = "/profile/create-post"
+layout = "default"
+title = "Create post"
+is_hidden = 0
+
+[session]
+security = "user"
+redirect = "login"
+
+[profileMenu]
+active = "discussions"
+
+[forumTopicForm]
+detailPage = "profile-discussion"
+listPage = "profile-discussions"
+==
+<div class="container profile-container">
+    <div class="profile-layout">
+        {% component 'profileMenu' %}
+        <div class="profile-workspace">
+            <div class="profile-workspace__aside">
+                {% partial 'communication-rules' %}
+            </div>
+            <div class="profile-workspace__divider" aria-hidden="true"></div>
+            <main class="profile-layout__main profile-workspace__content">
+                {% component 'forumTopicForm' %}
+            </main>
+        </div>
+    </div>
+</div>

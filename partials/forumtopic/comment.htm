@@ -1,0 +1,59 @@
+{# A single comment or reply (Figma 1234:4121 / 1234:4163).
+   Vars: message, isLoggedIn, likedIds. #}
+<article class="comment" id="comment-{{ message.id }}">
+    <span class="comment__avatar">
+        {% if message.user and message.user.avatar %}
+            <img src="{{ message.user.avatar.getThumb(59, 59, { mode: 'crop' }) }}" alt="{{ message.user.name }}">
+        {% else %}
+            <span class="comment__initials">
+                {{ message.user ? (message.user.name|first ~ message.user.surname|first)|upper : 'U' }}
+            </span>
+        {% endif %}
+    </span>
+    <div class="comment__main">
+        <div class="comment__head">
+            <span class="comment__name">
+                {{ message.user
+                    ? ((message.user.name ~ ' ' ~ message.user.surname)|trim ?: 'User-' ~ message.user.id)
+                    : 'User' }}
+            </span>
+            <span class="comment__dot" aria-hidden="true"></span>
+            <span class="comment__time">{{ message.created_at.diffForHumans }}</span>
+        </div>
+
+        <div class="comment__body">{{ message.body|nl2br }}</div>
+
+        <div class="comment__actions">
+            {% if isLoggedIn %}
+                <button type="button"
+                        class="comment-pill comment-pill--like {{ message.id in likedIds ? 'is-liked' : '' }}"
+                        data-request="{{ __SELF__ }}::onToggleCommentLike"
+                        data-request-data="id: {{ message.id }}"
+                        data-request-success="$(this).toggleClass('is-liked', !!data.liked).find('[data-like-count]').text(data.count)"
+                        aria-label="Like comment">
+                    <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 15.5C9 15.5 2.4 11.6 2.4 7A3.3 3.3 0 0 1 9 5.7 3.3 3.3 0 0 1 15.6 7c0 4.6-6.6 8.5-6.6 8.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+                    <span data-like-count>{{ message.likes_count }}</span>
+                </button>
+
+                <button type="button" class="comment-pill" data-comment-reply data-target="reply-{{ message.id }}">
+                    <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M15.5 11.5a1.5 1.5 0 0 1-1.5 1.5H6l-3 3V4a1.5 1.5 0 0 1 1.5-1.5h9.5A1.5 1.5 0 0 1 15.5 4v7.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+                    <span>Reply</span>
+                </button>
+
+                <button type="button" class="comment-pill"
+                        data-request="{{ __SELF__ }}::onReportComment"
+                        data-request-data="id: {{ message.id }}"
+                        data-request-confirm="Report this comment?"
+                        data-request-success="$(this).addClass('is-reported').prop('disabled', true).find('[data-report-label]').text('Reported')">
+                    <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4.5 16V3.5h8l-1.5 3 1.5 3H4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span data-report-label>Report</span>
+                </button>
+            {% else %}
+                <span class="comment-pill">
+                    <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 15.5C9 15.5 2.4 11.6 2.4 7A3.3 3.3 0 0 1 9 5.7 3.3 3.3 0 0 1 15.6 7c0 4.6-6.6 8.5-6.6 8.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+                    {{ message.likes_count }}
+                </span>
+            {% endif %}
+        </div>
+    </div>
+</article>

@@ -1,0 +1,37 @@
+url = "/profile/discussions/:slug"
+layout = "default"
+title = "Discussion"
+is_hidden = 0
+
+[session]
+security = "all"
+
+[profileMenu]
+active = "discussions"
+
+[forumTopic]
+slug = "{{ :slug }}"
+
+[forumActiveUsers]
+slug = "{{ :slug }}"
+limit = "6"
+
+[forumUpcomingEvents]
+limit = "4"
+==
+<div class="container profile-container">
+    <div class="profile-layout {{ user ? '' : 'profile-layout--guest' }}">
+        {% if user %}{% component 'profileMenu' %}{% endif %}
+        <div class="profile-workspace">
+            <div class="profile-workspace__aside">
+                {% partial 'communication-rules' %}
+                {% component 'forumActiveUsers' %}
+                {% component 'forumUpcomingEvents' %}
+            </div>
+            <div class="profile-workspace__divider" aria-hidden="true"></div>
+            <main class="profile-layout__main profile-workspace__content">
+            {% component 'forumTopic' %}
+        </main>
+        </div>
+    </div>
+</div>

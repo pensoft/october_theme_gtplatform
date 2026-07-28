@@ -1,0 +1,244 @@
+{# Theme override of the forumTopic component markup — discussion detail
+   (Figma 1479:8425) plus the comment thread. Data from
+   Pensoft\Forum\Components\TopicView: `topic`, `messages`, `commentSort`. #}
+{% set commentSortLabels = { newest: 'Newest', oldest: 'Oldest' } %}
+
+<div class="discussion" data-discussion>
+    <div class="discussion-toolbar">
+        {% if isLoggedIn %}
+            <a href="/profile/create-post" class="forum-new-btn">
+                <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                    <path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                </svg>
+                Start new topic
+            </a>
+        {% else %}
+            <button type="button" class="forum-new-btn" data-signup-trigger>
+                <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                    <path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                </svg>
+                Start new topic
+            </button>
+        {% endif %}
+    </div>
+
+    {% if not isLoggedIn %}{% partial 'signuppopup/default' %}{% endif %}
+
+    <article class="discussion-card">
+        <a href="/profile/discussions" class="discussion-card__back" aria-label="Back to discussions">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M19 12H6M11 7l-5 5 5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </a>
+
+        <div class="discussion-card__head">
+            <div class="forum-card__author">
+                <span class="forum-card__avatar">
+                    {% if topic.user and topic.user.avatar %}
+                        <img src="{{ topic.user.avatar.getThumb(59, 59, { mode: 'crop' }) }}" alt="{{ topic.user.name }}">
+                    {% else %}
+                        <span class="forum-card__initials">
+                            {{ topic.user ? (topic.user.name|first ~ topic.user.surname|first)|upper : '?' }}
+                        </span>
+                    {% endif %}
+                </span>
+                <span class="forum-card__name">
+                    {{ topic.user ? (topic.user.name ~ ' ' ~ topic.user.surname)|trim : 'Guest' }}
+                </span>
+                <span class="forum-card__dot" aria-hidden="true"></span>
+                <span class="forum-card__time">
+                    <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                        <rect x="2.5" y="3.5" width="13" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/>
+                        <path d="M2.5 7h13M6 2.5v2M12 2.5v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                    </svg>
+                    {{ topic.created_at.diffForHumans }}
+                </span>
+            </div>
+            {% if isLoggedIn %}
+                <button type="button" class="forum-card__bookmark {{ saved ? 'is-saved' : '' }}"
+                        data-request="{{ __SELF__ }}::onToggleBookmark"
+                        data-request-success="$(this).toggleClass('is-saved', !!data.saved)"
+                        aria-label="Save to my activity" aria-pressed="{{ saved ? 'true' : 'false' }}">
+                    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                        <path d="M15 17.5 10 14.375 5 17.5V3.75c0-.166.066-.325.183-.442A.625.625 0 0 1 5.625 3.125h8.75c.166 0 .325.066.442.183.117.117.183.276.183.442V17.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            {% else %}
+                <button type="button" class="forum-card__bookmark" data-signup-trigger aria-label="Sign in to save">
+                    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                        <path d="M15 17.5 10 14.375 5 17.5V3.75c0-.166.066-.325.183-.442A.625.625 0 0 1 5.625 3.125h8.75c.166 0 .325.066.442.183.117.117.183.276.183.442V17.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            {% endif %}
+        </div>
+
+        {% if topic.is_best_practice or topic.is_shared_document or topic.tags.count %}
+            <div class="forum-card__tags">
+                {% if topic.is_best_practice %}
+                    <span class="forum-tag forum-tag--best">Best practices</span>
+                {% endif %}
+                {% if topic.is_shared_document %}
+                    <span class="forum-tag forum-tag--doc">Shared documents</span>
+                {% endif %}
+                {% for tag in topic.tags %}
+                    <span class="forum-tag">{{ tag.name }}</span>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <h1 class="discussion-card__title">{{ topic.title }}</h1>
+
+        {% if topic.body %}
+            <div class="discussion-card__body">{{ topic.body|raw }}</div>
+        {% endif %}
+
+        {% if topic.attachments.count %}
+            <div class="discussion-files">
+                {% for file in topic.attachments %}
+                    {% if file.isImage() %}
+                        <a class="filetile filetile--image" href="{{ file.getPath() }}" target="_blank" rel="noopener" title="{{ file.file_name }}">
+                            <img src="{{ file.getThumb(200, 130, { mode: 'crop' }) }}" alt="{{ file.file_name }}">
+                        </a>
+                    {% elseif file.content_type starts with 'video' %}
+                        <video class="filetile filetile--video" src="{{ file.getPath() }}" controls preload="metadata"></video>
+                    {% else %}
+                        {% set ext = file.file_name|split('.')|last|lower %}
+                        <a class="filetile filetile--doc" href="{{ file.getPath() }}" target="_blank" rel="noopener" title="{{ file.file_name }}">
+                            <span class="filetile__glyph">
+                                {% partial __SELF__ ~ '::filetile-glyph' ext=ext %}
+                            </span>
+                            <span class="filetile__name">{{ file.file_name }}</span>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if topic.links %}
+            <div class="discussion-links">
+                {% for link in topic.links %}
+                    <a class="discussion-linkchip" href="{{ link }}" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M7.5 10.5a2.5 2.5 0 0 0 3.5 0l2.5-2.5a2.5 2.5 0 0 0-3.5-3.5l-1 1M10.5 7.5a2.5 2.5 0 0 0-3.5 0L4.5 10a2.5 2.5 0 0 0 3.5 3.5l1-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span>{{ link }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="forum-card__actions">
+            {% if isLoggedIn %}
+                <button type="button" class="forum-pill forum-pill--solid forum-pill--like {{ topicLiked ? 'is-liked' : '' }}"
+                        data-request="{{ __SELF__ }}::onToggleTopicLike"
+                        data-request-success="$(this).toggleClass('is-liked', !!data.liked).find('[data-topic-like-count]').text(data.count)"
+                        title="Like" aria-pressed="{{ topicLiked ? 'true' : 'false' }}">
+                    <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                        <path d="M9 15.5C9 15.5 2.4 11.6 2.4 7A3.3 3.3 0 0 1 9 5.7 3.3 3.3 0 0 1 15.6 7c0 4.6-6.6 8.5-6.6 8.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                    </svg>
+                    <span data-topic-like-count>{{ topic.likes_count }}</span>
+                </button>
+            {% else %}
+                <button type="button" class="forum-pill forum-pill--solid" data-signup-trigger title="Sign in to like">
+                    <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                        <path d="M9 15.5C9 15.5 2.4 11.6 2.4 7A3.3 3.3 0 0 1 9 5.7 3.3 3.3 0 0 1 15.6 7c0 4.6-6.6 8.5-6.6 8.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                    </svg>
+                    {{ topic.likes_count }}
+                </button>
+            {% endif %}
+            <span class="forum-pill forum-pill--solid" title="Replies">
+                <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                    <path d="M15.5 11.5a1.5 1.5 0 0 1-1.5 1.5H6l-3 3V4a1.5 1.5 0 0 1 1.5-1.5h9.5A1.5 1.5 0 0 1 15.5 4v7.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                </svg>
+                {{ topic.messages_count }}
+            </span>
+        </div>
+    </article>
+
+    {% if topic.is_locked %}
+        <p class="discussion-locked">This topic is locked. New comments are disabled.</p>
+    {% elseif isLoggedIn %}
+        <form class="discussion-composer"
+              data-request="{{ __SELF__ }}::onPostMessage"
+              data-request-validate
+              data-request-success="this.reset()">
+            <textarea name="body" class="discussion-composer__input" rows="2" placeholder="Join the conversation" aria-label="Your comment" required></textarea>
+            <span class="discussion-composer__error" data-validate-for="body"></span>
+            <div class="discussion-composer__bar">
+                <div class="discussion-composer__tools" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <g opacity="0.5">
+                            <path d="M10.6979 11.9531L9.44687 10.7125C8.84318 10.1139 8.54133 9.81452 8.19493 9.70509C7.89028 9.60885 7.56286 9.61239 7.26036 9.7152C6.91641 9.83211 6.62111 10.1379 6.03051 10.7495L3.03307 13.7101M10.6979 11.9531L10.9539 11.6992C11.5584 11.0998 11.8606 10.8001 12.2073 10.6907C12.5123 10.5945 12.84 10.5983 13.1427 10.7015C13.4868 10.8188 13.7821 11.1254 14.3726 11.7385L15 12.3701M10.6979 11.9531L13.7062 14.9674M15 12.3701V12.6C15 13.4401 15 13.8601 14.8365 14.181C14.6927 14.4632 14.4632 14.6927 14.181 14.8365C14.0476 14.9045 13.897 14.9442 13.7062 14.9674C13.4382 15 13.0908 15 12.6 15H5.4C4.55992 15 4.13988 15 3.81901 14.8365C3.53677 14.6927 3.3073 14.4632 3.16349 14.181C3.09597 14.0485 3.05634 13.899 3.03307 13.7101C3 13.4415 3 13.0931 3 12.6V5.4C3 4.55992 3 4.13988 3.16349 3.81901C3.3073 3.53677 3.53677 3.3073 3.81901 3.16349C4.13988 3 4.55992 3 5.4 3H12.6C13.4401 3 13.8601 3 14.181 3.16349C14.4632 3.3073 14.6927 3.53677 14.8365 3.81901C15 4.13988 15 4.55992 15 5.4V12.3701ZM12.75 6.74992C12.75 7.57835 12.0784 8.24992 11.25 8.24992C10.4216 8.24992 9.75 7.57835 9.75 6.74992C9.75 5.92149 10.4216 5.24992 11.25 5.24992C12.0784 5.24992 12.75 5.92149 12.75 6.74992Z" stroke="#182D10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </g>
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <g opacity="0.5">
+                            <path d="M12 7.5L13.9326 6.34044C14.5275 5.98352 14.8249 5.80507 15.0696 5.82788C15.283 5.84777 15.4777 5.958 15.6045 6.13075C15.75 6.32886 15.75 6.67572 15.75 7.36943V10.6306C15.75 11.3243 15.75 11.6711 15.6045 11.8693C15.4777 12.042 15.283 12.1522 15.0696 12.1721C14.8249 12.1949 14.5275 12.0165 13.9326 11.6596L12 10.5M4.65 13.5H9.6C10.4401 13.5 10.8601 13.5 11.181 13.3365C11.4632 13.1927 11.6927 12.9632 11.8365 12.681C12 12.3601 12 11.9401 12 11.1V6.9C12 6.05992 12 5.63988 11.8365 5.31901C11.6927 5.03677 11.4632 4.8073 11.181 4.66349C10.8601 4.5 10.4401 4.5 9.6 4.5H4.65C3.80992 4.5 3.38988 4.5 3.06901 4.66349C2.78677 4.8073 2.5573 5.03677 2.41349 5.31901C2.25 5.63988 2.25 6.05992 2.25 6.9V11.1C2.25 11.9401 2.25 12.3601 2.41349 12.681C2.5573 12.9632 2.78677 13.1927 3.06901 13.3365C3.38988 13.5 3.80992 13.5 4.65 13.5Z" stroke="#182D10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </g>
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <path opacity="0.5" d="M6.8739 13.2381C6.69409 13.406 6.55493 13.5184 6.41271 13.6005C5.71656 14.0024 4.85886 14.0024 4.16271 13.6005C3.90618 13.4524 3.65958 13.2058 3.16639 12.7126C2.6732 12.2194 2.4266 11.9728 2.27849 11.7163C1.87657 11.0201 1.87657 10.1624 2.27849 9.46627C2.4266 9.20974 2.6732 8.96315 3.16639 8.46995L5.28771 6.34863C5.7809 5.85544 6.0275 5.60884 6.28403 5.46074C6.98018 5.05881 7.83788 5.05881 8.53403 5.46074C8.79056 5.60884 9.03716 5.85544 9.53035 6.34863C10.0235 6.84182 10.2701 7.08842 10.4182 7.34495C10.8202 8.04111 10.8202 8.8988 10.4182 9.59495C10.3361 9.73717 10.2238 9.87633 10.0559 10.0561M7.94416 7.94442C7.77628 8.12424 7.6639 8.2634 7.58179 8.40561C7.17987 9.10177 7.17987 9.95946 7.58179 10.6556C7.7299 10.9121 7.9765 11.1587 8.46969 11.6519C8.96288 12.1451 9.20948 12.3917 9.46601 12.5398C10.1622 12.9418 11.0199 12.9418 11.716 12.5398C11.9725 12.3917 12.2191 12.1451 12.7123 11.6519L14.8337 9.53061C15.3268 9.03742 15.5734 8.79083 15.7215 8.53429C16.1235 7.83814 16.1235 6.98045 15.7215 6.28429C15.5734 6.02776 15.3268 5.78116 14.8337 5.28797C14.3405 4.79478 14.0939 4.54818 13.8373 4.40008C13.1412 3.99815 12.2835 3.99815 11.5873 4.40008C11.4451 4.48218 11.306 4.59456 11.1261 4.76244" stroke="#182D10" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="discussion-composer__actions">
+                    <button type="reset" class="discussion-btn discussion-btn--ghost">Cancel</button>
+                    <button type="submit" class="discussion-btn discussion-btn--primary" data-attach-loading>Comment</button>
+                </div>
+            </div>
+        </form>
+    {% else %}
+        <div class="discussion-signin">
+            <p class="discussion-signin__text">Sign in to join the conversation.</p>
+            <button type="button" class="discussion-btn discussion-btn--primary" data-signup-trigger>Sign in</button>
+        </div>
+    {% endif %}
+
+    <div class="discussion-comments">
+        <div class="discussion-comments__head">
+            <span class="discussion-comments__sortlabel">Sort by:</span>
+            <details class="forum-sort" data-forum-sort>
+                <summary class="forum-sort__current">
+                    <span>{{ commentSortLabels[commentSort] ?? 'Newest' }}</span>
+                    <svg class="forum-sort__chevron" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                        <path d="M3.5 5.25 7 8.75l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </summary>
+                <div class="forum-sort__menu">
+                    {% for key, label in commentSortLabels %}
+                        <a class="forum-sort__option {{ commentSort == key ? 'is-active' : '' }}" href="?csort={{ key }}#forum-messages">{{ label }}</a>
+                    {% endfor %}
+                </div>
+            </details>
+        </div>
+
+        <div id="forum-messages">
+            {% partial __SELF__ ~ '::messages' messages=messages isLoggedIn=isLoggedIn likedIds=likedIds %}
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        // Reply-form toggling for comments. Delegated on document so it keeps
+        // working after #forum-messages is re-rendered by an AJAX post.
+        if (window.PGT_COMMENTS_INIT) return;
+        window.PGT_COMMENTS_INIT = true;
+
+        document.addEventListener('click', function (e) {
+            var replyBtn = e.target.closest('[data-comment-reply]');
+            if (replyBtn) {
+                e.preventDefault();
+                var form = document.getElementById(replyBtn.getAttribute('data-target'));
+                if (form) {
+                    form.hidden = !form.hidden;
+                    if (!form.hidden) { var t = form.querySelector('textarea'); if (t) t.focus(); }
+                }
+                return;
+            }
+            var cancelBtn = e.target.closest('[data-reply-cancel]');
+            if (cancelBtn) {
+                e.preventDefault();
+                var f = cancelBtn.closest('form');
+                if (f) f.hidden = true;
+            }
+        });
+    })();
+    </script>
+</div>

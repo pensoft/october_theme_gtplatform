@@ -1,0 +1,13 @@
+{# Theme markup for the forumTagList component — Topics page (Figma 1529:5541).
+   Each chip is a tag with a white badge counting the published discussions
+   that use it. Clicking a chip opens the discussions list filtered by tag. #}
+<div class="topic-chips">
+    {% for tag in tags %}
+        <a class="topic-chip" href="{{ __SELF__.tagUrl(tag) }}">
+            <span class="topic-chip__label">{{ tag.name }}</span>
+            <span class="topic-chip__count">{{ tag.topics_count }}</span>
+        </a>
+    {% else %}
+        <p class="forum-empty">No topics yet.</p>
+    {% endfor %}
+</div>

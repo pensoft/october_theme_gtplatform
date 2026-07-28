@@ -1,0 +1,75 @@
+{# Header avatar + notifications dropdown (Figma 1734:5742 / 1734:6096).
+   Vars: user, unreadCount, notifications. #}
+<div class="gt-header__profile gt-notif" data-notif>
+    <button type="button" class="gt-notif__toggle" data-notif-toggle aria-haspopup="true" aria-expanded="false"
+            aria-label="Notifications{{ unreadCount > 0 ? ' (' ~ unreadCount ~ ' unread)' : '' }}">
+        {% if user.avatar %}
+            <img src="{{ user.avatar.getThumb(59, 59, { mode: 'crop' }) }}" alt="{{ user.name }} {{ user.surname }}" class="gt-header__avatar">
+        {% else %}
+            <img src="{{ 'CMS_icons_avatar_white.svg'|media }}" alt="{{ user.name }} {{ user.surname }}" class="gt-header__avatar gt-header__avatar--placeholder">
+        {% endif %}
+        <span class="gt-notif__badge" data-notif-count {{ unreadCount > 0 ? '' : 'hidden' }}>{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
+    </button>
+
+    <a href="/profile" class="gt-header__pill">{{ user.name }}{% if user.surname %} {{ user.surname|first }}{% endif %}</a>
+
+    <div class="gt-notif__panel" data-notif-panel hidden role="dialog" aria-label="Notifications">
+        <div class="gt-notif__head">
+            <span class="gt-notif__title">Notifications</span>
+            <button type="button" class="gt-notif__markall"
+                    data-request="{{ __SELF__ }}::onMarkAllRead"
+                    data-request-success="$(this).closest('[data-notif]').find('[data-notif-count]').attr('hidden', true).text('0')">
+                Mark all as read
+            </button>
+        </div>
+        <div class="gt-notif__list" data-notif-list>
+            {% partial __SELF__ ~ '::list' notifications=notifications %}
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        var root = document.currentScript.closest('[data-notif]');
+        if (!root || root.dataset.bound) return;
+        root.dataset.bound = '1';
+
+        var toggle = root.querySelector('[data-notif-toggle]');
+        var panel  = root.querySelector('[data-notif-panel]');
+
+        // The panel is position:fixed (so the header's overflow:hidden can't clip
+        // it); anchor its top-right corner under the avatar.
+        function position() {
+            var r = toggle.getBoundingClientRect();
+            panel.style.top   = (r.bottom + 12) + 'px';
+            panel.style.right = Math.max(12, window.innerWidth - r.right) + 'px';
+        }
+
+        function close() {
+            panel.hidden = true;
+            toggle.setAttribute('aria-expanded', 'false');
+        }
+
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var willOpen = panel.hidden;
+            if (willOpen) position();
+            panel.hidden = !willOpen;
+            toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        });
+
+        panel.addEventListener('click', function (e) { e.stopPropagation(); });
+
+        document.addEventListener('click', function (e) {
+            if (!root.contains(e.target)) close();
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') close();
+        });
+
+        window.addEventListener('resize', function () { if (!panel.hidden) position(); });
+        window.addEventListener('scroll', function () { if (!panel.hidden) position(); }, true);
+    })();
+    </script>
+</div>

@@ -1,0 +1,279 @@
+{# Theme markup for the forumTopicForm component — the "Create post" page
+   (Figma 1253:2833 heading / 1253:3108 title / 1479:7732 add topics / 1253:3082 body).
+   Data from Pensoft\Forum\Components\TopicForm: `tags`, __SELF__.listUrl(). #}
+<div class="create-post" data-forum>
+    <div id="create-post-banner"></div>
+
+    <h1 class="create-post__title">Create post</h1>
+
+    <form class="create-post__form"
+          data-request="{{ __SELF__ }}::onCreatePost"
+          data-request-validate
+          data-request-files>
+
+        <div class="create-post__field">
+            <input type="text" name="title" class="forum-field create-post__title-field"
+                   placeholder="Title" aria-label="Post title" maxlength="200" data-char-input required>
+            <div class="create-post__counter" aria-hidden="true"><span data-char-count>0</span>/200</div>
+        </div>
+        <span class="forum-modal__error" data-validate-for="title"></span>
+
+        <div class="forum-topics-select">
+            <button type="button" class="forum-tag-btn" data-forum-open-topics>Add topics</button>
+            <span class="forum-topics-selected" data-selected-tags></span>
+        </div>
+
+        <div class="create-post__body-card">
+            <div class="create-post__field">
+                <textarea name="body" class="create-post__body" rows="6"
+                          placeholder="What would you like to share?" aria-label="Post body"
+                          maxlength="1500" data-char-input></textarea>
+                <div class="create-post__counter" aria-hidden="true"><span data-char-count>0</span>/1500</div>
+            </div>
+
+            {# Selected file attachments, each removable. #}
+            <div class="create-post__attachments" data-attach-list></div>
+
+            <div class="create-post__bar">
+                <div class="create-post__tools">
+                    <button type="button" class="create-post__tool" data-attach-image aria-label="Attach image">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                            <g opacity="0.5">
+                                <path d="M10.6979 11.9531L9.44687 10.7125C8.84318 10.1139 8.54133 9.81452 8.19493 9.70509C7.89028 9.60885 7.56286 9.61239 7.26036 9.7152C6.91641 9.83211 6.62111 10.1379 6.03051 10.7495L3.03307 13.7101M10.6979 11.9531L10.9539 11.6992C11.5584 11.0998 11.8606 10.8001 12.2073 10.6907C12.5123 10.5945 12.84 10.5983 13.1427 10.7015C13.4868 10.8188 13.7821 11.1254 14.3726 11.7385L15 12.3701M10.6979 11.9531L13.7062 14.9674M15 12.3701V12.6C15 13.4401 15 13.8601 14.8365 14.181C14.6927 14.4632 14.4632 14.6927 14.181 14.8365C14.0476 14.9045 13.897 14.9442 13.7062 14.9674C13.4382 15 13.0908 15 12.6 15H5.4C4.55992 15 4.13988 15 3.81901 14.8365C3.53677 14.6927 3.3073 14.4632 3.16349 14.181C3.09597 14.0485 3.05634 13.899 3.03307 13.7101C3 13.4415 3 13.0931 3 12.6V5.4C3 4.55992 3 4.13988 3.16349 3.81901C3.3073 3.53677 3.53677 3.3073 3.81901 3.16349C4.13988 3 4.55992 3 5.4 3H12.6C13.4401 3 13.8601 3 14.181 3.16349C14.4632 3.3073 14.6927 3.53677 14.8365 3.81901C15 4.13988 15 4.55992 15 5.4V12.3701ZM12.75 6.74992C12.75 7.57835 12.0784 8.24992 11.25 8.24992C10.4216 8.24992 9.75 7.57835 9.75 6.74992C9.75 5.92149 10.4216 5.24992 11.25 5.24992C12.0784 5.24992 12.75 5.92149 12.75 6.74992Z" stroke="#182D10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </g>
+                        </svg>
+                    </button>
+                    <button type="button" class="create-post__tool" data-attach-video aria-label="Attach video">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                            <g opacity="0.5">
+                                <path d="M12 7.5L13.9326 6.34044C14.5275 5.98352 14.8249 5.80507 15.0696 5.82788C15.283 5.84777 15.4777 5.958 15.6045 6.13075C15.75 6.32886 15.75 6.67572 15.75 7.36943V10.6306C15.75 11.3243 15.75 11.6711 15.6045 11.8693C15.4777 12.042 15.283 12.1522 15.0696 12.1721C14.8249 12.1949 14.5275 12.0165 13.9326 11.6596L12 10.5M4.65 13.5H9.6C10.4401 13.5 10.8601 13.5 11.181 13.3365C11.4632 13.1927 11.6927 12.9632 11.8365 12.681C12 12.3601 12 11.9401 12 11.1V6.9C12 6.05992 12 5.63988 11.8365 5.31901C11.6927 5.03677 11.4632 4.8073 11.181 4.66349C10.8601 4.5 10.4401 4.5 9.6 4.5H4.65C3.80992 4.5 3.38988 4.5 3.06901 4.66349C2.78677 4.8073 2.5573 5.03677 2.41349 5.31901C2.25 5.63988 2.25 6.05992 2.25 6.9V11.1C2.25 11.9401 2.25 12.3601 2.41349 12.681C2.5573 12.9632 2.78677 13.1927 3.06901 13.3365C3.38988 13.5 3.80992 13.5 4.65 13.5Z" stroke="#182D10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </g>
+                        </svg>
+                    </button>
+                    <button type="button" class="create-post__tool" data-attach-doc aria-label="Attach file (PDF, DOC, TXT, PPT…)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                            <path opacity="0.5" d="M6.8739 13.2381C6.69409 13.406 6.55493 13.5184 6.41271 13.6005C5.71656 14.0024 4.85886 14.0024 4.16271 13.6005C3.90618 13.4524 3.65958 13.2058 3.16639 12.7126C2.6732 12.2194 2.4266 11.9728 2.27849 11.7163C1.87657 11.0201 1.87657 10.1624 2.27849 9.46627C2.4266 9.20974 2.6732 8.96315 3.16639 8.46995L5.28771 6.34863C5.7809 5.85544 6.0275 5.60884 6.28403 5.46074C6.98018 5.05881 7.83788 5.05881 8.53403 5.46074C8.79056 5.60884 9.03716 5.85544 9.53035 6.34863C10.0235 6.84182 10.2701 7.08842 10.4182 7.34495C10.8202 8.04111 10.8202 8.8988 10.4182 9.59495C10.3361 9.73717 10.2238 9.87633 10.0559 10.0561M7.94416 7.94442C7.77628 8.12424 7.6639 8.2634 7.58179 8.40561C7.17987 9.10177 7.17987 9.95946 7.58179 10.6556C7.7299 10.9121 7.9765 11.1587 8.46969 11.6519C8.96288 12.1451 9.20948 12.3917 9.46601 12.5398C10.1622 12.9418 11.0199 12.9418 11.716 12.5398C11.9725 12.3917 12.2191 12.1451 12.7123 11.6519L14.8337 9.53061C15.3268 9.03742 15.5734 8.79083 15.7215 8.53429C16.1235 7.83814 16.1235 6.98045 15.7215 6.28429C15.5734 6.02776 15.3268 5.78116 14.8337 5.28797C14.3405 4.79478 14.0939 4.54818 13.8373 4.40008C13.1412 3.99815 12.2835 3.99815 11.5873 4.40008C11.4451 4.48218 11.306 4.59456 11.1261 4.76244" stroke="#182D10" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="create-post__actions">
+                    <button type="button" class="forum-cancel-pill" data-request="{{ __SELF__ }}::onSaveDraft" data-request-files data-attach-loading>Save draft</button>
+                    <button type="submit" class="discussion-btn discussion-btn--primary" data-attach-loading>Post</button>
+                </div>
+            </div>
+        </div>
+
+        {# Hidden file inputs — sent with the form (data-request-files). #}
+        <input type="file" name="images[]" accept="image/*" multiple hidden data-file-image>
+        <input type="file" name="videos[]" accept="video/*" multiple hidden data-file-video>
+        <input type="file" name="documents[]" accept=".pdf,.doc,.docx,.txt,.rtf,.odt,.ppt,.pptx,.xls,.xlsx,.csv" multiple hidden data-file-doc>
+    </form>
+
+    {# ---------- Add topics picker modal (Figma 1479:7444) ---------- #}
+    <div class="forum-modal" data-forum-modal="topics" aria-hidden="true">
+        <div class="forum-modal__backdrop" data-forum-close></div>
+        <div class="forum-modal__dialog forum-modal__dialog--topics" role="dialog" aria-modal="true" aria-label="Add topics">
+            <h2 class="forum-modal__title">Add topics</h2>
+
+            <div class="forum-search">
+                <input type="text" class="forum-search__input" placeholder="Search topics" aria-label="Search topics" data-topics-search>
+                <svg class="forum-search__icon" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                    <circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M12.5 12.5L16 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+
+            <div class="forum-topics-grid" data-topics-grid>
+                {% for tag in tags %}
+                    <button type="button" class="forum-topic-chip" data-topic-chip
+                            data-tag-id="{{ tag.id }}" data-tag-name="{{ tag.name }}">
+                        {{ tag.name }}
+                    </button>
+                {% else %}
+                    <p class="forum-empty">No topics available yet.</p>
+                {% endfor %}
+            </div>
+
+            <div class="forum-modal__actions forum-modal__actions--start">
+                <button type="button" class="forum-cancel-pill" data-forum-close>Cancel</button>
+                <button type="button" class="discussion-btn discussion-btn--primary" data-topics-apply>Add</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        var root = document.currentScript.closest('[data-forum]');
+        if (!root || root.dataset.bound) return;
+        root.dataset.bound = '1';
+
+        var topicsModal  = root.querySelector('[data-forum-modal="topics"]');
+        var selectedWrap = root.querySelector('[data-selected-tags]');
+        var searchInput  = topicsModal.querySelector('[data-topics-search]');
+
+        // Live character counters (title + body). The `input` event fires on
+        // typing, cut and paste; `maxlength` caps each field at 1500 chars.
+        root.querySelectorAll('[data-char-input]').forEach(function (input) {
+            var field = input.closest('.create-post__field');
+            var count = field ? field.querySelector('[data-char-count]') : null;
+            if (!count) return;
+
+            var update = function () { count.textContent = input.value.length; };
+            input.addEventListener('input', update);
+            update();
+        });
+
+        // ---- File attachments: images / videos / documents ----
+        var imgInput   = root.querySelector('[data-file-image]');
+        var vidInput   = root.querySelector('[data-file-video]');
+        var docInput   = root.querySelector('[data-file-doc]');
+        var attachList = root.querySelector('[data-attach-list]');
+
+        function attachChip(label, onRemove) {
+            var chip = document.createElement('span');
+            chip.className = 'create-post__attachment';
+
+            var text = document.createElement('span');
+            text.className = 'create-post__attachment-label';
+            text.textContent = label;
+            chip.appendChild(text);
+
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'create-post__attachment-remove';
+            btn.setAttribute('aria-label', 'Remove ' + label);
+            btn.innerHTML = '<svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+            btn.addEventListener('click', onRemove);
+            chip.appendChild(btn);
+
+            return chip;
+        }
+
+        // Persistent per-input file store so selections accumulate across
+        // multiple picker openings (assigning input.files otherwise replaces it,
+        // so "attach another file" would drop the previous ones).
+        var stores = new WeakMap();
+        function storeFor(input) {
+            var dt = stores.get(input);
+            if (!dt) { dt = new DataTransfer(); stores.set(input, dt); }
+            return dt;
+        }
+        function fileKey(f) { return f.name + '|' + f.size + '|' + (f.lastModified || 0); }
+
+        function renderAttachments() {
+            attachList.innerHTML = '';
+            [imgInput, vidInput, docInput].forEach(function (input) {
+                if (!input) return;
+                Array.prototype.forEach.call(input.files, function (file, idx) {
+                    attachList.appendChild(attachChip(file.name, function () { removeFile(input, idx); }));
+                });
+            });
+        }
+
+        // Merge a fresh picker selection into the running store (additive, deduped).
+        function collectFiles(input) {
+            var dt = storeFor(input);
+            var seen = {};
+            Array.prototype.forEach.call(dt.files, function (f) { seen[fileKey(f)] = true; });
+            Array.prototype.forEach.call(input.files, function (f) {
+                var k = fileKey(f);
+                if (!seen[k]) { dt.items.add(f); seen[k] = true; }
+            });
+            input.files = dt.files;
+            renderAttachments();
+        }
+
+        // Rebuild the store without the removed index (DataTransfer trick).
+        function removeFile(input, removeIdx) {
+            var kept = new DataTransfer();
+            Array.prototype.forEach.call(storeFor(input).files, function (file, idx) {
+                if (idx !== removeIdx) kept.items.add(file);
+            });
+            stores.set(input, kept);
+            input.files = kept.files;
+            renderAttachments();
+        }
+
+        [imgInput, vidInput, docInput].forEach(function (input) {
+            if (input) input.addEventListener('change', function () { collectFiles(input); });
+        });
+
+        function openModal(m)  { m.classList.add('is-open'); m.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; }
+        function closeModal(m) {
+            m.classList.remove('is-open');
+            m.setAttribute('aria-hidden', 'true');
+            if (!root.querySelector('.forum-modal.is-open')) document.body.style.overflow = '';
+        }
+
+        // Render the picker selection as removable chips. Each chip carries its
+        // own hidden tags[] input, so removing the chip removes it from the post.
+        function applyTags() {
+            selectedWrap.innerHTML = '';
+            topicsModal.querySelectorAll('[data-topic-chip].is-selected').forEach(function (chip) {
+                var id   = chip.getAttribute('data-tag-id');
+                var name = chip.getAttribute('data-tag-name');
+
+                var chipEl = document.createElement('span');
+                chipEl.className = 'forum-tag forum-tag--removable';
+                chipEl.setAttribute('data-selected-tag', id);
+
+                var label = document.createElement('span');
+                label.textContent = name;
+                chipEl.appendChild(label);
+
+                var remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'forum-tag__remove';
+                remove.setAttribute('data-remove-tag', id);
+                remove.setAttribute('aria-label', 'Remove ' + name);
+                remove.innerHTML = '<svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+                chipEl.appendChild(remove);
+
+                var input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'tags[]';
+                input.value = id;
+                chipEl.appendChild(input);
+
+                selectedWrap.appendChild(chipEl);
+            });
+        }
+
+        // Remove a selected tag: drop its chip (+ hidden input) and deselect it
+        // in the picker so a reopened picker reflects the current selection.
+        function removeTag(id) {
+            var pickerChip = topicsModal.querySelector('[data-topic-chip][data-tag-id="' + id + '"]');
+            if (pickerChip) pickerChip.classList.remove('is-selected');
+
+            var chip = selectedWrap.querySelector('[data-selected-tag="' + id + '"]');
+            if (chip) chip.remove();
+        }
+
+        root.addEventListener('click', function (e) {
+            if (e.target.closest('[data-forum-open-topics]')) { e.preventDefault(); openModal(topicsModal); }
+            else if (e.target.closest('[data-topics-apply]')) { e.preventDefault(); applyTags(); closeModal(topicsModal); }
+            else if (e.target.closest('[data-remove-tag]'))   { e.preventDefault(); removeTag(e.target.closest('[data-remove-tag]').getAttribute('data-remove-tag')); }
+            else if (e.target.closest('[data-topic-chip]'))   { e.preventDefault(); e.target.closest('[data-topic-chip]').classList.toggle('is-selected'); }
+            else if (e.target.closest('[data-forum-close]'))  { e.preventDefault(); closeModal(e.target.closest('.forum-modal')); }
+            else if (e.target.closest('[data-attach-image]')) { e.preventDefault(); imgInput.click(); }
+            else if (e.target.closest('[data-attach-video]')) { e.preventDefault(); vidInput.click(); }
+            else if (e.target.closest('[data-attach-doc]'))   { e.preventDefault(); docInput.click(); }
+        });
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                var q = this.value.trim().toLowerCase();
+                topicsModal.querySelectorAll('[data-topic-chip]').forEach(function (chip) {
+                    chip.hidden = q && chip.getAttribute('data-tag-name').toLowerCase().indexOf(q) === -1;
+                });
+            });
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key !== 'Escape') return;
+            var open = root.querySelector('.forum-modal.is-open');
+            if (open) closeModal(open);
+        });
+    })();
+    </script>
+</div>

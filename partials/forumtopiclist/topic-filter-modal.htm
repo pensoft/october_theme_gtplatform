@@ -1,0 +1,141 @@
+{# Topic filter modal for the grid variant (Figma 1479:7329).
+   Multi-select: picking tags and pressing Add navigates to ?tag=slug,slug — a
+   topic matches when it carries any of them. Deselecting everything clears the
+   filter. Vars: tags, sort, currentTags. #}
+<div class="pgt-modal pgt-modal--topicfilter pgt-topicfilter-modal" data-topicfilter
+     aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="bpTopicFilterTitle">
+    <div class="pgt-modal__backdrop" data-topicfilter-close></div>
+    <div class="pgt-modal__dialog">
+        {# A plain GET form: submitting replaces the query string, which also drops
+           ?page= so the filtered list starts back at page one. #}
+        <form class="bp-topicmodal" method="get" data-topicfilter-form data-initial="{{ currentTags|join(',') }}">
+            <input type="hidden" name="sort" value="{{ sort }}">
+            <input type="hidden" name="tag" value="{{ currentTags|join(',') }}" data-topicfilter-value>
+
+            <div class="bp-topicmodal__body">
+                <h2 class="bp-topicmodal__title" id="bpTopicFilterTitle">Choose a topic</h2>
+
+                <div class="bp-topicmodal__search">
+                    <input type="search" class="bp-topicmodal__input" placeholder="Search topics"
+                           aria-label="Search topics" autocomplete="off" data-topicfilter-search>
+                    <svg class="bp-topicmodal__searchicon" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                        <circle cx="8" cy="8" r="5.25" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="m12.25 12.25 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+
+                <div class="bp-topicmodal__tags" data-topicfilter-tags>
+                    {% for tag in tags %}
+                        <button type="button"
+                                class="bp-topicchip {{ tag.slug in currentTags ? 'is-selected' : '' }}"
+                                data-topicfilter-chip data-slug="{{ tag.slug }}" data-name="{{ tag.name|lower }}"
+                                aria-pressed="{{ tag.slug in currentTags ? 'true' : 'false' }}">{{ tag.name }}</button>
+                    {% endfor %}
+                </div>
+
+                <p class="bp-topicmodal__empty" data-topicfilter-empty hidden>No topics match your search.</p>
+            </div>
+
+            <div class="bp-topicmodal__actions">
+                <button type="button" class="bp-topicmodal__cancel" data-topicfilter-close>Cancel</button>
+                <button type="submit" class="bp-topicmodal__add">Add</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    (function () {
+        if (window.PGT_TOPICFILTER_INIT) {
+            // An earlier include already wired things up — drop the duplicate DOM.
+            var dupes = document.querySelectorAll('.pgt-topicfilter-modal');
+            for (var i = 1; i < dupes.length; i++) dupes[i].parentNode.removeChild(dupes[i]);
+            return;
+        }
+        window.PGT_TOPICFILTER_INIT = true;
+
+        var modal = document.querySelector('[data-topicfilter]');
+        if (!modal) return;
+
+        var form    = modal.querySelector('[data-topicfilter-form]');
+        var value   = modal.querySelector('[data-topicfilter-value]');
+        var search  = modal.querySelector('[data-topicfilter-search]');
+        var empty   = modal.querySelector('[data-topicfilter-empty]');
+        var chips   = [].slice.call(modal.querySelectorAll('[data-topicfilter-chip]'));
+        var trigger = null;
+
+        function select(chip, on) {
+            chip.classList.toggle('is-selected', on);
+            chip.setAttribute('aria-pressed', on ? 'true' : 'false');
+        }
+
+        // Re-sync the chips to the tags the list is actually filtered by, so a
+        // Cancel (or Esc) discards whatever was toggled while the modal was open.
+        function reset() {
+            var initial = (form.getAttribute('data-initial') || '').split(',').filter(Boolean);
+            chips.forEach(function (chip) {
+                select(chip, initial.indexOf(chip.getAttribute('data-slug')) !== -1);
+            });
+        }
+
+        function filter(term) {
+            term = term.trim().toLowerCase();
+            var shown = 0;
+            chips.forEach(function (chip) {
+                var match = !term || chip.getAttribute('data-name').indexOf(term) !== -1;
+                chip.hidden = !match;
+                if (match) shown++;
+            });
+            if (empty) empty.hidden = shown > 0;
+        }
+
+        function open(el) {
+            trigger = el || null;
+            reset();
+            if (search) { search.value = ''; }
+            filter('');
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+            if (trigger) trigger.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+            if (search) search.focus();
+        }
+
+        function close() {
+            modal.classList.remove('is-open');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            if (trigger) { trigger.setAttribute('aria-expanded', 'false'); trigger.focus(); }
+        }
+
+        document.addEventListener('click', function (e) {
+            if (!e.target || !e.target.closest) return;
+
+            var opener = e.target.closest('[data-topicfilter-open]');
+            if (opener) { e.preventDefault(); open(opener); return; }
+
+            if (e.target.closest('[data-topicfilter-close]')) { e.preventDefault(); close(); return; }
+
+            var chip = e.target.closest('[data-topicfilter-chip]');
+            if (chip && modal.contains(chip)) select(chip, !chip.classList.contains('is-selected'));
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && modal.classList.contains('is-open')) close();
+        });
+
+        if (search) {
+            search.addEventListener('input', function () { filter(search.value); });
+        }
+
+        form.addEventListener('submit', function () {
+            var slugs = chips
+                .filter(function (chip) { return chip.classList.contains('is-selected'); })
+                .map(function (chip) { return chip.getAttribute('data-slug'); });
+
+            // A disabled field is not serialised — keeps ?tag= out of the URL entirely.
+            value.disabled = slugs.length === 0;
+            value.value = slugs.join(',');
+        });
+    })();
+</script>

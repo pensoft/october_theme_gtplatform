@@ -1,0 +1,31 @@
+{# "Active in the discussion" sidebar panel (Figma 1275:4443).
+   Var: activeUsers — collection of { user, count }. #}
+<aside class="side-panel active-users" aria-label="Active in the discussion">
+    <h4 class="side-panel__title">
+        <svg class="side-panel__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="14.5" r="5.5" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M8.7 9.6 6 3M15.3 9.6 18 3M9.5 3h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Active in the discussion
+    </h4>
+
+    {% for row in activeUsers %}
+        <div class="active-user">
+            <span class="active-user__who">
+                <span class="active-user__avatar">
+                    {% if row.user.avatar %}
+                        <img src="{{ row.user.avatar.getThumb(32, 32, { mode: 'crop' }) }}" alt="{{ row.user.name }}">
+                    {% else %}
+                        <span class="active-user__initials">{{ (row.user.name|first ~ row.user.surname|first)|upper }}</span>
+                    {% endif %}
+                </span>
+                <span class="active-user__name">
+                    {{ (row.user.name ~ ' ' ~ row.user.surname)|trim ?: 'User-' ~ row.user.id }}
+                </span>
+            </span>
+            <span class="active-user__count">{{ row.count }}</span>
+        </div>
+    {% else %}
+        <p class="side-panel__empty">No comments yet.</p>
+    {% endfor %}
+</aside>

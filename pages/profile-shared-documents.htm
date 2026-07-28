@@ -1,0 +1,31 @@
+url = "/profile/shared-documents"
+layout = "default"
+title = "Shared documents"
+is_hidden = 0
+
+[session]
+security = "user"
+redirect = "login"
+
+[profileMenu]
+active = "shared-documents"
+
+[forumTopicList]
+perPage = "24"
+detailPage = "profile-discussion"
+onlySharedDocuments = 1
+gridCards = 1
+showToolbar = 0
+==
+<div class="container profile-container">
+    <div class="profile-layout">
+        {% component 'profileMenu' %}
+        <main class="profile-layout__main">
+            <header class="profile-head">
+                <h1 class="profile-head__title">Shared documents</h1>
+                <p class="profile-head__sub">Documents shared across the GREEN TALENT community.</p>
+            </header>
+            {% component 'forumTopicList' %}
+        </main>
+    </div>
+</div>

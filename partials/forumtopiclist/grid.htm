@@ -1,0 +1,145 @@
+{# Best practices "publication" grid variant (Figma 1479:8434).
+   Vars: topics, tags, sort, currentTags, isLoggedIn, savedIds, emptyMessage. #}
+{% set sortLabels = { newest: 'Newest', oldest: 'Oldest', popular: 'Most liked', active: 'Most active' } %}
+{% set tagQuery = currentTags|join(',') %}
+
+<div class="bp-toolbar">
+    <div class="bp-toolbar__filters">
+        <button type="button" class="bp-topicpill" data-topicfilter-open
+                aria-haspopup="dialog" aria-expanded="false">
+            <span>Choose a topic</span>
+            <svg viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M3.5 5.25 7 8.75l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+
+        {# Selected topics (Figma 1479:8345) — each X links to the same list minus
+           that one slug, so removing a filter works without JavaScript. #}
+        {% for tag in tags %}
+            {% if tag.slug in currentTags %}
+                {% set rest = [] %}
+                {% for slug in currentTags %}
+                    {% if slug != tag.slug %}{% set rest = rest|merge([slug]) %}{% endif %}
+                {% endfor %}
+                {% set query = 'sort=' ~ sort %}
+                {% if rest|length %}{% set query = query ~ '&tag=' ~ rest|join(',') %}{% endif %}
+
+                <span class="bp-activetag">
+                    {{ tag.name }}
+                    <a class="bp-activetag__remove" href="?{{ query }}"
+                       aria-label="Remove {{ tag.name }} filter" title="Remove {{ tag.name }} filter">
+                        <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                            <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </a>
+                </span>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <details class="bp-dropdown bp-dropdown--right" data-forum-sort>
+        <summary class="bp-sortpill">
+            <span>{{ sortLabels[sort] ?? 'Newest' }}</span>
+            <svg viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M3.5 5.25 7 8.75l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </summary>
+        <div class="bp-dropdown__menu bp-dropdown__menu--right">
+            {% for key, label in sortLabels %}
+                <a class="bp-dropdown__option {{ sort == key ? 'is-active' : '' }}"
+                   href="?sort={{ key }}{{ tagQuery ? '&tag=' ~ tagQuery }}">{{ label }}</a>
+            {% endfor %}
+        </div>
+    </details>
+</div>
+
+{% partial __SELF__ ~ '::topic-filter-modal' tags=tags sort=sort currentTags=currentTags %}
+
+<div class="bp-grid">
+    {% for topic in topics %}
+        <article class="bp-card">
+            <div class="bp-card__head">
+                {% if topic.is_best_practice %}
+                    <span class="forum-tag forum-tag--best">Best practices</span>
+                {% elseif topic.is_shared_document %}
+                    <span class="forum-tag forum-tag--doc">Shared documents</span>
+                {% else %}
+                    <span class="forum-tag forum-tag--best">Best practices</span>
+                {% endif %}
+
+                {% if isLoggedIn %}
+                    <button type="button" class="forum-card__bookmark {{ topic.id in savedIds ? 'is-saved' : '' }}"
+                            data-request="{{ __SELF__ }}::onToggleBookmark" data-request-data="id: {{ topic.id }}"
+                            data-request-success="$(this).toggleClass('is-saved', !!data.saved)"
+                            aria-label="Save to my activity" aria-pressed="{{ topic.id in savedIds ? 'true' : 'false' }}">
+                        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                            <path d="M15 17.5 10 14.375 5 17.5V3.75c0-.166.066-.325.183-.442A.625.625 0 0 1 5.625 3.125h8.75c.166 0 .325.066.442.183.117.117.183.276.183.442V17.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                {% else %}
+                    <button type="button" class="forum-card__bookmark" data-signup-trigger aria-label="Sign in to save">
+                        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                            <path d="M15 17.5 10 14.375 5 17.5V3.75c0-.166.066-.325.183-.442A.625.625 0 0 1 5.625 3.125h8.75c.166 0 .325.066.442.183.117.117.183.276.183.442V17.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                {% endif %}
+            </div>
+
+            <div class="bp-card__author">
+                <span class="bp-card__avatar">
+                    {% if topic.user and topic.user.avatar %}
+                        <img src="{{ topic.user.avatar.getThumb(35, 35, { mode: 'crop' }) }}" alt="{{ topic.user.name }}">
+                    {% else %}
+                        <span class="bp-card__initials">{{ topic.user ? (topic.user.name|first ~ topic.user.surname|first)|upper : '?' }}</span>
+                    {% endif %}
+                </span>
+                <span class="bp-card__name">
+                    {{ topic.user ? (topic.user.name ~ ' ' ~ topic.user.surname)|trim : 'Guest' }}
+                </span>
+            </div>
+
+            {% set excerpt = topic.body|striptags|trim %}
+            <a class="bp-card__excerpt" href="{{ __SELF__.topicUrl(topic) }}">
+                {{ excerpt ? excerpt|slice(0, 110) ~ (excerpt|length > 110 ? '...' : '') : topic.title }}
+            </a>
+
+            {% if topic.tags.count %}
+                <div class="bp-card__tags">
+                    {% for tag in topic.tags %}
+                        <span class="forum-tag">{{ tag.name }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% set exts = [] %}
+            {% for file in topic.attachments %}
+                {% if not file.isImage() and not (file.content_type starts with 'video') %}
+                    {% set raw = file.file_name|split('.')|last|lower %}
+                    {% set canon = 'txt' %}
+                    {% if raw == 'pdf' %}{% set canon = 'pdf' %}
+                    {% elseif raw in ['doc', 'docx'] %}{% set canon = 'doc' %}
+                    {% elseif raw in ['xls', 'xlsx', 'csv'] %}{% set canon = 'xls' %}
+                    {% elseif raw in ['ppt', 'pptx'] %}{% set canon = 'ppt' %}
+                    {% endif %}
+                    {% if canon not in exts %}{% set exts = exts|merge([canon]) %}{% endif %}
+                {% endif %}
+            {% endfor %}
+            {% if exts|length %}
+                <div class="bp-card__files">
+                    {% for e in exts %}
+                        <span class="bp-fileicon">{% partial 'forumtopic/filetile-glyph' ext=e %}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <a class="bp-card__link" href="{{ __SELF__.topicUrl(topic) }}">
+                View publication
+                <svg viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                    <path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+        </article>
+    {% else %}
+        <p class="forum-empty">{{ emptyMessage ?: 'No best practices yet.' }}</p>
+    {% endfor %}
+</div>

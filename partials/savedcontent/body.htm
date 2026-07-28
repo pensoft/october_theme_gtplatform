@@ -98,6 +98,21 @@
             <span class="saved-tile__cta">View events</span>
         </a>
 
+
+        <a class="saved-tile saved-tile--publications" href="/profile/saved/publications">
+            <span class="saved-tile__icon">
+                <svg viewBox="0 0 32 32" width="32" height="32" fill="none" aria-hidden="true">
+                    <path d="M16 8.5c-2.2-1.6-5.2-2.2-8.5-2.2v18c3.3 0 6.3.6 8.5 2.2 2.2-1.6 5.2-2.2 8.5-2.2v-18c-3.3 0-6.3.6-8.5 2.2Z" stroke="#3D5692" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="M16 8.5v18" stroke="#3D5692" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </span>
+            <div class="saved-tile__body">
+                <h3 class="saved-tile__title">Publications</h3>
+                <p class="saved-tile__count">{{ publicationsCount|default(0) }} items</p>
+            </div>
+            <span class="saved-tile__cta">View publications</span>
+        </a>
+
         <a class="saved-tile saved-tile--jobs" href="/profile/saved/jobs">
             <span class="saved-tile__icon">
                 <svg viewBox="0 0 32 32" width="32" height="32" fill="none" aria-hidden="true">
@@ -112,5 +127,7 @@
             </div>
             <span class="saved-tile__cta">View jobs</span>
         </a>
+
+
     </div>
 {% endif %}
