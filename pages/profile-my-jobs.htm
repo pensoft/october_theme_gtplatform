@@ -21,7 +21,11 @@ detailPage = "profile-discussion"
                 <h1 class="profile-head__title">My activity</h1>
                 <p class="profile-head__sub">Everything you've posted across GREEN TALENT.</p>
             </header>
-            {% component 'forumMyActivity' %}
+            {# Wrapper is the AJAX update target — deleting a comment refreshes
+               the chips' counts and the pager, not just the list. #}
+            <div id="activity-panel">
+                {% component 'forumMyActivity' %}
+            </div>
         </main>
     </div>
 </div>

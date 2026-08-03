@@ -571,9 +571,15 @@ function appendProfile() {
 }
 function appendSignIn(){
     $(document).on('signin', function (e) {
-        var headerNavbarLogin = $('#headerNavbarNav');
+        // Desktop: beside the nav capsule, in the slot the profile cluster
+        // occupies for signed-in visitors — not inside .navbar-nav.
+        var $nav = $('#headerNavbarNav');
+        if ($nav.length && !$('.gt-header__signin').length) {
+            $nav.after('<a class="gt-header__signin" href="#" data-pgt-step="login">Sign in</a>');
+        }
+
+        // The slide-out mobile menu keeps its own nav item.
         var li = '<li class="nav-item sign-in"><a href="#" data-pgt-step="login">Sign in</a></li>';
-        headerNavbarLogin.find('>ul').append(li);
         var menu = $('#menuToggle');
         menu.find('>ul').append(li);
     });
@@ -581,9 +587,22 @@ function appendSignIn(){
 
 function appendSignOut() {
     $(document).on('signout', function (e) {
-        var headerNavbarNav = $('#headerNavbarNav');
-        var li = '<li class="nav-item  sign-in"><a data-request="onLogout" data-request-data="redirect: \'/\'">Sign out</a></li >';
-        headerNavbarNav.find('>ul').append(li);
+        // Desktop: sign-out belongs to the avatar cluster, stacked under the
+        // profile name — not in the nav capsule (Figma 1452:9477). The pill
+        // gets wrapped so the two can sit in a column beside the avatar.
+        var $profile = $('.gt-header__profile');
+        var $pill = $profile.find('.gt-header__pill');
+        if ($pill.length && !$profile.find('.gt-header__signout').length) {
+            $pill
+                .wrap('<span class="gt-header__account"></span>')
+                .after('<a class="gt-header__signout" href="#" data-request="onLogout" data-request-data="redirect: \'/\'">Sign out</a>');
+        }
+
+        // The slide-out mobile menu has no profile cluster of its own (the
+        // pill is hidden below the large breakpoint), so it keeps a nav item.
+        // Its own class, not .sign-in — that one is the filled green CTA for
+        // anonymous visitors and must not pick up the sign-out colour.
+        var li = '<li class="nav-item sign-out"><a data-request="onLogout" data-request-data="redirect: \'/\'">Sign out</a></li >';
         var menu = $('#menuToggle');
         menu.find('>ul').append(li);
     });

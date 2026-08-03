@@ -21,7 +21,13 @@
         <div class="forum-topics-select">
             <button type="button" class="forum-tag-btn" data-forum-open-topics>Add topics</button>
             <span class="forum-topics-selected" data-selected-tags></span>
+            <span class="forum-topics-selected" data-selected-flags></span>
         </div>
+
+        {# Set from the picker's on/off switches — the switches themselves live
+           in the modal, which sits outside this form and so is never posted. #}
+        <input type="hidden" name="is_best_practice" value="0" data-flag-input="best_practice">
+        <input type="hidden" name="is_shared_document" value="0" data-flag-input="shared_document">
 
         <div class="create-post__body-card">
             <div class="create-post__field">
@@ -94,6 +100,23 @@
                 {% endfor %}
             </div>
 
+            {# Category flags — independent of the tag chips above, and of each
+               other: a post can be both a best practice and a shared document. #}
+            <div class="forum-modal__flags">
+                <label class="forum-switch">
+                    <input type="checkbox" class="forum-switch__input"
+                           data-topic-flag="best_practice" data-flag-label="Best practices">
+                    <span class="forum-switch__track" aria-hidden="true"><span class="forum-switch__thumb"></span></span>
+                    <span class="forum-switch__label">Best practices</span>
+                </label>
+                <label class="forum-switch">
+                    <input type="checkbox" class="forum-switch__input"
+                           data-topic-flag="shared_document" data-flag-label="Shared documents">
+                    <span class="forum-switch__track" aria-hidden="true"><span class="forum-switch__thumb"></span></span>
+                    <span class="forum-switch__label">Shared documents</span>
+                </label>
+            </div>
+
             <div class="forum-modal__actions forum-modal__actions--start">
                 <button type="button" class="forum-cancel-pill" data-forum-close>Cancel</button>
                 <button type="button" class="discussion-btn discussion-btn--primary" data-topics-apply>Add</button>
@@ -109,6 +132,7 @@
 
         var topicsModal  = root.querySelector('[data-forum-modal="topics"]');
         var selectedWrap = root.querySelector('[data-selected-tags]');
+        var flagsWrap    = root.querySelector('[data-selected-flags]');
         var searchInput  = topicsModal.querySelector('[data-topics-search]');
 
         // Live character counters (title + body). The `input` event fires on
@@ -239,6 +263,53 @@
             });
         }
 
+        // Mirror the picker's on/off switches onto the form's hidden inputs and
+        // show each enabled flag as a removable chip, the same way tags work.
+        function applyFlags() {
+            flagsWrap.innerHTML = '';
+
+            topicsModal.querySelectorAll('[data-topic-flag]').forEach(function (box) {
+                var key    = box.getAttribute('data-topic-flag');
+                var label  = box.getAttribute('data-flag-label');
+                var hidden = root.querySelector('[data-flag-input="' + key + '"]');
+
+                if (hidden) hidden.value = box.checked ? '1' : '0';
+                if (!box.checked) return;
+
+                var chipEl = document.createElement('span');
+                chipEl.className = 'forum-tag forum-tag--removable forum-tag--' +
+                    (key === 'best_practice' ? 'best' : 'doc');
+                chipEl.setAttribute('data-selected-flag', key);
+
+                var text = document.createElement('span');
+                text.textContent = label;
+                chipEl.appendChild(text);
+
+                var remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'forum-tag__remove';
+                remove.setAttribute('data-remove-flag', key);
+                remove.setAttribute('aria-label', 'Remove ' + label);
+                remove.innerHTML = '<svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+                chipEl.appendChild(remove);
+
+                flagsWrap.appendChild(chipEl);
+            });
+        }
+
+        // Clearing a flag chip also switches the picker back off, so reopening
+        // the modal shows the current state.
+        function removeFlag(key) {
+            var box = topicsModal.querySelector('[data-topic-flag="' + key + '"]');
+            if (box) box.checked = false;
+
+            var hidden = root.querySelector('[data-flag-input="' + key + '"]');
+            if (hidden) hidden.value = '0';
+
+            var chip = flagsWrap.querySelector('[data-selected-flag="' + key + '"]');
+            if (chip) chip.remove();
+        }
+
         // Remove a selected tag: drop its chip (+ hidden input) and deselect it
         // in the picker so a reopened picker reflects the current selection.
         function removeTag(id) {
@@ -251,8 +322,9 @@
 
         root.addEventListener('click', function (e) {
             if (e.target.closest('[data-forum-open-topics]')) { e.preventDefault(); openModal(topicsModal); }
-            else if (e.target.closest('[data-topics-apply]')) { e.preventDefault(); applyTags(); closeModal(topicsModal); }
+            else if (e.target.closest('[data-topics-apply]')) { e.preventDefault(); applyTags(); applyFlags(); closeModal(topicsModal); }
             else if (e.target.closest('[data-remove-tag]'))   { e.preventDefault(); removeTag(e.target.closest('[data-remove-tag]').getAttribute('data-remove-tag')); }
+            else if (e.target.closest('[data-remove-flag]'))  { e.preventDefault(); removeFlag(e.target.closest('[data-remove-flag]').getAttribute('data-remove-flag')); }
             else if (e.target.closest('[data-topic-chip]'))   { e.preventDefault(); e.target.closest('[data-topic-chip]').classList.toggle('is-selected'); }
             else if (e.target.closest('[data-forum-close]'))  { e.preventDefault(); closeModal(e.target.closest('.forum-modal')); }
             else if (e.target.closest('[data-attach-image]')) { e.preventDefault(); imgInput.click(); }

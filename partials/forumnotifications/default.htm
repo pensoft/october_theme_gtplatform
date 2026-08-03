@@ -49,16 +49,17 @@
             toggle.setAttribute('aria-expanded', 'false');
         }
 
+        // No stopPropagation anywhere in here: October's AJAX framework binds
+        // [data-request] clicks delegated on `document`, so swallowing the
+        // bubble would kill "Mark all as read". The outside-click closer below
+        // already ignores clicks inside `root`.
         toggle.addEventListener('click', function (e) {
             e.preventDefault();
-            e.stopPropagation();
             var willOpen = panel.hidden;
             if (willOpen) position();
             panel.hidden = !willOpen;
             toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
         });
-
-        panel.addEventListener('click', function (e) { e.stopPropagation(); });
 
         document.addEventListener('click', function (e) {
             if (!root.contains(e.target)) close();

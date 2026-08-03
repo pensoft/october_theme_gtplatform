@@ -117,18 +117,20 @@
         align-items: center;
         background-color: inherit;
 
+        // Figma 1452:9477 — the nav is one bordered gradient capsule holding
+        // plain text items, not a row of individual translucent pills.
         .navbar-nav {
             display: flex;
             flex-basis: 100%;
             width: 100%;
             max-width: fit-content;
             flex-grow: 1;
-            padding-left: 0.5rem;
-            padding-right: 0.5rem;
-            padding-top: 1rem;
-            padding-bottom: 1rem;
-            justify-content: space-around;
-            background-color: inherit;
+            gap: 20px;
+            padding: 12px 25px;
+            justify-content: center;
+            border: 1px solid #F5FAFF;
+            border-radius: 15px;
+            background: linear-gradient(90deg, rgba(195, 235, 145, 0) 0%, rgba(195, 235, 145, .3) 115.24%);
             flex-direction: column;
             box-sizing: border-box;
             align-items: center;
@@ -155,28 +157,25 @@
                 cursor: pointer;
                 text-align: center;
                 //margin-bottom: 12px;
-                background-color: inherit;
-                border-radius: 44.8px;
-                background: rgba(255, 255, 255, 0.11);
-                backdrop-filter: blur(12.5px);
-                margin-right: 19px;
-                //
-                //&:not(.social) a{
-                //}
+                // No per-item pill — the capsule around the whole .navbar-nav
+                // is the only surface, and the 20px gap does the spacing.
+                background: none;
+                margin-right: 0;
 
                 &>a {
-                    padding-left: 8px;
-                    padding-right: 8px;
-                    padding-top: 8px;
-                    padding-bottom: 8px;
-                    margin-left: 8px;
-                    margin-right: 8px;
+                    padding: 0;
+                    margin: 0;
                     white-space: nowrap;
                     text-overflow: ellipsis;
                     max-width: 100%;
                     //display: inline-block;
                     position: relative;
                     color: @white-color;
+                    font-family: 'Fustat';
+                    font-size: 18px;
+                    font-weight: 500;
+                    line-height: normal;
+                    letter-spacing: -0.36px;
 
 
                     &:hover {
@@ -255,28 +254,27 @@
                             display: block;
                         }
 
-                        /* navbar arrows**/
+                        /* navbar arrows — 20px chevron box, 5px after the label */
                         position: relative;
-                        padding-right: 20px;
+                        padding-right: 25px;
                         //margin-right: 20px;
                         &:after {
                             content: '';
                             display: block;
                             position: absolute;
-                            right: 16px;
+                            right: 0;
                             top: 50%;
-                            margin-top: -5px;
-                            width: 10px;
-                            height: 10px;
-                            background: url('../../assets/images/Icon ionic-ios-arrow-forward.svg') no-repeat center center;
-                            background-size: contain;
+                            margin-top: -10px;
+                            width: 20px;
+                            height: 20px;
+                            background: url('../../assets/images/chevron-down.svg') no-repeat center center;
+                            background-size: 11.5px 6.5px;
                             pointer-events: none;
                             transition: transform 0.3s ease;
                         }
 
                         &:hover:after {
                             transform: rotate(180deg);
-                            margin-top: -5px;
                             opacity: 0.6;
                         }
 
@@ -352,23 +350,12 @@
 
                     }
 
-                    &.sign-in{
-                        border-radius: 44.8px;
-                        background: #C3EB91;
-                        backdrop-filter: blur(12.5px);
-                        text-align: center;
-                        font-family: Fustat;
-                        font-size: 16px;
-                        font-style: normal;
-                        font-weight: 500;
-                        line-height: 100%; /* 16px */
-                        //position: absolute;
-                        right: 57px;
-                        top: 80px;
-                        a{
-                            //color: #182D10!important;
-                        }
-                    }
+                    // The "Sign in" CTA used to live here as a .sign-in item.
+                    // It is now .gt-header__signin, a sibling of the nav rather
+                    // than an item inside the capsule — see themes/master.less
+                    // and appendSignIn() in assets/js/app.js. Only the mobile
+                    // menu still renders .sign-in, and that is styled below in
+                    // the max-width:1000px block.
 
                     // External link to the main Green Talent site — set apart
                     // from the platform nav items and prefixed with the logo
@@ -527,6 +514,12 @@
 
     #menu li.sign-in a{
         color: @white-color !important;
+    }
+
+    // Sign out reads as the orange label from Figma 1452:9521 here too, but
+    // keeps the mobile menu's own sizing so it sits with the other items.
+    #menu li.sign-out a{
+        color: @gt-header-orange !important;
     }
 
     // The Green Talent logo (injected in app.js) is a desktop-only flourish —

@@ -1,4 +1,4 @@
-url = "/profile/discussions/:slug"
+url = "/discussions/:slug"
 layout = "default"
 title = "Discussion"
 is_hidden = 0
@@ -20,8 +20,8 @@ limit = "6"
 limit = "4"
 ==
 <div class="container profile-container">
-    <div class="profile-layout {{ user ? '' : 'profile-layout--guest' }}">
-        {% if user %}{% component 'profileMenu' %}{% endif %}
+    <div class="profile-layout">
+        {% component 'profileMenu' %}
         <div class="profile-workspace">
             <div class="profile-workspace__aside">
                 {% partial 'communication-rules' %}

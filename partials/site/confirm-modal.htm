@@ -1,0 +1,106 @@
+{# Styled replacement for the browser's window.confirm(), used by every
+   front-end [data-request-confirm] trigger. October's AJAX framework fires an
+   `ajaxConfirmMessage` event on window before it falls back to confirm(); if a
+   handler returns anything, the framework waits on `event.promise` and only
+   re-issues the request once that promise resolves (see framework.js,
+   handleConfirmMessage). Include once per layout.
+
+   A trigger can tune the confirm button with:
+     data-confirm-label="Delete"   — button text (default "Confirm")
+     data-confirm-danger           — render the button as destructive #}
+<div class="pgt-modal pgt-modal--confirm pgt-confirm-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="pgtConfirmTitle">
+    <div class="pgt-modal__backdrop" data-confirm-cancel></div>
+    <div class="pgt-modal__dialog pgt-confirm">
+        <div class="pgt-confirm__icon" aria-hidden="true">
+            <svg viewBox="0 0 40 40" width="40" height="40" fill="none">
+                <path d="M6.5 11.5h27M15 11.5V7.5h10v4M10.5 11.5l1.6 22h15.8l1.6-22M16.5 17.5v10M23.5 17.5v10"
+                      stroke="#EB8533" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div class="pgt-confirm__text">
+            <h2 class="pgt-confirm__title" id="pgtConfirmTitle" data-confirm-message>Are you sure?</h2>
+        </div>
+        <div class="pgt-confirm__actions">
+            <button type="button" class="pgt-confirm__btn pgt-confirm__btn--ghost" data-confirm-cancel>Cancel</button>
+            <button type="button" class="pgt-confirm__btn pgt-confirm__btn--ok" data-confirm-ok>Confirm</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        if (window.PGT_CONFIRM_INIT) {
+            var dupes = document.querySelectorAll('.pgt-confirm-modal');
+            for (var i = 1; i < dupes.length; i++) dupes[i].parentNode.removeChild(dupes[i]);
+            return;
+        }
+        window.PGT_CONFIRM_INIT = true;
+
+        var modal = document.querySelector('.pgt-confirm-modal');
+        if (!modal) return;
+
+        var messageEl = modal.querySelector('[data-confirm-message]');
+        var okBtn     = modal.querySelector('[data-confirm-ok]');
+        var pending   = null;   // Deferred handed over by the framework
+        var lastTrigger = null;
+
+        // Capture phase: the framework's own delegated click handler is bound to
+        // document on the bubble phase and asks for confirmation there, so a
+        // bubble-phase listener here would record the trigger too late.
+        document.addEventListener('click', function (e) {
+            var t = e.target.closest && e.target.closest('[data-request-confirm]');
+            if (t) lastTrigger = t;
+        }, true);
+
+        function open(message) {
+            messageEl.textContent = message;
+
+            var label  = lastTrigger && lastTrigger.getAttribute('data-confirm-label');
+            var danger = lastTrigger && lastTrigger.hasAttribute('data-confirm-danger');
+            okBtn.textContent = label && label.length ? label : 'Confirm';
+            okBtn.classList.toggle('pgt-confirm__btn--danger', !!danger);
+
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+            okBtn.focus();
+        }
+
+        function close() {
+            modal.classList.remove('is-open');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        // Dropping the deferred without resolving it is how the request is
+        // cancelled — the framework simply never re-issues it.
+        function cancel() {
+            pending = null;
+            close();
+        }
+
+        function accept() {
+            var deferred = pending;
+            pending = null;
+            close();
+            if (deferred) deferred.resolve();
+        }
+
+        $(window).on('ajaxConfirmMessage', function (e, message) {
+            if (!message) return;       // undefined → framework keeps its default
+
+            pending = e.promise;
+            open(message);
+            return true;                // non-undefined → framework awaits the promise
+        });
+
+        modal.addEventListener('click', function (e) {
+            if (e.target.closest('[data-confirm-cancel]')) cancel();
+            else if (e.target.closest('[data-confirm-ok]')) accept();
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && modal.classList.contains('is-open')) cancel();
+        });
+    })();
+</script>

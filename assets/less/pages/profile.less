@@ -961,6 +961,13 @@
         letter-spacing: -0.32px;
         line-height: 1.45;
         color: #808080;
+
+        // Author cleared the text; the comment stays as an anchor for replies.
+        &--deleted {
+            font-style: italic;
+            font-weight: 400;
+            color: rgba(24, 45, 16, .38);
+        }
     }
 
     &__actions {
@@ -1000,6 +1007,13 @@
         cursor: default;
         svg { opacity: 1; }
         &:hover { background: rgba(24, 45, 16, .08); }
+    }
+
+    // Permanent delete — author only.
+    &--danger {
+        color: @pf-orange;
+        svg { opacity: .75; }
+        &:hover { background: fade(@pf-orange, 14%); color: @pf-orange; }
     }
 }
 
@@ -1190,6 +1204,72 @@
         gap: 10px;
 
         &--start { justify-content: flex-start; }
+    }
+
+    // "Best practices" / "Shared documents" switches in the topic picker.
+    &__flags {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding-top: 20px;
+        border-top: 1px solid @pf-border;
+    }
+}
+
+// On/off switch, styled from the native checkbox it wraps so the control stays
+// keyboard-operable and reports its own state.
+.forum-switch {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+
+    &__input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    &__track {
+        position: relative;
+        flex-shrink: 0;
+        width: 42px;
+        height: 24px;
+        border-radius: 90px;
+        background: rgba(24, 45, 16, .18);
+        transition: background .15s ease;
+    }
+
+    &__thumb {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(24, 45, 16, .25);
+        transition: transform .15s ease;
+    }
+
+    &__label {
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 16px;
+        letter-spacing: -0.32px;
+        color: @pf-text;
+    }
+
+    &__input:checked ~ &__track {
+        background: @pf-earth;
+
+        .forum-switch__thumb { transform: translateX(18px); }
+    }
+
+    &__input:focus-visible ~ &__track {
+        outline: 2px solid @pf-earth;
+        outline-offset: 2px;
     }
 }
 
@@ -2240,6 +2320,31 @@
     }
 
     &__replies { flex-shrink: 0; }
+
+    &__meta-right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-shrink: 0;
+    }
+
+    &__delete {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 0;
+        border: 0;
+        background: none;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        color: @pf-orange;
+        cursor: pointer;
+        transition: color .12s ease;
+
+        svg { width: 14px; height: 14px; }
+        &:hover { color: darken(@pf-orange, 10%); }
+    }
 
     &__thread {
         display: inline-flex;

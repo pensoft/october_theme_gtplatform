@@ -1,6 +1,10 @@
+{# Guests get the same menu, trimmed to the four public browsing sections:
+   Discussions, Best practices, Shared documents and Topics. Everything else
+   is account-bound and hidden until sign-in. #}
 <aside class="profile-menu" aria-label="Profile menu">
     <h4 class="profile-menu__heading">Menu</h4>
     <nav class="profile-menu__list">
+        {% if isLoggedIn %}
         <a href="/profile" class="profile-menu__item {{ active == 'profile' ? 'is-active' : '' }}">
             {# user-alt-1 (Figma 1731:5471) #}
             <svg viewBox="0 0 20 20" width="20" height="20" fill="none" aria-hidden="true">
@@ -10,7 +14,8 @@
             </svg>
             <span class="profile-menu__item-label">Profile</span>
         </a>
-        <a href="/profile/discussions" class="profile-menu__item {{ active == 'discussions' ? 'is-active' : '' }}">
+        {% endif %}
+        <a href="/discussions" class="profile-menu__item {{ active == 'discussions' ? 'is-active' : '' }}">
             {# message-circle-chat (Figma 1514:2775) #}
             <svg viewBox="0 0 20 20" width="20" height="20" fill="none" aria-hidden="true">
                 <g transform="translate(1.6 1.6)">
@@ -19,7 +24,7 @@
             </svg>
             <span class="profile-menu__item-label">Discussions</span>
         </a>
-        <a href="/profile/best-practices" class="profile-menu__item {{ active == 'best-practices' ? 'is-active' : '' }}">
+        <a href="/best-practices" class="profile-menu__item {{ active == 'best-practices' ? 'is-active' : '' }}">
             {# star (Figma 1452:10309) #}
             <svg viewBox="0 0 20 20" width="20" height="20" fill="none" aria-hidden="true">
                 <g transform="translate(1.73 2.07)">
@@ -28,7 +33,7 @@
             </svg>
             <span class="profile-menu__item-label">Best practices</span>
         </a>
-        <a href="/profile/shared-documents" class="profile-menu__item {{ active == 'shared-documents' ? 'is-active' : '' }}">
+        <a href="/shared-documents" class="profile-menu__item {{ active == 'shared-documents' ? 'is-active' : '' }}">
             {# file-link (Figma 1452:10313) #}
             <svg viewBox="0 0 20 20" width="20" height="20" fill="none" aria-hidden="true">
                 <g transform="translate(2.02 1.6)">
@@ -37,7 +42,7 @@
             </svg>
             <span class="profile-menu__item-label">Shared documents</span>
         </a>
-        <a href="/profile/topics" class="profile-menu__item {{ active == 'topics' ? 'is-active' : '' }}">
+        <a href="/topics" class="profile-menu__item {{ active == 'topics' ? 'is-active' : '' }}">
             {# pen-swirl (Figma 1452:10317) — filled path #}
             <svg viewBox="0 0 20 20" width="20" height="20" fill="none" aria-hidden="true">
                 <g transform="translate(1.6 1.6)">
@@ -46,6 +51,7 @@
             </svg>
             <span class="profile-menu__item-label">Topics</span>
         </a>
+        {% if isLoggedIn %}
         <a href="/profile/jobs" class="profile-menu__item {{ active == 'jobs' ? 'is-active' : '' }}">
             {# user-pen-alt-1 (Figma 1731:5461) #}
             <svg viewBox="0 0 20 20" width="20" height="20" fill="none" aria-hidden="true">
@@ -81,9 +87,11 @@
             </svg>
             <span class="profile-menu__item-label">Delete account</span>
         </button>
+        {% endif %}
     </nav>
 </aside>
 
+{% if isLoggedIn %}
 {# ---------- Delete account confirmation popup (Figma 440:9310) ---------- #}
 <div class="delete-account-popup" id="deleteAccountPopup" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="deleteAccountPopupTitle">
     <div class="delete-account-popup__backdrop" data-delete-close></div>
@@ -147,3 +155,4 @@
     });
 })();
 </script>
+{% endif %}

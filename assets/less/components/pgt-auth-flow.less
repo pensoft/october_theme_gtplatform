@@ -624,6 +624,100 @@
     }
 }
 
+// ----- Confirmation popup (replaces window.confirm) -----
+.pgt-modal--confirm {
+    align-items: center;
+
+    .pgt-modal__dialog {
+        max-width: 480px;
+    }
+}
+
+.pgt-confirm {
+    background: #fff;
+    border-radius: 20px;
+    padding: 45px 40px 35px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    text-align: center;
+    filter: drop-shadow(-6px 4px 12.5px rgba(85, 85, 85, .06));
+
+    @media (max-width: 560px) {
+        padding: 32px 24px 26px;
+        gap: 20px;
+    }
+
+    &__icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 10px;
+        background: fade(#EB8533, 12%);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    &__title {
+        font-family: Parkinsans, Fustat, Arial, sans-serif;
+        font-weight: 500;
+        font-size: 24px;
+        line-height: 1.4;
+        color: #182D10;
+        margin: 0;
+
+        @media (max-width: 560px) { font-size: 20px; }
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    &__btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 9px 28px;
+        border-radius: 60px;
+        font-family: Fustat, Arial, sans-serif;
+        font-weight: 600;
+        font-size: 16px;
+        letter-spacing: -.32px;
+        line-height: normal;
+        border: 0;
+        cursor: pointer;
+        transition: background .15s ease, color .15s ease;
+
+        &--ghost {
+            background: rgba(24, 45, 16, .07);
+            color: #182D10;
+
+            &:hover { background: rgba(24, 45, 16, .13); }
+        }
+
+        &--ok {
+            background: #8AC53E;
+            color: #fff;
+
+            &:hover { background: #7ab632; }
+        }
+
+        // Destructive variant, set from the trigger's [data-confirm-danger].
+        &--danger {
+            background: #EB8533;
+            color: #fff;
+
+            &:hover { background: darken(#EB8533, 8%); }
+        }
+    }
+}
+
 // ----- "Why are you joining" reasons card (Figma node 301:1607) -----
 .pgt-reasons {
     padding: 55px;

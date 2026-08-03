@@ -4,7 +4,8 @@
 <li class="comment-node">
     {% partial __SELF__ ~ '::comment' message=message isLoggedIn=isLoggedIn likedIds=likedIds %}
 
-    {% if isLoggedIn %}
+    {# No Reply button on an emptied comment, so no composer to go with it. #}
+    {% if isLoggedIn and not message.is_deleted %}
         <form class="comment-replyform" id="reply-{{ message.id }}" hidden
               data-request="{{ __SELF__ }}::onReplyComment"
               data-request-validate>

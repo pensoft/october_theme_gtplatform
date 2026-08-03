@@ -1,4 +1,4 @@
-url = "/profile/discussions"
+url = "/discussions"
 layout = "default"
 title = "Discussions"
 is_hidden = 0
@@ -14,8 +14,8 @@ perPage = "20"
 detailPage = "profile-discussion"
 ==
 <div class="container profile-container">
-    <div class="profile-layout {{ user ? '' : 'profile-layout--guest' }}">
-        {% if user %}{% component 'profileMenu' %}{% endif %}
+    <div class="profile-layout">
+        {% component 'profileMenu' %}
         <div class="profile-workspace">
             <div class="profile-workspace__aside">
                 {% partial 'communication-rules' %}

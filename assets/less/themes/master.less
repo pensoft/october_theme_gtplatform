@@ -456,6 +456,7 @@ ul.pagination{
 @gt-header-pill-bg:  #52843E;
 @gt-header-pill-tx:  #0b1f0b;
 @gt-header-muted:    #c9dbc4;
+@gt-header-orange:  #EB8533;
 
 .gt-header-wrap {
     position: relative;
@@ -539,35 +540,20 @@ ul.pagination{
         flex: 1 1 auto;
         justify-content: center !important;
 
-        // Override the translucent nav-item pills from .navbar
+        // The capsule itself (border, gradient, 20px gap) lives in
+        // components/navbar.less — don't re-declare its background here or the
+        // !important would flatten it back out.
         .navbar-nav {
             justify-content: center !important;
-            gap: 8px;
-            background: transparent !important;
 
             .nav-item {
-                background: transparent !important;
-                backdrop-filter: none !important;
-                border-radius: 0;
-                margin-right: 0 !important;
-
                 & > a {
-                    padding: 8px 16px !important;
-                    margin: 0 !important;
-                    border-radius: 999px;
-                    transition: background .15s ease, color .15s ease, opacity .15s ease;
+                    transition: color .15s ease, opacity .15s ease;
                     color: #FFF;
-                    font-family: Fustat;
-                    font-size: 18px;
-                    font-style: normal;
-                    font-weight: 500;
-                    line-height: normal;
-                    letter-spacing: -0.36px;
 
                     &:hover {
-                        background: rgba(255, 255, 255, .08);
                         color: #fff !important;
-                        opacity: 1 !important;
+                        opacity: .6 !important;
                     }
                 }
 
@@ -586,7 +572,17 @@ ul.pagination{
         flex: 0 0 auto;
         text-decoration: none;
 
-        &:hover { opacity: .92; }
+        // Keep the hover fade on the avatar/name only. The notifications panel
+        // is a child of this element, so an opacity on the wrapper would make
+        // the whole open panel translucent while the cursor is inside it.
+        // The pill is matched as a descendant — app.js wraps it in
+        // .gt-header__account, so it is no longer a direct child.
+        & > .gt-notif__toggle,
+        .gt-header__pill {
+            transition: opacity .15s ease;
+
+            &:hover { opacity: .92; }
+        }
 
         // The hamburger toggle is absolutely positioned (right: 24px) and out
         // of flow, so the avatar — the rightmost flex item once the nav is
@@ -637,6 +633,65 @@ ul.pagination{
         .breakpoint-large-down({
             display: none;
         });
+    }
+
+    // Name over sign-out, stacked to the right of the avatar. Injected by
+    // appendSignOut() in app.js — the profile markup is component-rendered.
+    &__account {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+
+        .breakpoint-large-down({
+            display: none;
+        });
+    }
+
+    // Anonymous counterpart to the profile cluster: the green CTA it had as a
+    // .nav-item.sign-in, now a sibling of the nav instead of an item inside it.
+    // Typography still comes from `.navbar a` (Fustat 500 / 16px / -0.48px),
+    // which outranks this selector — only the box and colour live here.
+    &__signin {
+        display: inline-flex;
+        align-items: center;
+        flex: 0 0 auto;
+        padding: 8px 16px;
+        border-radius: 44.8px;
+        background: #C3EB91;
+        backdrop-filter: blur(12.5px);
+        white-space: nowrap;
+        color: @gt-header-orange;
+        transition: opacity .15s ease;
+
+        &:hover {
+            color: @gt-header-orange;
+            opacity: .8;
+            text-decoration: none;
+        }
+
+        .breakpoint-large-down({
+            display: none;
+        });
+    }
+
+    // Figma 1452:9521 — plain orange label, no pill.
+    &__signout {
+        color: @gt-header-orange;
+        font-family: Fustat;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: normal;
+        letter-spacing: -0.32px;
+        white-space: nowrap;
+        transition: opacity .15s ease;
+
+        &:hover {
+            color: @gt-header-orange;
+            opacity: .6;
+            text-decoration: none;
+        }
     }
 }
 
@@ -693,6 +748,8 @@ ul.pagination{
         padding: 28px 25px 18px;
 
         &[hidden] { display: none; }
+
+        &:hover { opacity: 1; }
     }
 
     &__head {
@@ -741,7 +798,9 @@ ul.pagination{
 
         &:hover { background: rgba(24, 45, 16, .04); text-decoration: none; }
         &.is-unread { background: #eef7e0; }
-        &.is-unread:hover { background: darken(#eef7e0, 3%); }
+        // The unread highlight fades out on hover (the panel's white shows
+        // through) — transparency stays on the item, never on the panel.
+        &.is-unread:hover { background: fade(#eef7e0, 40%); }
     }
 
     &__avatar {
