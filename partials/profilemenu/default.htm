@@ -1,10 +1,16 @@
 {# Guests get the same menu, trimmed to the four public browsing sections:
    Discussions, Best practices, Shared documents and Topics. Everything else
-   is account-bound and hidden until sign-in. #}
+   is account-bound and hidden until sign-in.
+
+   The gate is `user`, set by the [session] component (Session.php sets
+   $this->page['user'], which lands in the controller's vars, and
+   Controller::renderPartial merges those into every partial). Don't swap it for
+   a variable passed in from the component — that couples this markup to a
+   plugin deploy, which is exactly how it broke before. #}
 <aside class="profile-menu" aria-label="Profile menu">
     <h4 class="profile-menu__heading">Menu</h4>
     <nav class="profile-menu__list">
-        {% if isLoggedIn %}
+        {% if user %}
         <a href="/profile" class="profile-menu__item {{ active == 'profile' ? 'is-active' : '' }}">
             {# user-alt-1 (Figma 1731:5471) #}
             <svg viewBox="0 0 20 20" width="20" height="20" fill="none" aria-hidden="true">
@@ -51,7 +57,7 @@
             </svg>
             <span class="profile-menu__item-label">Topics</span>
         </a>
-        {% if isLoggedIn %}
+        {% if user %}
         <a href="/profile/jobs" class="profile-menu__item {{ active == 'jobs' ? 'is-active' : '' }}">
             {# user-pen-alt-1 (Figma 1731:5461) #}
             <svg viewBox="0 0 20 20" width="20" height="20" fill="none" aria-hidden="true">
@@ -91,7 +97,7 @@
     </nav>
 </aside>
 
-{% if isLoggedIn %}
+{% if user %}
 {# ---------- Delete account confirmation popup (Figma 440:9310) ---------- #}
 <div class="delete-account-popup" id="deleteAccountPopup" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="deleteAccountPopupTitle">
     <div class="delete-account-popup__backdrop" data-delete-close></div>
