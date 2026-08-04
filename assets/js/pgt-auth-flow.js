@@ -34,8 +34,19 @@
 
     $(document).on('click', '[data-pgt-step]', function (e) {
         e.preventDefault();
-        var step = $(this).data('pgt-step');
-        loadStep(step);
+        var $trigger = $(this);
+
+        // A trigger can name the page to land on after signing in
+        // (data-pgt-redirect="platform"). Passed to the server so the rendered
+        // login form carries it, which keeps the redirect scoped to this
+        // trigger — every other login still just refreshes in place.
+        var extra = {};
+        var redirect = $trigger.attr('data-pgt-redirect');
+        if (redirect) {
+            extra.redirect = redirect;
+        }
+
+        loadStep($trigger.data('pgt-step'), extra);
     });
 
     $(document).on('click', '[data-pgt-close]', function (e) {

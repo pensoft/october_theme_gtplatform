@@ -49,8 +49,12 @@
         {% for topic in topics %}
             <article class="forum-card">
                 <div class="forum-card__head">
+                    {# Avatar + name open the member's profile card for signed-in
+                       visitors; plain text for everyone else. #}
+                    {% set _authorCard = isLoggedIn and topic.user %}
                     <div class="forum-card__author">
-                        <span class="forum-card__avatar">
+                        <span class="forum-card__avatar {{ _authorCard ? 'is-clickable' : '' }}"
+                              {% if _authorCard %}data-user-card="{{ topic.user.id }}" role="button" tabindex="0" aria-label="View {{ (topic.user.name ~ ' ' ~ topic.user.surname)|trim }}'s profile"{% endif %}>
                             {% if topic.user and topic.user.avatar %}
                                 <img src="{{ topic.user.avatar.getThumb(59, 59, { mode: 'crop' }) }}" alt="{{ topic.user.name }}">
                             {% else %}
@@ -59,7 +63,8 @@
                                 </span>
                             {% endif %}
                         </span>
-                        <span class="forum-card__name">
+                        <span class="forum-card__name {{ _authorCard ? 'is-clickable' : '' }}"
+                              {% if _authorCard %}data-user-card="{{ topic.user.id }}" role="button" tabindex="0"{% endif %}>
                             {{ topic.user ? (topic.user.name ~ ' ' ~ topic.user.surname)|trim : 'Guest' }}
                         </span>
                         <span class="forum-card__dot" aria-hidden="true"></span>

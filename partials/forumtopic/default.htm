@@ -156,33 +156,54 @@
     {% if topic.is_locked %}
         <p class="discussion-locked">This topic is locked. New comments are disabled.</p>
     {% elseif isLoggedIn %}
-        <form class="discussion-composer"
+        <form class="discussion-composer" data-composer
               data-request="{{ __SELF__ }}::onPostMessage"
               data-request-validate
-              data-request-success="this.reset()">
-            <textarea name="body" class="discussion-composer__input" rows="2" placeholder="Join the conversation" aria-label="Your comment" required></textarea>
+              data-request-files
+              data-request-success="this.reset(); window.PGT_COMPOSER_RESET && window.PGT_COMPOSER_RESET(); window.PGT_RichText && window.PGT_RichText.clearWithin(this);">
+            {# No `required`: CKEditor hides this textarea, and the browser
+               refuses to submit a form with a hidden required control. Empty
+               bodies are rejected server-side (RichText::isEmpty). #}
+            <textarea name="body" class="discussion-composer__input" rows="2" placeholder="Join the conversation" aria-label="Your comment" data-richtext></textarea>
             <span class="discussion-composer__error" data-validate-for="body"></span>
+
+            {# Selected file attachments, each removable — same as create-post. #}
+            <div class="discussion-composer__attachments" data-composer-attachments></div>
+
             <div class="discussion-composer__bar">
-                <div class="discussion-composer__tools" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <div class="discussion-composer__tools">
+                    <button type="button" class="discussion-composer__tool" data-composer-image aria-label="Attach image">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
                         <g opacity="0.5">
                             <path d="M10.6979 11.9531L9.44687 10.7125C8.84318 10.1139 8.54133 9.81452 8.19493 9.70509C7.89028 9.60885 7.56286 9.61239 7.26036 9.7152C6.91641 9.83211 6.62111 10.1379 6.03051 10.7495L3.03307 13.7101M10.6979 11.9531L10.9539 11.6992C11.5584 11.0998 11.8606 10.8001 12.2073 10.6907C12.5123 10.5945 12.84 10.5983 13.1427 10.7015C13.4868 10.8188 13.7821 11.1254 14.3726 11.7385L15 12.3701M10.6979 11.9531L13.7062 14.9674M15 12.3701V12.6C15 13.4401 15 13.8601 14.8365 14.181C14.6927 14.4632 14.4632 14.6927 14.181 14.8365C14.0476 14.9045 13.897 14.9442 13.7062 14.9674C13.4382 15 13.0908 15 12.6 15H5.4C4.55992 15 4.13988 15 3.81901 14.8365C3.53677 14.6927 3.3073 14.4632 3.16349 14.181C3.09597 14.0485 3.05634 13.899 3.03307 13.7101C3 13.4415 3 13.0931 3 12.6V5.4C3 4.55992 3 4.13988 3.16349 3.81901C3.3073 3.53677 3.53677 3.3073 3.81901 3.16349C4.13988 3 4.55992 3 5.4 3H12.6C13.4401 3 13.8601 3 14.181 3.16349C14.4632 3.3073 14.6927 3.53677 14.8365 3.81901C15 4.13988 15 4.55992 15 5.4V12.3701ZM12.75 6.74992C12.75 7.57835 12.0784 8.24992 11.25 8.24992C10.4216 8.24992 9.75 7.57835 9.75 6.74992C9.75 5.92149 10.4216 5.24992 11.25 5.24992C12.0784 5.24992 12.75 5.92149 12.75 6.74992Z" stroke="#182D10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                         </g>
                     </svg>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    </button>
+                    <button type="button" class="discussion-composer__tool" data-composer-video aria-label="Attach video">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
                         <g opacity="0.5">
                             <path d="M12 7.5L13.9326 6.34044C14.5275 5.98352 14.8249 5.80507 15.0696 5.82788C15.283 5.84777 15.4777 5.958 15.6045 6.13075C15.75 6.32886 15.75 6.67572 15.75 7.36943V10.6306C15.75 11.3243 15.75 11.6711 15.6045 11.8693C15.4777 12.042 15.283 12.1522 15.0696 12.1721C14.8249 12.1949 14.5275 12.0165 13.9326 11.6596L12 10.5M4.65 13.5H9.6C10.4401 13.5 10.8601 13.5 11.181 13.3365C11.4632 13.1927 11.6927 12.9632 11.8365 12.681C12 12.3601 12 11.9401 12 11.1V6.9C12 6.05992 12 5.63988 11.8365 5.31901C11.6927 5.03677 11.4632 4.8073 11.181 4.66349C10.8601 4.5 10.4401 4.5 9.6 4.5H4.65C3.80992 4.5 3.38988 4.5 3.06901 4.66349C2.78677 4.8073 2.5573 5.03677 2.41349 5.31901C2.25 5.63988 2.25 6.05992 2.25 6.9V11.1C2.25 11.9401 2.25 12.3601 2.41349 12.681C2.5573 12.9632 2.78677 13.1927 3.06901 13.3365C3.38988 13.5 3.80992 13.5 4.65 13.5Z" stroke="#182D10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                         </g>
                     </svg>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
-                        <path opacity="0.5" d="M6.8739 13.2381C6.69409 13.406 6.55493 13.5184 6.41271 13.6005C5.71656 14.0024 4.85886 14.0024 4.16271 13.6005C3.90618 13.4524 3.65958 13.2058 3.16639 12.7126C2.6732 12.2194 2.4266 11.9728 2.27849 11.7163C1.87657 11.0201 1.87657 10.1624 2.27849 9.46627C2.4266 9.20974 2.6732 8.96315 3.16639 8.46995L5.28771 6.34863C5.7809 5.85544 6.0275 5.60884 6.28403 5.46074C6.98018 5.05881 7.83788 5.05881 8.53403 5.46074C8.79056 5.60884 9.03716 5.85544 9.53035 6.34863C10.0235 6.84182 10.2701 7.08842 10.4182 7.34495C10.8202 8.04111 10.8202 8.8988 10.4182 9.59495C10.3361 9.73717 10.2238 9.87633 10.0559 10.0561M7.94416 7.94442C7.77628 8.12424 7.6639 8.2634 7.58179 8.40561C7.17987 9.10177 7.17987 9.95946 7.58179 10.6556C7.7299 10.9121 7.9765 11.1587 8.46969 11.6519C8.96288 12.1451 9.20948 12.3917 9.46601 12.5398C10.1622 12.9418 11.0199 12.9418 11.716 12.5398C11.9725 12.3917 12.2191 12.1451 12.7123 11.6519L14.8337 9.53061C15.3268 9.03742 15.5734 8.79083 15.7215 8.53429C16.1235 7.83814 16.1235 6.98045 15.7215 6.28429C15.5734 6.02776 15.3268 5.78116 14.8337 5.28797C14.3405 4.79478 14.0939 4.54818 13.8373 4.40008C13.1412 3.99815 12.2835 3.99815 11.5873 4.40008C11.4451 4.48218 11.306 4.59456 11.1261 4.76244" stroke="#182D10" stroke-width="1.5" stroke-linecap="round"/>
+                    </button>
+                    <button type="button" class="discussion-composer__tool" data-composer-doc aria-label="Attach file (PDF, DOC, TXT, PPT…)">
+                    {# Paperclip. currentColor + the button's own opacity drive
+                       the dim/hover states, so no colour is baked in here. #}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="-28.01 -28.01 336.09 336.09" fill="none" aria-hidden="true">
+                        <path fill="currentColor" opacity="0.5" d="M149.823,257.142c-31.398,30.698-81.882,30.576-113.105-0.429 c-31.214-30.987-31.337-81.129-0.42-112.308l-0.026-0.018L149.841,31.615l14.203-14.098c23.522-23.356,61.65-23.356,85.172,0 s23.522,61.221,0,84.586l-125.19,123.02l-0.044-0.035c-15.428,14.771-40.018,14.666-55.262-0.394 c-15.244-15.069-15.34-39.361-0.394-54.588l-0.044-0.053l13.94-13.756l69.701-68.843l13.931,13.774l-83.632,82.599 c-7.701,7.596-7.701,19.926,0,27.53s20.188,7.604,27.88,0L235.02,87.987l-0.035-0.026l0.473-0.403 c15.682-15.568,15.682-40.823,0-56.39s-41.094-15.568-56.776,0l-0.42,0.473l-0.026-0.018l-14.194,14.089L50.466,158.485 c-23.522,23.356-23.522,61.221,0,84.577s61.659,23.356,85.163,0l99.375-98.675l14.194-14.089l14.194,14.089l-14.194,14.098 l-99.357,98.675C149.841,257.159,149.823,257.142,149.823,257.142z"/>
                     </svg>
+                    </button>
                 </div>
                 <div class="discussion-composer__actions">
                     <button type="reset" class="discussion-btn discussion-btn--ghost">Cancel</button>
                     <button type="submit" class="discussion-btn discussion-btn--primary" data-attach-loading>Comment</button>
                 </div>
             </div>
+
+            {# Hidden file inputs — sent with the form (data-request-files). #}
+            <input type="file" name="images[]" accept="image/*" multiple hidden data-composer-file-image>
+            <input type="file" name="videos[]" accept="video/*" multiple hidden data-composer-file-video>
+            <input type="file" name="documents[]" accept=".pdf,.doc,.docx,.txt,.rtf,.odt,.ppt,.pptx,.xls,.xlsx,.csv" multiple hidden data-composer-file-doc>
         </form>
     {% else %}
         <div class="discussion-signin">
@@ -214,6 +235,14 @@
         </div>
     </div>
 
+    {# Rich text for the composer and every reply form — bold / italic / link /
+       lists. Loaded here rather than in the layout so the 1.3 MB build only
+       lands on the pages that actually have an editor. #}
+    {% if isLoggedIn and not topic.is_locked %}
+        <script src="{{ 'assets/vendor/ckeditor5/ckeditor.js'|theme }}"></script>
+        <script src="{{ 'assets/js/rich-text.js'|theme }}"></script>
+    {% endif %}
+
     <script>
     (function () {
         // Reply-form toggling for comments. Delegated on document so it keeps
@@ -239,6 +268,102 @@
                 if (f) f.hidden = true;
             }
         });
+
+        // ---- Composer attachments: images / videos / documents ----
+        // Mirrors the create-post form's picker behaviour (see
+        // partials/forumtopicform/default.htm): a persistent per-input
+        // DataTransfer store so selections accumulate across openings, with
+        // removable chips. Assigning input.files replaces the whole list, so
+        // "attach another file" would otherwise drop the earlier picks.
+        var composer = document.querySelector('[data-composer]');
+        if (!composer) return;
+
+        var imgInput   = composer.querySelector('[data-composer-file-image]');
+        var vidInput   = composer.querySelector('[data-composer-file-video]');
+        var docInput   = composer.querySelector('[data-composer-file-doc]');
+        var attachList = composer.querySelector('[data-composer-attachments]');
+        var inputs     = [imgInput, vidInput, docInput];
+
+        var stores = new WeakMap();
+        function storeFor(input) {
+            var dt = stores.get(input);
+            if (!dt) { dt = new DataTransfer(); stores.set(input, dt); }
+            return dt;
+        }
+        function fileKey(f) { return f.name + '|' + f.size + '|' + (f.lastModified || 0); }
+
+        function attachChip(label, onRemove) {
+            var chip = document.createElement('span');
+            chip.className = 'discussion-composer__attachment';
+
+            var text = document.createElement('span');
+            text.className = 'discussion-composer__attachment-label';
+            text.textContent = label;
+            chip.appendChild(text);
+
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'discussion-composer__attachment-remove';
+            btn.setAttribute('aria-label', 'Remove ' + label);
+            btn.innerHTML = '<svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+            btn.addEventListener('click', onRemove);
+            chip.appendChild(btn);
+
+            return chip;
+        }
+
+        function renderAttachments() {
+            attachList.innerHTML = '';
+            inputs.forEach(function (input) {
+                if (!input) return;
+                Array.prototype.forEach.call(input.files, function (file, idx) {
+                    attachList.appendChild(attachChip(file.name, function () { removeFile(input, idx); }));
+                });
+            });
+        }
+
+        // Merge a fresh picker selection into the running store (additive, deduped).
+        function collectFiles(input) {
+            var dt = storeFor(input);
+            var seen = {};
+            Array.prototype.forEach.call(dt.files, function (f) { seen[fileKey(f)] = true; });
+            Array.prototype.forEach.call(input.files, function (f) {
+                var k = fileKey(f);
+                if (!seen[k]) { dt.items.add(f); seen[k] = true; }
+            });
+            input.files = dt.files;
+            renderAttachments();
+        }
+
+        function removeFile(input, removeIdx) {
+            var kept = new DataTransfer();
+            Array.prototype.forEach.call(storeFor(input).files, function (file, idx) {
+                if (idx !== removeIdx) kept.items.add(file);
+            });
+            stores.set(input, kept);
+            input.files = kept.files;
+            renderAttachments();
+        }
+
+        inputs.forEach(function (input) {
+            if (input) input.addEventListener('change', function () { collectFiles(input); });
+        });
+
+        composer.addEventListener('click', function (e) {
+            if (e.target.closest('[data-composer-image]'))    { e.preventDefault(); imgInput.click(); }
+            else if (e.target.closest('[data-composer-video]')) { e.preventDefault(); vidInput.click(); }
+            else if (e.target.closest('[data-composer-doc]'))   { e.preventDefault(); docInput.click(); }
+        });
+
+        // form.reset() empties the inputs but not our stores or the chip list;
+        // called from the form's data-request-success after a comment posts.
+        // The Cancel button is type="reset", so hook that too.
+        function resetAttachments() {
+            inputs.forEach(function (input) { if (input) stores.set(input, new DataTransfer()); });
+            renderAttachments();
+        }
+        window.PGT_COMPOSER_RESET = resetAttachments;
+        composer.addEventListener('reset', function () { setTimeout(resetAttachments, 0); });
     })();
     </script>
 </div>

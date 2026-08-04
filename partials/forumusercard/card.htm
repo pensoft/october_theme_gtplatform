@@ -1,0 +1,49 @@
+{# Card body (Figma 1537:5865). Var: profile (a RainLab user).
+   Rows render only when the member has filled that field in. #}
+{% set _name = __SELF__.displayName(profile) %}
+
+<div class="usercard">
+    <button type="button" class="usercard__close" data-usercard-close aria-label="Close">
+        <svg viewBox="0 0 30 30" width="30" height="30" fill="none" aria-hidden="true">
+            <path d="M9 9l12 12M21 9L9 21" stroke="#182D10" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+    </button>
+
+    <div class="usercard__head">
+        <span class="usercard__avatar">
+            {% if profile.avatar %}
+                <img src="{{ profile.avatar.getThumb(60, 60, { mode: 'crop' }) }}" alt="{{ _name }}">
+            {% else %}
+                <span class="usercard__initials">
+                    {{ ((profile.name|first ~ profile.surname|first)|upper) ?: '?' }}
+                </span>
+            {% endif %}
+        </span>
+
+        <div class="usercard__identity">
+            <p class="usercard__name">{{ _name }}</p>
+            {% if profile.institute %}
+                <p class="usercard__role">{{ profile.institute }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="usercard__field">
+        <p class="usercard__label">Name</p>
+        <p class="usercard__value">{{ _name }}</p>
+    </div>
+
+    {% if profile.institute %}
+        <div class="usercard__field">
+            <p class="usercard__label">Institute</p>
+            <p class="usercard__value">{{ profile.institute }}</p>
+        </div>
+    {% endif %}
+
+    {% if profile.biography %}
+        <div class="usercard__field">
+            <p class="usercard__label">Biography</p>
+            <p class="usercard__value">{{ profile.biography|striptags|trim }}</p>
+        </div>
+    {% endif %}
+</div>

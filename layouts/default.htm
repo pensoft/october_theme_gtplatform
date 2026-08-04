@@ -7,6 +7,11 @@ security = "all"
 
 [forumNotifications]
 
+; Member profile popup. Must be attached here, not just rendered with
+; {% component %} — the tag resolves names against the page/layout components
+; and silently outputs nothing for one that was never declared.
+[forumUserCard]
+
 [metaList]
 includePageMeta = 1
 escape = 1
@@ -126,7 +131,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         %}
     {% endif %}
 
-    {% if this.page.id != 'home' %}
+    {# No footer on the full-screen hero pages — see the header guard in
+       partials/site/header.htm. #}
+    {% if this.page.id not in ['home', 'platform'] %}
     <!-- Footer -->
     <footer id="layout-footer">
         {% partial 'site/footer'
@@ -165,6 +172,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 {# Styled window.confirm() replacement for every [data-request-confirm]
    trigger on the front end. #}
 {% partial 'site/confirm-modal' %}
+
+{# Member profile popup, opened from avatars/names in discussions and comments.
+   Members only — the triggers are not rendered for anonymous visitors. #}
+{% if user %}{% component 'forumUserCard' %}{% endif %}
 
 </body>
 

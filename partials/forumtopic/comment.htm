@@ -1,7 +1,10 @@
 {# A single comment or reply (Figma 1234:4121 / 1234:4163).
    Vars: message, isLoggedIn, likedIds. #}
+{# Avatar + name open the author's profile card for signed-in visitors. #}
+{% set _authorCard = isLoggedIn and message.user %}
 <article class="comment" id="comment-{{ message.id }}">
-    <span class="comment__avatar">
+    <span class="comment__avatar {{ _authorCard ? 'is-clickable' : '' }}"
+          {% if _authorCard %}data-user-card="{{ message.user.id }}" role="button" tabindex="0" aria-label="View {{ (message.user.name ~ ' ' ~ message.user.surname)|trim }}'s profile"{% endif %}>
         {% if message.user and message.user.avatar %}
             <img src="{{ message.user.avatar.getThumb(59, 59, { mode: 'crop' }) }}" alt="{{ message.user.name }}">
         {% else %}
@@ -12,7 +15,8 @@
     </span>
     <div class="comment__main">
         <div class="comment__head">
-            <span class="comment__name">
+            <span class="comment__name {{ _authorCard ? 'is-clickable' : '' }}"
+                  {% if _authorCard %}data-user-card="{{ message.user.id }}" role="button" tabindex="0"{% endif %}>
                 {{ message.user
                     ? ((message.user.name ~ ' ' ~ message.user.surname)|trim ?: 'User-' ~ message.user.id)
                     : 'User' }}
@@ -26,7 +30,31 @@
         {% if message.is_deleted %}
             <div class="comment__body comment__body--deleted">This comment was deleted by its author.</div>
         {% else %}
-            <div class="comment__body">{{ message.body|nl2br }}</div>
+            {# Editor HTML, whitelisted server-side by Pensoft\Forum\Classes\RichText
+               before it was stored — never render an unsanitised body raw. #}
+            <div class="comment__body comment__body--rich">{{ message.body|raw }}</div>
+
+            {% if message.attachments.count %}
+                <div class="discussion-files comment__files">
+                    {% for file in message.attachments %}
+                        {% if file.isImage() %}
+                            <a class="filetile filetile--image" href="{{ file.getPath() }}" target="_blank" rel="noopener" title="{{ file.file_name }}">
+                                <img src="{{ file.getThumb(200, 130, { mode: 'crop' }) }}" alt="{{ file.file_name }}">
+                            </a>
+                        {% elseif file.content_type starts with 'video' %}
+                            <video class="filetile filetile--video" src="{{ file.getPath() }}" controls preload="metadata"></video>
+                        {% else %}
+                            {% set ext = file.file_name|split('.')|last|lower %}
+                            <a class="filetile filetile--doc" href="{{ file.getPath() }}" target="_blank" rel="noopener" title="{{ file.file_name }}">
+                                <span class="filetile__glyph">
+                                    {% partial __SELF__ ~ '::filetile-glyph' ext=ext %}
+                                </span>
+                                <span class="filetile__name">{{ file.file_name }}</span>
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
         {% endif %}
 
         {# Nothing to like, reply to, report or delete once the text is gone. #}

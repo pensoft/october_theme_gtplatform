@@ -4,6 +4,9 @@
     <h2 class="pgt-login__title">Log in</h2>
 
     <form id="pgtLoginForm" data-request="{{ __SELF__ }}::onSignin" class="pgt-login__form">
+        {# Set when the trigger asked for a specific landing page; absent
+           otherwise, so a normal login still refreshes in place. #}
+        {% if redirect %}<input type="hidden" name="redirect" value="{{ redirect }}">{% endif %}
         <div class="pgt-login__fields">
             <div class="pgt-field">
                 <label for="pgtLoginLogin">Email or username</label>

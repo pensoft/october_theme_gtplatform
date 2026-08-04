@@ -10,7 +10,9 @@
               data-request="{{ __SELF__ }}::onReplyComment"
               data-request-validate>
             <input type="hidden" name="parent" value="{{ message.id }}">
-            <textarea name="body" rows="2" placeholder="Write a reply…" aria-label="Reply" required></textarea>
+            {# See the composer in ::default — no `required` on a rich-text
+               field, the server rejects empty bodies. #}
+            <textarea name="body" rows="2" placeholder="Write a reply…" aria-label="Reply" data-richtext></textarea>
             <div class="comment-replyform__actions">
                 <button type="button" class="forum-cancel-pill" data-reply-cancel>Cancel</button>
                 <button type="submit" class="discussion-btn discussion-btn--primary" data-attach-loading>Reply</button>

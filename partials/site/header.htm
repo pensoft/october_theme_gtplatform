@@ -14,7 +14,11 @@ numberOfLevels = 2
     {% partial 'signuppopup/default' %}
 {% endif %}
 
-{% if page_id != 'home' %}
+{# The hero pages (home, /platform) are their own full-screen landing — the
+   pills in the hero are the navigation, so the standard header is skipped.
+   Keep this list in step with the footer guard in layouts/default.htm and the
+   .content-wrapper rules in themes/master.less. #}
+{% if page_id not in ['home', 'platform'] %}
 
 {# Pages that show only the compact menu bar (no hero title) — Figma 496:12345 #}
 {% set _compactPages = ['job', 'profile', 'profile-saved', 'profile-saved-events', 'profile-saved-jobs', 'post-job', 'login', 'forgot'] %}

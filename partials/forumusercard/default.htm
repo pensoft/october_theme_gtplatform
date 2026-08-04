@@ -1,0 +1,76 @@
+{# Member profile popup (Figma 1537:5865). Opened from any [data-user-card="id"]
+   trigger — the avatars and names in discussion cards and comment threads. The
+   body is loaded on demand into #forumUserCardContent by forumUserCard::onShowUserCard.
+   Include once per layout. #}
+<div class="pgt-modal pgt-modal--usercard forum-usercard-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Member profile">
+    <div class="pgt-modal__backdrop" data-usercard-close></div>
+    <div class="pgt-modal__dialog">
+        <div id="forumUserCardContent"></div>
+    </div>
+</div>
+
+<script>
+(function () {
+    if (window.PGT_USERCARD_INIT) return;
+    window.PGT_USERCARD_INIT = true;
+
+    var modal = document.querySelector('.forum-usercard-modal');
+    if (!modal) return;
+
+    var content = modal.querySelector('#forumUserCardContent');
+
+    function open() {
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function close() {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        content.innerHTML = '';
+    }
+
+    // Delegated on document so triggers keep working after a partial update
+    // re-renders the comment thread or the discussion list.
+    document.addEventListener('click', function (e) {
+        var trigger = e.target.closest && e.target.closest('[data-user-card]');
+        if (trigger) {
+            e.preventDefault();
+            var id = trigger.getAttribute('data-user-card');
+            if (!id) return;
+
+            $.request('forumUserCard::onShowUserCard', {
+                data: { id: id },
+                success: function (response) {
+                    this.success(response).done(function () { open(); });
+                }
+            });
+            return;
+        }
+
+        if (e.target.closest && e.target.closest('[data-usercard-close]')) {
+            e.preventDefault();
+            close();
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+            close();
+            return;
+        }
+
+        // The triggers are spans with role="button", so they need Enter/Space
+        // wired up by hand to match what a real button would do.
+        if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+
+        var trigger = e.target.closest && e.target.closest('[data-user-card]');
+        if (trigger) {
+            e.preventDefault();
+            trigger.click();
+        }
+    });
+})();
+</script>

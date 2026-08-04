@@ -1,0 +1,17 @@
+url = "/platform"
+layout = "default"
+title = "Capacity-building platform"
+is_hidden = 0
+meta_description = "Explore the GREEN TALENT capacity-building platform"
+robot_index = "index"
+robot_follow = "follow"
+
+[session]
+security = "all"
+==
+{# Standalone home for the platform sections. Reached from the guest hero —
+   both "Continue as viewer" and its login land here — and open to signed-in
+   and anonymous visitors alike, so it declares no access restriction. #}
+<section class="pgt-hero">
+    {% partial 'site/platform-hero' %}
+</section>

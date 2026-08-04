@@ -19,10 +19,14 @@
         <span class="forum-modal__error" data-validate-for="title"></span>
 
         <div class="forum-topics-select">
-            <button type="button" class="forum-tag-btn" data-forum-open-topics>Add topics</button>
+            <button type="button" class="forum-tag-btn" data-forum-open-topics aria-describedby="createPostTopicsError">
+                Add topics<span class="forum-required" aria-hidden="true">*</span>
+            </button>
             <span class="forum-topics-selected" data-selected-tags></span>
             <span class="forum-topics-selected" data-selected-flags></span>
         </div>
+        {# At least one topic is required to publish (not to save a draft). #}
+        <span class="forum-modal__error" id="createPostTopicsError" data-validate-for="tags"></span>
 
         {# Set from the picker's on/off switches — the switches themselves live
            in the modal, which sits outside this form and so is never posted. #}
@@ -31,9 +35,13 @@
 
         <div class="create-post__body-card">
             <div class="create-post__field">
+                {# `maxlength` stops applying once CKEditor hides the textarea,
+                   so the cap is enforced on the editor's model instead (see
+                   assets/js/rich-text.js) and re-checked in TopicForm. #}
                 <textarea name="body" class="create-post__body" rows="6"
                           placeholder="What would you like to share?" aria-label="Post body"
-                          maxlength="1500" data-char-input></textarea>
+                          maxlength="1500" data-maxlength="1500"
+                          data-richtext data-char-input></textarea>
                 <div class="create-post__counter" aria-hidden="true"><span data-char-count>0</span>/1500</div>
             </div>
 
@@ -57,8 +65,10 @@
                         </svg>
                     </button>
                     <button type="button" class="create-post__tool" data-attach-doc aria-label="Attach file (PDF, DOC, TXT, PPT…)">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
-                            <path opacity="0.5" d="M6.8739 13.2381C6.69409 13.406 6.55493 13.5184 6.41271 13.6005C5.71656 14.0024 4.85886 14.0024 4.16271 13.6005C3.90618 13.4524 3.65958 13.2058 3.16639 12.7126C2.6732 12.2194 2.4266 11.9728 2.27849 11.7163C1.87657 11.0201 1.87657 10.1624 2.27849 9.46627C2.4266 9.20974 2.6732 8.96315 3.16639 8.46995L5.28771 6.34863C5.7809 5.85544 6.0275 5.60884 6.28403 5.46074C6.98018 5.05881 7.83788 5.05881 8.53403 5.46074C8.79056 5.60884 9.03716 5.85544 9.53035 6.34863C10.0235 6.84182 10.2701 7.08842 10.4182 7.34495C10.8202 8.04111 10.8202 8.8988 10.4182 9.59495C10.3361 9.73717 10.2238 9.87633 10.0559 10.0561M7.94416 7.94442C7.77628 8.12424 7.6639 8.2634 7.58179 8.40561C7.17987 9.10177 7.17987 9.95946 7.58179 10.6556C7.7299 10.9121 7.9765 11.1587 8.46969 11.6519C8.96288 12.1451 9.20948 12.3917 9.46601 12.5398C10.1622 12.9418 11.0199 12.9418 11.716 12.5398C11.9725 12.3917 12.2191 12.1451 12.7123 11.6519L14.8337 9.53061C15.3268 9.03742 15.5734 8.79083 15.7215 8.53429C16.1235 7.83814 16.1235 6.98045 15.7215 6.28429C15.5734 6.02776 15.3268 5.78116 14.8337 5.28797C14.3405 4.79478 14.0939 4.54818 13.8373 4.40008C13.1412 3.99815 12.2835 3.99815 11.5873 4.40008C11.4451 4.48218 11.306 4.59456 11.1261 4.76244" stroke="#182D10" stroke-width="1.5" stroke-linecap="round"/>
+                        {# Paperclip. currentColor + the button's own opacity drive
+                           the dim/hover states, so no colour is baked in here. #}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="-28.01 -28.01 336.09 336.09" fill="none" aria-hidden="true">
+                            <path fill="currentColor" opacity="0.5" d="M149.823,257.142c-31.398,30.698-81.882,30.576-113.105-0.429 c-31.214-30.987-31.337-81.129-0.42-112.308l-0.026-0.018L149.841,31.615l14.203-14.098c23.522-23.356,61.65-23.356,85.172,0 s23.522,61.221,0,84.586l-125.19,123.02l-0.044-0.035c-15.428,14.771-40.018,14.666-55.262-0.394 c-15.244-15.069-15.34-39.361-0.394-54.588l-0.044-0.053l13.94-13.756l69.701-68.843l13.931,13.774l-83.632,82.599 c-7.701,7.596-7.701,19.926,0,27.53s20.188,7.604,27.88,0L235.02,87.987l-0.035-0.026l0.473-0.403 c15.682-15.568,15.682-40.823,0-56.39s-41.094-15.568-56.776,0l-0.42,0.473l-0.026-0.018l-14.194,14.089L50.466,158.485 c-23.522,23.356-23.522,61.221,0,84.577s61.659,23.356,85.163,0l99.375-98.675l14.194-14.089l14.194,14.089l-14.194,14.098 l-99.357,98.675C149.841,257.159,149.823,257.142,149.823,257.142z"/>
                         </svg>
                     </button>
                 </div>
@@ -123,6 +133,12 @@
             </div>
         </div>
     </div>
+
+    {# Rich text for the post body — bold / italic / link / lists. Loaded here
+       rather than in the layout so the 1.3 MB build only lands on the pages
+       that actually have an editor. #}
+    <script src="{{ 'assets/vendor/ckeditor5/ckeditor.js'|theme }}"></script>
+    <script src="{{ 'assets/js/rich-text.js'|theme }}"></script>
 
     <script>
     (function () {
@@ -330,6 +346,27 @@
             else if (e.target.closest('[data-attach-image]')) { e.preventDefault(); imgInput.click(); }
             else if (e.target.closest('[data-attach-video]')) { e.preventDefault(); vidInput.click(); }
             else if (e.target.closest('[data-attach-doc]'))   { e.preventDefault(); docInput.click(); }
+        });
+
+        // A topic is mandatory to publish. The server enforces it too, but
+        // catching it here avoids uploading the attachments only to be
+        // rejected. stopPropagation keeps October's document-level submit
+        // handler from firing. "Save draft" is a type="button" data-request,
+        // so it never reaches this and stays unconstrained.
+        var postForm  = root.querySelector('.create-post__form');
+        var tagsError = root.querySelector('[data-validate-for="tags"]');
+
+        postForm.addEventListener('submit', function (e) {
+            if (selectedWrap.querySelector('input[name="tags[]"]')) {
+                if (tagsError) tagsError.textContent = '';
+                return;
+            }
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (tagsError) tagsError.textContent = 'Please choose at least one topic.';
+            openModal(topicsModal);
         });
 
         if (searchInput) {

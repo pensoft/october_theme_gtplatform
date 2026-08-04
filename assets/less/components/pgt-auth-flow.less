@@ -139,8 +139,20 @@
 // ----- Hero buttons row (Figma node 274:2022) -----
 .pgt-hero__buttons {
     gap: 15px;          // Figma exact
+    align-items: center;
     margin-top: 24px;
     flex-wrap: wrap;
+
+    // Sections that aren't live yet sit back at 55% — Figma dims every pill
+    // except the one you can actually open. Keyed off the attribute the
+    // "Coming soon" popup already listens for, so the two never disagree.
+    // Scoped to this row: the --floating variant on /exchange-forum reuses
+    // .pgt-pill and is deliberately left flat.
+    .pgt-pill[data-coming-soon] {
+        opacity: .55;
+
+        &:hover { opacity: 1; }
+    }
 }
 
 .pgt-pill {
@@ -150,11 +162,19 @@
     padding: 12px 25px;
     border-radius: 900px;
     border: 1px solid #f5faff;                                  // subtle white outline
-    background: linear-gradient(115.24deg,
+    // 115.24 is the gradient's end stop, not its angle — the fill runs left to
+    // right and the second colour lands past the right edge.
+    background: linear-gradient(90deg,
         rgba(138, 197, 62, 0) 0%,
-        rgba(47, 85, 32, .30) 100%);
+        rgba(47, 85, 32, .30) 115.24%);
     backdrop-filter: blur(20.924px);
     -webkit-backdrop-filter: blur(20.924px);
+    // Figma's five-layer drop shadow. The two widest layers are fully
+    // transparent in the design, so only the three that render are kept.
+    box-shadow: 0 39.523px 88.347px rgba(0, 0, 0, .10),
+                0 160.419px 160.419px rgba(0, 0, 0, .09),
+                0 362.686px 218.542px rgba(0, 0, 0, .05);
+    overflow: hidden;
     color: #fff;
     font-family: Fustat, Arial, sans-serif;
     font-size: 16px;
@@ -162,7 +182,8 @@
     line-height: normal;
     letter-spacing: -0.32px;
     text-decoration: none;
-    transition: background .2s ease, transform .15s ease, border-color .2s ease;
+    transition: background .2s ease, opacity .2s ease, transform .15s ease, border-color .2s ease;
+
 
     &:hover {
         //background: linear-gradient(115.24deg,
@@ -175,10 +196,14 @@
         text-decoration: none;
     }
 
-    // Active state (solid green pill — Figma "Frame 2085661065")
+    // Active state (solid green pill — Figma "Frame 2085661065"). The design
+    // drops the outline, blur and shadow here, leaving a flat green pill.
     &--active {
         background: #8AC53E;
-        border-color: #8AC53E;
+        border-color: transparent;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        box-shadow: none;
         color: #fff;
 
         &:hover {
@@ -192,11 +217,17 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 20px;
-        height: 20px;
+        width: 24px;
+        height: 24px;
         flex-shrink: 0;
 
-        svg { display: block; }
+        // The markup carries width/height="20" attributes; CSS outranks those,
+        // so the icons scale to the design's 24px without touching every SVG.
+        svg {
+            display: block;
+            width: 24px;
+            height: 24px;
+        }
     }
 }
 

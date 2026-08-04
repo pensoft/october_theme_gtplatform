@@ -502,7 +502,14 @@ ul.pagination{
     display: flex;
     align-items: center;
     justify-content: space-between;
-    z-index: 2;
+    // position:relative + z-index makes this a stacking context, so everything
+    // inside it — including the fixed .gt-notif__panel and its z-index of 1200
+    // — competes with the rest of the page at THIS value, not its own. Keep it
+    // above page content (which tops out around 20) so the notifications panel
+    // can cover things like .pgt-hero__buttons--floating (z-index 3), and below
+    // the overlay range (modal backdrops 490+, popups 10000) so a modal still
+    // covers the header.
+    z-index: 100;
     box-sizing: border-box;
     //margin-top: 40px;
 
@@ -732,6 +739,9 @@ ul.pagination{
     }
 
     // Fixed so the header's overflow:hidden can't clip it; JS anchors it to the avatar.
+    // The z-index below only orders this against its siblings inside
+    // .gt-header.navbar's stacking context — what puts the panel above page
+    // content is that element's own z-index, not this one.
     &__panel {
         position: fixed;
         top: 0;
@@ -880,7 +890,10 @@ ul.pagination{
     }
 });
 
-.home{
+// Pages whose whole content is the welcome hero — it fills the viewport
+// instead of sitting in the normal page flow.
+.home,
+.platform{
     .pgt-hero{
         //min-height: calc(~'100vh - 240px');
         min-height: 100vh;
@@ -955,9 +968,10 @@ ul.pagination{
     }
 }
 
-// On the homepage the welcome hero handles its own background — don't render
-// the standard page hero there. (The header partial already skips it for 'home'.)
-.content-wrapper.home .gt-header-wrap { display: none; }
+// On the hero pages the welcome hero handles its own background — don't render
+// the standard page hero there. (The header partial already skips it for these.)
+.content-wrapper.home .gt-header-wrap,
+.content-wrapper.platform .gt-header-wrap { display: none; }
 
 // =====================================================
 //  Footer (Figma node 511:16040)
