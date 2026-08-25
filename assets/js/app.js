@@ -587,15 +587,14 @@ function appendSignIn(){
 
 function appendSignOut() {
     $(document).on('signout', function (e) {
-        // Desktop: sign-out belongs to the avatar cluster, stacked under the
-        // profile name — not in the nav capsule (Figma 1452:9477). The pill
-        // gets wrapped so the two can sit in a column beside the avatar.
+        // Desktop: sign-out belongs to the avatar cluster, beside the avatar —
+        // not in the nav capsule (Figma 1452:9477). It used to be stacked under
+        // the profile name pill; that pill is gone, so it now sits inline right
+        // after the avatar link.
         var $profile = $('.gt-header__profile');
-        var $pill = $profile.find('.gt-header__pill');
-        if ($pill.length && !$profile.find('.gt-header__signout').length) {
-            $pill
-                .wrap('<span class="gt-header__account"></span>')
-                .after('<a class="gt-header__signout" href="#" data-request="onLogout" data-request-data="redirect: \'/\'">Sign out</a>');
+        var $avatar = $profile.find('.gt-header__avatar-link');
+        if ($avatar.length && !$profile.find('.gt-header__signout').length) {
+            $avatar.after('<a class="gt-header__signout" href="#" data-request="onLogout" data-request-data="redirect: \'/\'">Sign out</a>');
         }
 
         // The slide-out mobile menu has no profile cluster of its own (the

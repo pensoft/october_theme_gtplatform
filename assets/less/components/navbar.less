@@ -141,9 +141,12 @@
                 display: none;
             });
 
+            // The item for the page you are on keeps the same white as the
+            // rest — no dimming, so nothing looks stuck in a clicked state.
             .active {
                 &>a {
-                    opacity: 0.6;
+                    opacity: 1;
+                    color: @white-color;
                 }
             }
 
@@ -366,7 +369,9 @@
                             align-items: center;
                             gap: 8px;
                             font-weight: 600;
-                            color: #88c23d !important;
+                            // White like every other item — the green made it
+                            // read as an already-clicked link.
+                            color: @white-color !important;
                         }
                         .green-talent__logo{
                             //width: 22px;

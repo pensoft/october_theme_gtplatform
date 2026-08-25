@@ -457,6 +457,9 @@ ul.pagination{
 @gt-header-pill-tx:  #0b1f0b;
 @gt-header-muted:    #c9dbc4;
 @gt-header-orange:  #EB8533;
+// "Sign in" reads green on the pale green CTA pill — orange on that fill was
+// too low-contrast to sit comfortably (matches @footer-accent).
+@gt-header-signin:  #52843E;
 
 .gt-header-wrap {
     position: relative;
@@ -564,9 +567,12 @@ ul.pagination{
                     }
                 }
 
+                // The current page's item stays white like the rest — it used
+                // to turn accent green, which read as a stuck "clicked" state.
                 &.active > a,
                 &.dropdown.active > a {
-                    color: @gt-header-accent !important;
+                    color: #FFF !important;
+                    opacity: 1 !important;
                 }
             }
         }
@@ -579,13 +585,11 @@ ul.pagination{
         flex: 0 0 auto;
         text-decoration: none;
 
-        // Keep the hover fade on the avatar/name only. The notifications panel
+        // Keep the hover fade on the bell/avatar only. The notifications panel
         // is a child of this element, so an opacity on the wrapper would make
         // the whole open panel translucent while the cursor is inside it.
-        // The pill is matched as a descendant — app.js wraps it in
-        // .gt-header__account, so it is no longer a direct child.
         & > .gt-notif__toggle,
-        .gt-header__pill {
+        & > .gt-header__avatar-link {
             transition: opacity .15s ease;
 
             &:hover { opacity: .92; }
@@ -619,40 +623,12 @@ ul.pagination{
         }
     }
 
-    &__pill {
+    // The avatar is a plain link to the profile — the name pill that used to
+    // carry that link was dropped to unclutter the header row.
+    &__avatar-link {
         display: inline-flex;
-        align-items: center;
-        height: 32px;
-        padding: 0 16px;
-        border-radius: 999px;
-        background: @gt-header-pill-bg;
-        white-space: nowrap;
-        color: #FFF;
-        text-align: center;
-        font-family: Fustat;
-        font-size: 18px;
-        font-style: normal;
-        font-weight: 600;
-        line-height: normal;
-        letter-spacing: -0.36px;
-
-
-        .breakpoint-large-down({
-            display: none;
-        });
-    }
-
-    // Name over sign-out, stacked to the right of the avatar. Injected by
-    // appendSignOut() in app.js — the profile markup is component-rendered.
-    &__account {
-        display: inline-flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
-
-        .breakpoint-large-down({
-            display: none;
-        });
+        line-height: 0;
+        flex: 0 0 auto;
     }
 
     // Anonymous counterpart to the profile cluster: the green CTA it had as a
@@ -668,11 +644,11 @@ ul.pagination{
         background: #C3EB91;
         backdrop-filter: blur(12.5px);
         white-space: nowrap;
-        color: @gt-header-orange;
+        color: @gt-header-signin;
         transition: opacity .15s ease;
 
         &:hover {
-            color: @gt-header-orange;
+            color: @gt-header-signin;
             opacity: .8;
             text-decoration: none;
         }
@@ -682,9 +658,15 @@ ul.pagination{
         });
     }
 
-    // Figma 1452:9521 — plain orange label, no pill.
+    // Figma 1452:9521 — plain orange label, no pill. Desktop only: the
+    // slide-out mobile menu carries its own sign-out nav item, and this used
+    // to be hidden along with the .gt-header__account column that wrapped it.
     &__signout {
         color: @gt-header-orange;
+
+        .breakpoint-large-down({
+            display: none;
+        });
         font-family: Fustat;
         font-size: 16px;
         font-style: normal;
@@ -706,36 +688,66 @@ ul.pagination{
 .gt-notif {
     position: relative;
 
+    // Round bell button, same diameter as the avatar it sits beside. The fill
+    // is the header capsule's gradient — dark at the bottom-left, lifting to
+    // pale green at the top-right.
     &__toggle {
         position: relative;
         display: inline-flex;
-        padding: 0;
-        border: 0;
-        background: transparent;
-        cursor: pointer;
-        line-height: 0;
-    }
-
-    &__badge {
-        position: absolute;
-        top: -2px;
-        right: -2px;
-        min-width: 22px;
-        height: 22px;
-        padding: 0 5px;
-        display: inline-flex;
         align-items: center;
         justify-content: center;
-        border-radius: 900px;
-        background: darken(@gt-header-accent, 8%);
-        border: 2px solid @gt-header-bg-2;
+        width: 59px;
+        height: 59px;
+        flex: 0 0 auto;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: linear-gradient(45deg, rgba(195, 235, 145, 0) 0%, rgba(195, 235, 145, .72) 100%);
         color: #fff;
-        font-family: Fustat, Arial, sans-serif;
-        font-size: 12px;
-        font-weight: 700;
-        line-height: 1;
+        cursor: pointer;
+        line-height: 0;
+
+        svg { display: block; }
+
+        .breakpoint-large-down({
+            width: 44px;
+            height: 44px;
+
+            svg { width: 20px; height: 20px; }
+        });
+    }
+
+    // Unread marker: the green dot at the bell's top-left corner. The count
+    // itself is carried by the toggle's aria-label and by the panel, so the
+    // number is kept for assistive tech only rather than crowding the dot.
+    &__badge {
+        position: absolute;
+        top: 2px;
+        left: 0;
+        width: 14px;
+        height: 14px;
+        display: block;
+        border-radius: 50%;
+        background: @gt-header-accent;
 
         &[hidden] { display: none; }
+
+        .breakpoint-large-down({
+            width: 11px;
+            height: 11px;
+        });
+    }
+
+    &__badge-count {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        border: 0;
+        clip: rect(0 0 0 0);
+        overflow: hidden;
+        white-space: nowrap;
     }
 
     // Fixed so the header's overflow:hidden can't clip it; JS anchors it to the avatar.
@@ -1061,14 +1073,16 @@ ul.pagination{
             }
         }
 
+        // Sign in / Sign out. Green rather than orange — the orange sat oddly
+        // against the pale green footer wash.
         &--accent {
-            color: @footer-orange !important;
+            color: @footer-accent !important;
             font-weight: 700;
             opacity: .7;
 
             &:hover {
                 opacity: 1;
-                color: @footer-orange !important;
+                color: @footer-accent !important;
             }
         }
     }

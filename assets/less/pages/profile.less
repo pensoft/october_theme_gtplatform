@@ -1192,6 +1192,9 @@
 }
 
 // ---- Topic tag chips (Figma 1514:2365) ----
+// `line-height` is pinned rather than inherited: body sets `1.7em`, which
+// computes to ~30px off the 18px root and gets passed down verbatim, so these
+// chips were rendering ~41px tall with 12px text marooned in the middle.
 .forum-tag {
     display: inline-flex;
     align-items: center;
@@ -1200,8 +1203,9 @@
     background: #e7eeff;
     color: #3d5692;
     font-family: Fustat, Arial, sans-serif;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
+    line-height: 20px;
     letter-spacing: -0.24px;
     white-space: nowrap;
 
@@ -1560,6 +1564,8 @@
 }
 
 // "Add topics" trigger chip (Figma 1479:7732)
+// Same chip as .forum-tag, as a button — keep the two in step, line-height
+// included (see the note there).
 .forum-tag-btn {
     display: inline-flex;
     align-items: center;
@@ -1569,8 +1575,9 @@
     background: #e7eeff;
     color: #3d5692;
     font-family: Fustat, Arial, sans-serif;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
+    line-height: 20px;
     letter-spacing: -0.24px;
     cursor: pointer;
 
