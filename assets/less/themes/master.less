@@ -470,8 +470,46 @@ ul.pagination{
     color: #fff;
     overflow: hidden;
     border-radius: 20px;
-    margin: 20px;
 
+    // Capped to the same column the content uses (GT-132 #6).
+    //
+    // The hero was full-bleed while .container stops at 1220px, so the two
+    // agreed on a laptop and drifted apart as the window grew: measured
+    // 1209/1209 at 1264px, but 1849/1220 at 1904px — a 629px mismatch, with
+    // the hero running edge to edge above a stranded, narrow content column.
+    // That is the "layout varies a lot between resolutions" report.
+    //
+    // width + auto margins rather than plain `margin: 20px`: below the cap
+    // the auto margins resolve to exactly the 20px inset this always had, and
+    // above it they centre the hero on the same axis as .container, so the two
+    // share an edge at every width.
+    width: ~"calc(100% - 40px)";
+    margin: 20px auto;
+
+    // .container does not scale smoothly — it snaps to 540 / 720 / 960 / 1220
+    // at the breakpoints. A fluid hero therefore drifted against it at every
+    // step, not just on wide screens: 697 vs 540 at 752px, 921 vs 720 at
+    // 976px, 1849 vs 1220 at 1904px. Mirroring the same steps keeps the two
+    // sharing an edge at every width, which is the actual "layout varies
+    // between resolutions" complaint.
+    .breakpoint-small({  max-width: 540px;  });
+    .breakpoint-medium({ max-width: 720px;  });
+    .breakpoint-large({  max-width: 960px;  });
+    .breakpoint-huge({   max-width: 1220px; });
+
+    // The profile / job / post-job family lays its content out in
+    // .profile-container and .post-job-container, which are fluid up to
+    // 1385px rather than stepped. Those are exactly the pages the header
+    // partial marks --compact, so the modifier already distinguishes them:
+    // stay fluid there too, capped at the same 1385.
+    &--compact {
+        max-width: 1385px;
+
+        .breakpoint-small({  max-width: 1385px; });
+        .breakpoint-medium({ max-width: 1385px; });
+        .breakpoint-large({  max-width: 1385px; });
+        .breakpoint-huge({   max-width: 1385px; });
+    }
 
     // subtle decorative blossom in the background (uses existing theme asset)
     //&::before {

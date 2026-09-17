@@ -25,7 +25,14 @@
     {% if not isLoggedIn %}{% partial 'signuppopup/default' %}{% endif %}
 
     <article class="discussion-card">
-        <a href="/discussions" class="discussion-card__back" aria-label="Back to discussions">
+        {# A draft is only reachable from /profile/drafts, so send the arrow
+           back there rather than to the public forum (GT-132 #2). This page
+           serves both lists — profile-drafts and profile-discussions share
+           detailPage="profile-discussion" — so the topic's own flag is what
+           distinguishes them, not the URL. #}
+        {% set _backUrl   = topic.is_draft ? '/profile/drafts' : '/discussions' %}
+        {% set _backLabel = topic.is_draft ? 'Back to drafts' : 'Back to discussions' %}
+        <a href="{{ _backUrl }}" class="discussion-card__back" aria-label="{{ _backLabel }}">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M19 12H6M11 7l-5 5 5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
@@ -150,6 +157,32 @@
                 </svg>
                 {{ topic.messages_count }}
             </span>
+
+            {# Edit / Delete for the post itself (GT-132 #1 and #3). Comments
+               have had these all along; posts had neither, which is what made
+               a finished draft read-only. Shown to the author and to backend
+               users holding pensoft.forum.manage_topics. #}
+            {% if __SELF__.canManageTopic(topic) %}
+                <a href="/profile/create-post?edit={{ topic.slug }}"
+                   class="forum-pill forum-pill--solid" aria-label="Edit post">
+                    <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                        <path d="M12.1 2.9a1.6 1.6 0 0 1 2.3 2.3L6.6 13 3.5 14l1-3.1 7.6-8Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Edit</span>
+                </a>
+
+                <button type="button" class="forum-pill forum-pill--solid forum-pill--danger"
+                        data-request="{{ __SELF__ }}::onDeleteTopic"
+                        data-request-confirm="Delete this post? It will be removed from the forum for everyone. Its comments are kept, and an admin can restore it."
+                        data-confirm-label="Delete" data-confirm-danger
+                        data-request-success="window.PGT_POST_DELETED && window.PGT_POST_DELETED(data)"
+                        aria-label="Delete post">
+                    <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                        <path d="M3.5 5h11M7 5V3.5h4V5M5.2 5l.6 9.5h6.4L12.8 5M7.4 7.8v4M10.6 7.8v4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Delete</span>
+                </button>
+            {% endif %}
         </div>
     </article>
 
@@ -364,6 +397,70 @@
         }
         window.PGT_COMPOSER_RESET = resetAttachments;
         composer.addEventListener('reset', function () { setTimeout(resetAttachments, 0); });
+    })();
+    </script>
+
+    {# Confirmation shown after a post is deleted (GT-132 #3). The handler
+       returns the destination as data rather than a redirect response, so the
+       browser stays put until this is dismissed — a server-side redirect would
+       navigate immediately and the message would never be seen. #}
+    <div class="job-posted-popup" id="postDeletedPopup" role="dialog" aria-modal="true"
+         aria-hidden="true" aria-labelledby="postDeletedPopupTitle">
+        <div class="job-posted-popup__backdrop" data-post-deleted-close></div>
+        <div class="job-posted-popup__dialog" role="document">
+            <h2 id="postDeletedPopupTitle" class="job-posted-popup__title">Post deleted</h2>
+            <p class="job-posted-popup__sub">
+                Your post has been removed from the forum. Comments left on it are kept,
+                so an administrator can restore the post if this was a mistake.
+            </p>
+            <div class="job-posted-popup__actions">
+                <button type="button" class="job-posted-popup__btn job-posted-popup__btn--primary"
+                        data-post-deleted-close>Done</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        var modal = document.getElementById('postDeletedPopup');
+        if (!modal) return;
+
+        // Where to go once the message is dismissed — supplied by onDeleteTopic
+        // so a deleted draft returns to the drafts list rather than the forum.
+        var target = '/discussions';
+
+        function leave() {
+            // Guard against a double fire (button + backdrop) restarting navigation.
+            if (modal.dataset.leaving) return;
+            modal.dataset.leaving = '1';
+            window.location.href = target;
+        }
+
+        // Called from the Delete button's data-request-success.
+        window.PGT_POST_DELETED = function (data) {
+            if (!data || !data.deleted) return;
+            if (data.redirectUrl) target = data.redirectUrl;
+
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+
+            var ok = modal.querySelector('.job-posted-popup__btn--primary');
+            if (ok) ok.focus();
+        };
+
+        modal.addEventListener('click', function (e) {
+            if (e.target.closest('[data-post-deleted-close]')) {
+                e.preventDefault();
+                leave();
+            }
+        });
+
+        // Escape dismisses it the same way — the post is already gone either
+        // way, so there is nothing to cancel back to.
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && modal.classList.contains('is-open')) leave();
+        });
     })();
     </script>
 </div>

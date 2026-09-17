@@ -4,16 +4,26 @@
 <div class="create-post" data-forum>
     <div id="create-post-banner"></div>
 
-    <h1 class="create-post__title">Create post</h1>
+    {# The same form doubles as the editor when ?edit=<slug> resolves to a post
+       the visitor may change (GT-132 #1). `editing` is null for a new post, so
+       every branch below falls back to the original create behaviour. #}
+    <h1 class="create-post__title">{{ editing ? 'Edit post' : 'Create post' }}</h1>
 
     <form class="create-post__form"
-          data-request="{{ __SELF__ }}::onCreatePost"
+          data-request="{{ __SELF__ }}::{{ editing ? 'onUpdatePost' : 'onCreatePost' }}"
           data-request-validate
           data-request-files>
 
+        {% if editing %}
+            {# Identifies the post server-side; the handler re-checks
+               permission rather than trusting this. #}
+            <input type="hidden" name="edit_slug" value="{{ editing.slug }}">
+        {% endif %}
+
         <div class="create-post__field">
             <input type="text" name="title" class="forum-field create-post__title-field"
-                   placeholder="Title" aria-label="Post title" maxlength="200" data-char-input required>
+                   placeholder="Title" aria-label="Post title" maxlength="200" data-char-input required
+                   value="{{ editing ? editing.title : '' }}">
             <div class="create-post__counter" aria-hidden="true"><span data-char-count>0</span>/200</div>
         </div>
         <span class="forum-modal__error" data-validate-for="title"></span>
@@ -30,8 +40,21 @@
 
         {# Set from the picker's on/off switches — the switches themselves live
            in the modal, which sits outside this form and so is never posted. #}
-        <input type="hidden" name="is_best_practice" value="0" data-flag-input="best_practice">
-        <input type="hidden" name="is_shared_document" value="0" data-flag-input="shared_document">
+        <input type="hidden" name="is_best_practice" value="{{ editing and editing.is_best_practice ? '1' : '0' }}" data-flag-input="best_practice">
+        <input type="hidden" name="is_shared_document" value="{{ editing and editing.is_shared_document ? '1' : '0' }}" data-flag-input="shared_document">
+
+        {% if editing %}
+            {# Pre-select the post's existing topics. The picker reads this on
+               load so the chips and the modal's switches start in the state
+               the post was saved with, rather than empty. #}
+            <script type="application/json" data-forum-preselect>
+                {{ {
+                    tags: editing.tags|map(t => t.id),
+                    best_practice: editing.is_best_practice ? 1 : 0,
+                    shared_document: editing.is_shared_document ? 1 : 0
+                }|json_encode|raw }}
+            </script>
+        {% endif %}
 
         <div class="create-post__body-card">
             <div class="create-post__field">
@@ -41,7 +64,7 @@
                 <textarea name="body" class="create-post__body" rows="6"
                           placeholder="What would you like to share?" aria-label="Post body"
                           maxlength="1500" data-maxlength="1500"
-                          data-richtext data-char-input></textarea>
+                          data-richtext data-char-input>{{ editing ? editing.body|raw : '' }}</textarea>
                 <div class="create-post__counter" aria-hidden="true"><span data-char-count>0</span>/1500</div>
             </div>
 
@@ -73,8 +96,16 @@
                     </button>
                 </div>
                 <div class="create-post__actions">
-                    <button type="button" class="forum-cancel-pill" data-request="{{ __SELF__ }}::onSaveDraft" data-request-files data-attach-loading>Save draft</button>
-                    <button type="submit" class="discussion-btn discussion-btn--primary" data-attach-loading>Post</button>
+                    {% if editing %}
+                        {# No "Save draft" when editing: onSaveDraft always
+                           creates a new row, so offering it here would
+                           silently duplicate the post being edited. #}
+                        <a href="/discussions/{{ editing.slug }}" class="forum-cancel-pill">Cancel</a>
+                        <button type="submit" class="discussion-btn discussion-btn--primary" data-attach-loading>Save changes</button>
+                    {% else %}
+                        <button type="button" class="forum-cancel-pill" data-request="{{ __SELF__ }}::onSaveDraft" data-request-files data-attach-loading>Save draft</button>
+                        <button type="submit" class="discussion-btn discussion-btn--primary" data-attach-loading>Post</button>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -325,6 +356,33 @@
             var chip = flagsWrap.querySelector('[data-selected-flag="' + key + '"]');
             if (chip) chip.remove();
         }
+
+        // Editing an existing post (GT-132 #1): seed the picker from the JSON
+        // the partial emits, then run the very same apply functions the
+        // modal's "Apply" button uses. That way the chips, the hidden tags[]
+        // inputs and the flag switches all start in the state the post was
+        // saved with, with no second code path to keep in step.
+        (function preselect() {
+            var node = root.querySelector('[data-forum-preselect]');
+            if (!node) return;
+
+            var data;
+            try { data = JSON.parse(node.textContent); } catch (e) { return; }
+
+            (data.tags || []).forEach(function (id) {
+                var chip = topicsModal.querySelector('[data-topic-chip][data-tag-id="' + id + '"]');
+                if (chip) chip.classList.add('is-selected');
+            });
+
+            [['best_practice', data.best_practice], ['shared_document', data.shared_document]]
+                .forEach(function (pair) {
+                    var box = topicsModal.querySelector('[data-topic-flag="' + pair[0] + '"]');
+                    if (box) box.checked = !!Number(pair[1]);
+                });
+
+            applyTags();
+            applyFlags();
+        })();
 
         // Remove a selected tag: drop its chip (+ hidden input) and deselect it
         // in the picker so a reopened picker reflects the current selection.

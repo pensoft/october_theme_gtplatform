@@ -594,6 +594,14 @@
 
     &--solid { background: rgba(24, 45, 16, .08); padding-left: 12px; padding-right: 12px; }
 
+    // Delete a post — author or admin (GT-132 #3). Mirrors
+    // .comment-pill--danger so the post and comment controls read alike.
+    &--danger {
+        color: @pf-orange;
+        svg { opacity: .75; }
+        &:hover { background: fade(@pf-orange, 14%); color: @pf-orange; }
+    }
+
     &[href]:hover { background: rgba(24, 45, 16, .09); color: rgba(24, 45, 16, .5); text-decoration: none; }
 
     // Interactive pills (buttons) — like / share on the detail card.

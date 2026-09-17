@@ -1753,7 +1753,12 @@
     margin-bottom: 0;
     gap: 15px;
 
-    &--full { grid-column: 1 / -1; }
+    // Escaped: Less reads the slash as division and compiled `1 / -1` down to
+    // `grid-column: -1`, which pins the item to the last column line instead
+    // of spanning the row. That silently mis-placed every --full field, and
+    // only became obvious once the lat/long note gave one of them enough text
+    // to distort the column widths.
+    &--full { grid-column: ~"1 / -1"; }
 }
 
 .pj-label {
@@ -2001,6 +2006,18 @@
     font-size: 12px;
     margin-top: 4px;
     display: block;
+}
+
+// Field help text. The class was already in use under "Key responsibilities"
+// but had no rule at all, so it rendered as unstyled inline text at body size
+// and read as content rather than as a note (GT-132 #5).
+.pj-help {
+    display: block;
+    margin-top: -6px;          // the .pj-field gap already provides the space
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    color: @pj-muted;
 }
 
 // ----- Buttons -----

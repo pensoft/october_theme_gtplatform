@@ -184,6 +184,17 @@ description_limit = 0
                     <label for="pjLongitude" class="pj-label">Longitude</label>
                     <input id="pjLongitude" name="longitude" type="number" step="any" min="-180" max="180" class="pj-input" placeholder="e.g. 23.3219">
                 </div>
+
+                {# GT-132 #5 — the pair was unlabelled as to what it is for, so
+                   people left it blank without knowing what they lost. #}
+                <div class="pj-field pj-field--full">
+                    <span class="pj-help">
+                        Latitude and longitude are optional. Fill them in and the opportunity
+                        is pinned at that exact point on the map; leave them empty and it is
+                        shown by city and country only. You can read a location's coordinates
+                        off Google Maps by right-clicking the spot.
+                    </span>
+                </div>
             </div>
         </section>
 

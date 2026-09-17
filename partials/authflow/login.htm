@@ -8,9 +8,14 @@
            otherwise, so a normal login still refreshes in place. #}
         {% if redirect %}<input type="hidden" name="redirect" value="{{ redirect }}">{% endif %}
         <div class="pgt-login__fields">
+            {# "Email" only (GT-132 #4). AuthFlow::onSignin authenticates with
+               RainLab's login_attribute, and no user_settings row has ever
+               been saved, so it falls back to the LOGIN_EMAIL default — a
+               username genuinely cannot sign in, which is what the old
+               "Email or username" label invited people to try. #}
             <div class="pgt-field">
-                <label for="pgtLoginLogin">Email or username</label>
-                <input type="text" id="pgtLoginLogin" name="login" autocomplete="username">
+                <label for="pgtLoginLogin">Email</label>
+                <input type="email" id="pgtLoginLogin" name="login" autocomplete="email" inputmode="email">
             </div>
 
             <div class="pgt-field pgt-field--password">
