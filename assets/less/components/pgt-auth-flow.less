@@ -32,12 +32,24 @@
     gap: 65px;
     //padding: 112px 20px;
 
-    // Decorative neonflower at 35% opacity
+    // Decorative neonflower at 35% opacity.
+    //
+    // neonflower.svg was 12 MB, of which 548 bytes was markup — an <svg>
+    // wrapping one embedded raster. The bloom is now a plain image, flattened
+    // onto this block's own #0C1808 so it carries no alpha: GD encodes WebP
+    // losslessly whenever alpha survives, and dropping it took the file from
+    // 1.27 MB to 226 KB. Flattening onto the true backdrop is exactly what
+    // alpha compositing would have produced, so the .35 here and the .85 on
+    // .event-detail__hero both still read correctly.
     &::before {
         content: "";
         position: absolute;
         inset: 0;
-        background: url("../../assets/images/neonflower.svg") center no-repeat;
+        background: url("../../assets/images/neonflower.jpg") center no-repeat;
+        background-image: image-set(
+            url("../../assets/images/neonflower.webp") type("image/webp"),
+            url("../../assets/images/neonflower.jpg")  type("image/jpeg")
+        );
         background-size: 100%;
         opacity: .35;
         pointer-events: none;
@@ -442,10 +454,21 @@
         display: flex;
     }
 
+    // position: fixed, not absolute (GT-129, Welcome window #4). .pgt-modal is
+    // itself the scroll container (overflow-y: auto), so an absolutely
+    // positioned child anchors to its padding box and scrolls away with the
+    // content: on a tall card such as Create an account, scrolling down left
+    // the page undimmed below the backdrop — the "bar at the bottom of the
+    // page" in Maria's screenshot. Fixed keeps it pinned to the viewport.
+    //
+    // Dark scrim rather than the old rgba(236, 246, 230, .55) pale wash
+    // (Welcome window #3): that lifted the dark hero to a grey-green #84907F,
+    // where the point is for the background to stay dark through the whole
+    // sign-up flow. #0B1A08 is the welcome page's own background.
     &__backdrop {
-        position: absolute;
+        position: fixed;
         inset: 0;
-        background: rgba(236, 246, 230, .55);
+        background: rgba(11, 26, 8, .6);
         backdrop-filter: blur(2px);
     }
 
@@ -765,11 +788,15 @@
         gap: 24px;
     });
 
+    // Vector, not reason.png (GT-129, Welcome window #2). The PNG was exactly
+    // 110x110 drawn at 110 CSS px — crisp at 1x, visibly soft on any HiDPI
+    // screen, which is what Maria saw. The SVG carries its own tile and
+    // corner, so the border-radius here is now belt-and-braces only.
     &__icon {
         width: 110px;
         height: 110px;
         border-radius: 10px;
-        background: url("../../assets/images/reason.png") center no-repeat;
+        background: url("../../assets/images/reason.svg") center no-repeat;
         background-size: contain;
         display: flex;
         align-items: center;

@@ -30,7 +30,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
+    // Matches .gt-hero's gap so title, subtitle and CTA are evenly spaced
+    // (GT-129, Exchange forum #3).
+    gap: 18px;
     width: 100%;
 }
 
@@ -152,15 +154,25 @@
     border-radius: 15px;
     box-shadow: none;
 
+    // The magnifier sat slightly high (GT-129, Exchange forum #4): the span
+    // was inline, so its box included the font's descender space below the
+    // glyph, and centring that taller box left the glyph itself above centre.
+    // Making the span a flex box sized to the SVG centres what you actually see.
     &-icon {
         position: absolute;
         right: 25px;
         top: 50%;
         transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 0;
         color: @jb-text-dark;
         opacity: .45;
         pointer-events: none;
         z-index: 2;
+
+        svg { display: block; }
     }
 
     &-input {
@@ -197,20 +209,29 @@
     }
 }
 
-// Icon-only rounded square (Figma) — the labelled "Filters" pill with its
-// heavy shadow is gone; the sliders glyph carries the meaning.
+// Icon-only rounded square (GT-128 #4). The labelled "Filters" pill was tried
+// and rejected — the glyph carries the meaning, so the label lives in
+// aria-label. The white fill and hairline border stay; only the search field
+// and the chips below it were asked to go flat.
 .jobs-page__filter-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex: 0 0 auto;
-    width: 56px;
-    height: 56px;
+    // Square, matching the search field's 70px height (GT-129, Exchange
+    // forum #4) — at 56px it sat noticeably short of the field beside it.
+    width: 70px;
+    height: 70px;
     padding: 0;
     border: 1px solid @jb-btn-border;
     border-radius: 15px;
     background: #fff;
     color: @jb-icon-dark;
+    font-family: Fustat, Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: normal;
+    letter-spacing: -0.36px;
     cursor: pointer;
     box-shadow: none;
     transition: background .15s ease, border-color .15s ease;
@@ -1620,6 +1641,10 @@
 @pj-shadow:      0 2px 6px rgba(20, 40, 20, .06);
 @pj-radius:      12px;
 @pj-earth:       #52843E;
+// Form field shell — GT-129, Post a job #1 and #3.
+@pj-field-border: #E7E7F1;
+@pj-field-stroke: 2px;
+@pj-field-h:      80px;
 
 .post-job-container {
     padding: 26px 16px 80px;
@@ -1740,28 +1765,46 @@
     margin: 0;
 }
 
+// Outline-only fields (GT-129, Post a job #3): a 2px #E7E7F1 stroke, no fill
+// and no drop shadow — the white card-on-white look made the form read as a
+// stack of floating tiles. #E7E7F1 is already the page's hairline colour
+// (see .post-job-page__back above).
 .pj-input,
 .pj-select,
-.pj-textarea {
+.pj-textarea,
+.pj-combo__button {
     width: 100%;
     box-sizing: border-box;
-    border: 0;
+    border: @pj-field-stroke solid @pj-field-border;
     border-radius: @pj-radius;
-    background: #fff;
-    box-shadow: @pj-shadow;
-    padding: 16px 20px;
+    background: transparent;
+    box-shadow: none;
     font-family: Fustat, Arial, sans-serif;
     font-size: 14px;
     color: @pj-text;
     line-height: 1.4;
-    transition: box-shadow .15s ease;
+    // Was a box-shadow transition; with the shadow gone the focus state is a
+    // straight border-colour change, which is also less abrupt when a select
+    // opens (Post a job #2).
+    transition: border-color .15s ease;
 
     &::placeholder { color: @pj-muted; }
 
     &:focus {
         outline: none;
-        box-shadow: 0 0 0 2px rgba(138, 197, 62, .35), @pj-shadow;
+        border-color: @pj-earth;
     }
+}
+
+// Single-line fields stand at a uniform 80px (Post a job #1) — they were
+// ~52px, which Maria read as cramped. box-sizing means the 2px strokes are
+// inside that 80px, and zero vertical padding lets the browser centre the
+// value itself.
+.pj-input,
+.pj-select,
+.pj-combo__button {
+    height: @pj-field-h;
+    padding: 0 20px;
 }
 
 .pj-select {
@@ -1772,40 +1815,162 @@
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path fill='%23182d10' d='M6 8.5 1.5 4l1-1L6 6.5 9.5 3l1 1z'/></svg>");
     background-repeat: no-repeat;
     background-position: right 18px center;
-    background-color: #fff;
+    // Transparent, not #fff — otherwise the fill this rule sets would defeat
+    // the outline-only treatment above.
+    background-color: transparent;
 }
 
 .pj-textarea {
     min-height: 180px;
+    padding: 20px;
     resize: vertical;
+}
+
+// ----- Custom dropdown (GT-129, Post a job #2) -----
+// A native <select> draws its panel in the OS, so it cannot be animated and
+// offers no open state to rotate an arrow against. assets/js/pj-select.js
+// builds a button + listbox alongside each select and hides the select, which
+// stays in the DOM as the value the form posts.
+.pj-combo {
+    position: relative;
+
+    // Only hidden once JS has built the replacement, so the plain select still
+    // works if the script never runs. Kept in the layout rather than
+    // display:none so the form still serialises it and validation can focus it.
+    &__native.pj-combo__native {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        border: 0;
+        opacity: 0;
+        pointer-events: none;
+        clip: rect(0 0 0 0);
+        overflow: hidden;
+    }
+
+    &__button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    &__value {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+        // "Select…" reads as a placeholder until a real choice is made.
+        &.is-placeholder { color: @pj-muted; }
+    }
+
+    // Rotates to point up while the list is open.
+    &__arrow {
+        display: inline-flex;
+        flex: 0 0 auto;
+        color: @pj-text;
+        transition: transform .28s cubic-bezier(.2, .7, .2, 1);
+
+        svg { display: block; }
+    }
+
+    &.is-open &__arrow { transform: rotate(180deg); }
+    &.is-open &__button { border-color: @pj-earth; }
+
+    // The expand itself. max-height is the animatable stand-in for height:auto;
+    // 320px is above any of these lists at 46px a row, so the transition always
+    // runs to completion rather than stopping short.
+    &__list {
+        position: absolute;
+        z-index: 20;
+        // Escaped: Less does its own maths inside calc() and folded
+        // `100% + 6px` into `calc(106%)`, which put the panel 6% down the
+        // field instead of 6px below it.
+        top: ~"calc(100% + 6px)";
+        left: 0;
+        right: 0;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        background: #fff;
+        border: @pj-field-stroke solid @pj-field-border;
+        border-radius: @pj-radius;
+        box-shadow: 0 12px 28px rgba(20, 40, 20, .10);
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        transform: translateY(-6px);
+        pointer-events: none;
+        transition: max-height .28s cubic-bezier(.2, .7, .2, 1),
+                    opacity .18s ease,
+                    transform .28s cubic-bezier(.2, .7, .2, 1);
+
+        &:focus { outline: none; }
+    }
+
+    &.is-open &__list {
+        max-height: 320px;
+        opacity: 1;
+        transform: translateY(0);
+        overflow-y: auto;
+        pointer-events: auto;
+    }
+
+    &__option {
+        padding: 12px 20px;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 14px;
+        line-height: 1.4;
+        color: @pj-text;
+        cursor: pointer;
+        transition: background .12s ease;
+
+        &--placeholder { color: @pj-muted; }
+
+        // .is-active follows the keyboard; .is-selected is the current value.
+        &:hover,
+        &.is-active { background: rgba(138, 197, 62, .14); }
+        &.is-selected { font-weight: 700; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        &__list, &__arrow { transition: none; }
+    }
 }
 
 // ---- CKEditor 4 wrapper around #pjDesc — match the .pj-textarea card shell.
 // CKEditor builds an outer container with id `cke_<textareaId>`. We restyle
 // only that instance so other CKEditors in the theme keep their defaults.
 #cke_pjDesc.cke {
-    border: 0;
+    // Follows the outline-only field shell (GT-129, Post a job #3) — left on
+    // the old white-and-shadow treatment it would have been the one raised
+    // tile in an otherwise flat form.
+    border: @pj-field-stroke solid @pj-field-border;
     border-radius: @pj-radius;
-    background: #fff;
-    box-shadow: @pj-shadow!important;
+    background: transparent;
+    box-shadow: none !important;
     padding: 0;
     overflow: hidden;
     font-family: Fustat, Arial, sans-serif;
     font-size: 14px;
     color: @pj-text;
     line-height: 1.4;
-    transition: box-shadow .15s ease;
+    transition: border-color .15s ease;
 
     &:hover,
     &:focus-within {
-        box-shadow: 0 4px 12px rgba(20, 40, 20, .08);
+        border-color: @pj-earth;
     }
 
     .cke_inner,
     .cke_top,
     .cke_contents,
     .cke_bottom {
-        background: #fff;
+        background: transparent;
         border: 0;
     }
 

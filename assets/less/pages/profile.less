@@ -554,6 +554,15 @@
         color: rgba(24, 45, 16, .5);
     }
 
+    // Attachment indicator badges (GT-128 #8), between the excerpt and the
+    // like/reply row. The badge itself is .bp-fileicon, shared with the
+    // publication grid — only the row spacing lives here.
+    &__files {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+    }
+
     &__actions {
         display: flex;
         align-items: center;

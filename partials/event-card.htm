@@ -25,7 +25,11 @@
             <div class="event-card__placeholder" aria-hidden="true"></div>
         {% endif %}
 
-        <span class="event-card__overlay" aria-hidden="true"></span>
+        {# The green gradient wash over the image is gone (GT-129, Circle
+           graphic #4) — it tinted every photo and fought the artwork. Removed
+           here rather than in CSS so no empty element is left behind; this
+           partial feeds the exchange forum, /events, and the saved lists, so
+           the change lands everywhere at once, which is what the ticket asks. #}
 
         <div class="event-card__badges">
             {% if ev.start_date %}

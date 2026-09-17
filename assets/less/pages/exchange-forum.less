@@ -171,9 +171,15 @@
         // Centered via negative margins (see ef-connect-ring-pulse note).
         animation: ef-connect-ring-pulse 4s ease-in-out infinite;
 
+        // Diameters come from the SVG attached to GT-129 (1200x675 artboard,
+        // radii 326.45 / 190.87 / 139.22). The middle and inner discs used to
+        // be far larger in proportion — 628 and 458 against an outer of 759 —
+        // which swelled the graphic and left the photos stranded out at the
+        // card edges.
         // Outer: gradient #8AC53E → transparent, 50% opacity
         &--outer {
             width: 759px;  height: 759px;  margin: -379.5px 0 0 -379.5px;
+            //width: 653px;  height: 653px;  margin: -326.5px 0 0 -326.5px;
             background: linear-gradient(180deg, #8AC53E 0%, rgba(186, 236, 190, 0) 100%);
             opacity: .5;
             animation-delay: 0s;
@@ -181,6 +187,7 @@
         // Middle: solid #E2FADD, 40% opacity
         &--mid {
             width: 628px;  height: 628px;  margin: -314px 0 0 -314px;
+            //width: 382px;  height: 382px;  margin: -191px 0 0 -191px;
             background: #E2FADD;
             opacity: .4;
             animation-delay: .5s;
@@ -188,6 +195,7 @@
         // Inner: solid #ECF6E6
         &--inner {
             width: 458px;  height: 458px;  margin: -229px 0 0 -229px;
+            //width: 278px;  height: 278px;  margin: -139px 0 0 -139px;
             background: #ECF6E6;
             animation-delay: 1s;
         }
@@ -259,6 +267,14 @@
         }
         .ef-connect__accent {
             transform: translateX(-24px);
+        }
+
+        // "community connected" both carry the button's green (GT-129,
+        // Circle graphic #3). .ef-accent's @ef-green-dark (#5d9e1f) was a
+        // shade off the "Explore all events" CTA directly below.
+        .ef-connect__word--accent,
+        .ef-connect__accent {
+            color: @ef-green;
         }
 
         &.is-revealed .ef-connect__word {
@@ -385,34 +401,25 @@
             display: block;
         }
 
-        &--tl {
-            top: 79px;
-            left: 100px;
-            width: 243px;
-            height: 171px;
-            border-radius: 17px;
-        }
-        &--tr {
-            top: 84px;
-            right: 100px;
-            width: 197px;
-            height: 129px;
-            border-radius: 15px;
-        }
-        &--bl {
-            bottom: 47px;
-            left: 194px;
-            width: 149px;
-            height: 161px;
-            border-radius: 15px;
-        }
-        &--br {
-            bottom: 55px;
-            right: 144px;
-            width: 180px;
-            height: 153px;
-            border-radius: 15px;
-        }
+        // Anchored to the centre, like the rings, rather than to the card
+        // edges (GT-129, Circle graphic #1). Pinning them to the edges was
+        // what made them drift away from the circle: the rings are a fixed
+        // size about the centre, so every extra pixel of card width pushed the
+        // photos further out. Centre-relative offsets hold the composition at
+        // any width. Each margin is the photo's centre offset minus half its
+        // own size (112.5 / 90).
+        top: 50%;
+        left: 50%;
+        // All four are one size now — they were 243x171, 197x129, 149x161 and
+        // 180x153, which is the mismatch Maria flagged (Circle graphic #2).
+        width: 225px;
+        height: 180px;
+        border-radius: 15px;
+
+        &--tl { margin: -300px 0 0 -451.5px; }
+        &--tr { margin: -318px 0 0  191.5px; }
+        &--bl { margin:   84px 0 0 -420.5px; }
+        &--br { margin:  110px 0 0  229.5px; }
     }
 
     &__photo-overlay {
@@ -430,10 +437,16 @@
         padding: 70px 24px;
         min-height: 0;
 
-        &__photo--tl { width: 160px; height: 110px; top: 30px; left: 16px; }
-        &__photo--tr { width: 130px; height: 90px;  top: 30px; right: 16px; }
-        &__photo--bl { width: 110px; height: 120px; bottom: 30px; left: 60px; }
-        &__photo--br { width: 130px; height: 110px; bottom: 30px; right: 60px; }
+        // Same centre-anchored composition, scaled down — keep these in the
+        // margin idiom, not top/right/bottom, or they fight the base rule.
+        // 150x120 holds the 225x180 aspect; offsets are the desktop ones at
+        // ~0.55, minus half the size (75 / 60).
+        &__photo { width: 150px; height: 120px; }
+
+        &__photo--tl { margin: -175px 0 0 -261px; }
+        &__photo--tr { margin: -185px 0 0   92px; }
+        &__photo--bl { margin:   36px 0 0 -244px; }
+        &__photo--br { margin:   50px 0 0  113px; }
     }
 
     @media (max-width: 640px) {
@@ -737,13 +750,15 @@
         transform-origin: center;
         animation: ef-conv-pulse 4.5s ease-in-out infinite;
 
-        // Stagger phases so the rings don't all pulse in lockstep
-        &:nth-of-type(1) { animation-delay: 0s;   }
-        &:nth-of-type(2) { animation-delay: .35s; }
-        &:nth-of-type(3) { animation-delay: .7s;  }
-        &:nth-of-type(4) { animation-delay: 1.05s;}
-        &:nth-of-type(5) { animation-delay: 1.4s; }
-        &:nth-of-type(6) { animation-delay: 1.75s;}
+        // Stagger phases so the circles don't pulse in lockstep. Explicit
+        // modifiers rather than :nth-of-type — these are <g> elements sitting
+        // among other <g> siblings, so nth-of-type counted every sibling and
+        // handed out delays by document position: the three circles were
+        // landing on 1.05s / 1.4s / 1.75s rather than the intended spread, and
+        // any edit to the illustration reshuffled them again.
+        &--0 { animation-delay: 0s;   }
+        &--1 { animation-delay: .35s; }
+        &--2 { animation-delay: .7s;  }
     }
 
     // 45×45 notification dots — smooth, constant scale pulse so they feel
@@ -753,12 +768,13 @@
         transform-origin: center;
         animation: ef-conv-dot-pulse 2.4s ease-in-out infinite;
 
-        // Slight stagger by position so the dots breathe out of phase
-        // (two share x="741" but at different y — the attribute selectors
-        // pick them out reliably).
-        &[x="280"]          { animation-delay: 0s;   }
-        &[x="741"][y="396"] { animation-delay: .5s;  }
-        &[x="741"][y="568"] { animation-delay: 1s;   }
+        // Slight stagger by position so the circles breathe out of phase.
+        // Coordinates are the new illustration's; the avatar takes its class
+        // on a clipping <g> rather than a rect, so it is matched by the
+        // presence of clip-path instead of an x/y pair.
+        &[x="280"][y="503"] { animation-delay: 0s;   }
+        &[x="741"][y="417"] { animation-delay: .5s;  }
+        &[clip-path]        { animation-delay: 1s;   }
     }
 
     // ----- Triggered when the section scrolls into view (JS adds .is-in-view) -----
@@ -1116,21 +1132,10 @@
     }
 }
 
-// ---- Coming soon pill ----
-.ef-coming-soon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 25px;
-    border-radius: 900px;
-    background: #5787FF;
-    color: #fff;
-    font-family: Fustat, Arial, sans-serif;
-    font-weight: 600;
-    font-size: 18px;
-    letter-spacing: -.36px;
-    line-height: 1;
-}
+// .ef-coming-soon was a blue #5787FF pill used only by "Start collaborating".
+// That button now uses .ef-connect__cta like every other CTA on the page
+// (GT-129, Collab corner #3), leaving this rule unreferenced — removed so no
+// one reaches for a blue pill in a green design by mistake.
 
 // =====================================================
 //  Section 5: Opportunities for growth and exchange header (Figma 245:10214)

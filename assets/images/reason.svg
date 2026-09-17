@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110" width="110" height="110" role="img" aria-hidden="true">
+    <!--
+      "Why are you joining…" badge for the registration flow (GT-129, Welcome
+      window #2). Replaces reason.png, which was a 110x110 raster rendered at
+      110 CSS px — pin sharp at 1x, visibly soft on any HiDPI screen.
+
+      Geometry measured from Maria's Question icon.png: tile 198px with a 16px
+      corner, badge 104px centred (0.525 of the tile), tile #E9F8DC,
+      badge #52843E. Scaled to a 110 box: corner 9, badge 58.
+
+      The eight-lobed rosette is two identical rounded squares, one turned 45
+      degrees. Side 48.8 rather than the 41 the diagonal alone implies: the
+      corner radius rounds the points off, so the shape reaches less far than
+      side * sqrt(2). 48.8 was arrived at by rendering and measuring back
+      against the 0.525 ratio.
+    -->
+    <rect width="110" height="110" rx="9" fill="#E9F8DC"/>
+
+    <g fill="#52843E">
+        <rect x="32.5" y="32.5" width="45" height="45" rx="7"/>
+        <rect x="32.5" y="32.5" width="45" height="45" rx="7" transform="rotate(45 55 55)"/>
+    </g>
+
+    <!-- Question mark: a 270-degree hook, a short stem, then the dot. -->
+    <path d="M48.1 50.1a7 7 0 1 1 7 7v3.1"
+          fill="none" stroke="#FFFFFF" stroke-width="4.7"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="55.1" cy="67.6" r="3.1" fill="#FFFFFF"/>
+</svg>

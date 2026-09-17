@@ -8,6 +8,10 @@
 @ev-text-dark:    #182D10;
 @ev-text-muted:   #6b7a6b;
 @ev-card-radius:  15px;
+// Event detail: 55px between the major sections, 22px inside the
+// back-link / tags / image header group (GT-129, Events page #2).
+@ev-detail-gap:       55px;
+@ev-detail-gap-tight: 22px;
 @ev-border:       #e3e6df;
 @ev-bg:           #ffffff;
 @ev-bg-soft:      #f5f7f1;
@@ -66,15 +70,23 @@
         box-shadow: none;
         padding: 0;
 
+        // See .jobs-page__search-icon — the inline span's descender space left
+        // the magnifier above true centre (GT-129, Exchange forum #4).
         &-icon {
             position: absolute;
             right: 25px;
             top: 50%;
             transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 0;
             color: @ev-text-dark;
             opacity: .45;
             pointer-events: none;
             z-index: 2;
+
+            svg { display: block; }
         }
 
         // Plain input fallback (before selectize takes over)
@@ -133,20 +145,29 @@
         &__date  { font-size: 12px; color: @ev-text-muted; }
     }
 
-    // Icon-only rounded square (Figma) — the labelled "Filters" pill with its
-    // heavy shadow is gone; the sliders glyph carries the meaning.
+    // Icon-only rounded square (GT-128 #4) — mirrors .jobs-page__filter-btn;
+    // keep the two in step. The labelled pill was tried and rejected. The
+    // white fill and hairline border stay: only the search field and the
+    // chips below were asked to go flat.
     &__filter-btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         flex: 0 0 auto;
-        width: 56px;
-        height: 56px;
+        // Square, matching the search field's 70px height (GT-129, Exchange
+        // forum #4) — keep in step with .jobs-page__filter-btn.
+        width: 70px;
+        height: 70px;
         padding: 0;
         border: 1px solid @ev-btn-border;
         border-radius: 15px;
         background: #fff;
         color: @ev-icon-dark;
+        font-family: Fustat, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 500;
+        line-height: normal;
+        letter-spacing: -0.36px;
         cursor: pointer;
         box-shadow: none;
         transition: background .15s ease, border-color .15s ease;
@@ -398,18 +419,9 @@
         //    url("../../assets/images/neonflower.svg") center/contain no-repeat;
     }
 
-    // Green gradient overlay on top of the image (Figma 251:20200):
-    // a -16.11deg gradient — strong green at the bottom, fading clear toward the top.
-    &__overlay {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(
-            -16.11deg,
-            rgba(138, 197, 62, .75) 8.114%,
-            rgba(138, 197, 62, 0)   68.874%
-        );
-        pointer-events: none;
-    }
+    // The green gradient overlay that used to sit on the image (Figma
+    // 251:20200) was dropped in GT-129 (Circle graphic #4) along with its
+    // .event-card__overlay span in partials/event-card.htm.
 
     // Top-aligned row of badges sitting just inside the image top edge
     &__badges {
@@ -471,10 +483,17 @@
     }
 
     // Location row (below the image)
+    // Always exactly two lines tall (GT-129, Homepage overall #1). A long
+    // venue — "Bar Beton at Utrecht Rijnsweerd, Pythagoraslaan 101,
+    // Netherlands" — wrapped to a second line and pushed that one card's
+    // title below its neighbours'. Reserving the space keeps every title on
+    // the same baseline across the row, and the clamp stops a longer venue
+    // reintroducing the drift. 2.9em = two lines at line-height 1.45.
     &__location {
-        display: inline-flex;
-        align-items: center;
+        display: flex;
+        align-items: flex-start;
         gap: 4px;
+        min-height: 2.9em;
         font-family: Fustat, Arial, sans-serif;
         font-size: 14px;
         font-weight: 400;
@@ -482,7 +501,16 @@
         color: @ev-text-dark;
         opacity: .45;
 
-        svg { display: block; flex-shrink: 0; }
+        // Nudge the pin down onto the first line's optical centre now that
+        // the row is top-aligned rather than centred.
+        svg { display: block; flex-shrink: 0; margin-top: 2px; }
+
+        span {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
     }
 
     &__title {
@@ -815,7 +843,18 @@
     padding: 0 16px;
     display: flex;
     flex-direction: column;
-    gap: 55px;
+    gap: @ev-detail-gap;
+
+    // "Back to events" -> tags -> image is one header group, so it reads
+    // tighter than the 55px that separates the major sections below it
+    // (GT-129, Events page #2). A flex gap cannot be set per child, so the two
+    // pairs are pulled back up by the difference. Both selectors are adjacency
+    // pairs on purpose: .event-detail__meta is used twice in the partial, and
+    // only the one directly after the topbar should move.
+    &__topbar + &__meta,
+    &__meta + &__cover {
+        margin-top: @ev-detail-gap-tight - @ev-detail-gap;
+    }
 
     // ----- Hero (dark band) -----
     &__hero {
@@ -831,11 +870,17 @@
         justify-content: center;
         text-align: center;
 
+        // See .pgt-hero::before in pgt-auth-flow.less — same bloom, same
+        // flattened-onto-#0C1808 asset that replaced the 12 MB neonflower.svg.
         &::before {
             content: "";
             position: absolute;
             inset: 0;
-            background: url("../../assets/images/neonflower.svg") no-repeat;
+            background: url("../../assets/images/neonflower.jpg") no-repeat;
+            background-image: image-set(
+                url("../../assets/images/neonflower.webp") type("image/webp"),
+                url("../../assets/images/neonflower.jpg")  type("image/jpeg")
+            );
             background-size: cover;
             opacity: .85;
             pointer-events: none;

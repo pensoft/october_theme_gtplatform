@@ -88,8 +88,11 @@ numberOfLevels = 2
                     {% if _jobType == '2' %}
                         Explore <span class="jobs-hero__accent">Secondment</span> Positions
                     {% else %}
-                        Explore <span class="jobs-hero__accent">Many</span> Job Opportunities
-
+                        {# GT-129, Exchange forum #3: "Many" dropped. The green
+                           accent moves to "Job" so this reads in parallel with
+                           the Secondment tab above, where the accent is the
+                           word that distinguishes the two tabs. #}
+                        Explore <span class="jobs-hero__accent">Job</span> Opportunities
                     {% endif %}
                 </h1>
 

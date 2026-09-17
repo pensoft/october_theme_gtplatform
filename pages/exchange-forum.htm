@@ -50,7 +50,10 @@ function onStart()
                     <span class="ef-connect__word" style="--i:1">that</span>
                     <span class="ef-connect__word" style="--i:2">keep</span>
                     <span class="ef-connect__word" style="--i:3">your</span>
-                    <span class="ef-connect__word" style="--i:4">community</span>
+                    {# "community" is green too (GT-129, Circle graphic #3).
+                       It keeps .ef-connect__word so it stays part of the
+                       staggered word reveal; only the colour differs. #}
+                    <span class="ef-connect__word ef-connect__word--accent" style="--i:4">community</span>
                     <span class="ef-accent ef-connect__accent">connected</span>
                 </h2>
                 <p class="ef-connect__lead">
@@ -187,9 +190,17 @@ function onStart()
             // green modifier so they stand out regardless of the scroll fill.
             var greenWords = { exchange: 1, learning: 1, collaboration: 1 };
             var words = el.textContent.trim().split(/\s+/);
+            // The "and" inside the green run goes green too (GT-129, Homepage
+            // overall #2). Keyed off the preceding word rather than the word
+            // itself, because the sentence has two "and"s — this colours the
+            // one in "exchange, learning, and collaboration" and leaves the
+            // one in "people, knowledge, and opportunities" alone.
+            var prevGreen = false;
             el.innerHTML = words.map(function (w) {
                 var key = w.toLowerCase().replace(/[^a-z]/g, '');
-                var cls = greenWords[key] ? 'ef-quote__word ef-quote__word--green' : 'ef-quote__word';
+                var green = !!greenWords[key] || (key === 'and' && prevGreen);
+                prevGreen = green;
+                var cls = green ? 'ef-quote__word ef-quote__word--green' : 'ef-quote__word';
                 return '<span class="' + cls + '">' + w + '</span>';
             }).join(' ');
             var spans = el.querySelectorAll('.ef-quote__word');
@@ -239,7 +250,19 @@ function onStart()
         </div>
 
         <div class="ef-conversations__cta">
-            <a href="/discussions"><span class="ef-coming-soon">Start collaborating</span></a>
+            {# Same component as "Explore all events" above (GT-129, Collab
+               corner #3). It used to be .ef-coming-soon — a blue #5787FF pill
+               left over from when this section was not built yet, which was
+               the one button on the page not in the green CTA style. The
+               arrow stays hidden until hover, exactly as the other one does. #}
+            <a href="/discussions" class="ef-connect__cta">
+                <span class="ef-connect__cta-label">Start collaborating</span>
+                <span class="ef-connect__cta-arrow" aria-hidden="true">
+                    <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="#8AC53E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 10h10M11 6l4 4-4 4"/>
+                    </svg>
+                </span>
+            </a>
         </div>
     </section>
 

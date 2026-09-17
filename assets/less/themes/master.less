@@ -483,15 +483,38 @@ ul.pagination{
     //    opacity: .08;
     //    pointer-events: none;
     //}
+    // Hero blossom (GT-129, Exchange forum #1). Maria supplied a pre-darkened
+    // image to replace neonflower_header.svg, which was both too light and a
+    // 12 MB SVG. The darkening is baked into the file, so no opacity here —
+    // dimming it again would undo the point of the new asset.
+    //
+    // Two declarations, not a mistake: the plain url() is the fallback any
+    // browser understands, then image-set() upgrades to WebP where supported.
+    // Anything that cannot parse image-set() simply keeps the PNG line.
+    // The artwork is a smooth dark gradient, which WebP encodes almost for
+    // free — 10 KB against 1.1 MB, mean deviation under 1/255.
     &::before {
         content: "";
         position: absolute;
         inset: 0;
-        background: url("../../assets/images/neonflower_header.svg") center no-repeat;
+        background: url("../../assets/images/hero-flower.png") center no-repeat;
+        background-image: image-set(
+            url("../../assets/images/hero-flower.webp") type("image/webp"),
+            url("../../assets/images/hero-flower.png")  type("image/png")
+        );
         background-size: cover;
-        opacity: .85;
         pointer-events: none;
     }
+}
+
+// The collaboration corner gets its own, much shorter crop of the same
+// blossom — cover on the tall artwork would push the flower off the band.
+.content-wrapper.collaboration-corner .gt-header-wrap::before {
+    background-image: url("../../assets/images/hero-flower-compact.png");
+    background-image: image-set(
+        url("../../assets/images/hero-flower-compact.webp") type("image/webp"),
+        url("../../assets/images/hero-flower-compact.png")  type("image/png")
+    );
 }
 
 .gt-header.navbar {
@@ -921,8 +944,19 @@ ul.pagination{
     align-items: center;
     flex-direction: column;
     justify-content: center;
-    gap: 50px;
-    padding: 0;
+    // One rhythm for title -> subtitle -> button (GT-129, Exchange forum #3).
+    // The button used to sit 50px off the text while the title and subtitle
+    // were 15px apart, so the three never read as one group. 18px matches the
+    // title/subtitle spacing the hero without a button already uses.
+    gap: 18px;
+
+    // The hero occupies the card below a 169px nav, so centring inside this
+    // box put the text ~40px below the card's own centre — the nav reads as a
+    // floating capsule over the artwork, not as a block the text sits under.
+    // border-box keeps the card's height at 296px while the padding shrinks
+    // the centring area, lifting the content by half of it (GT-129 #2).
+    box-sizing: border-box;
+    padding: 0 0 80px;
 
     .breakpoint-large-down({
         padding: 24px 12px 50px;

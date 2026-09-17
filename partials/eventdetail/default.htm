@@ -46,14 +46,12 @@
 <!--        </p>-->
 <!--    {% endif %}-->
 
-    <p class="event-detail__lead">
-        {% set _leadText = event.title|striptags %}
-        {%- if _leadText|length > 320 -%}
-            {{ _leadText|slice(0, 320)|trim }}…
-        {%- else -%}
-            {{ _leadText }}
-        {%- endif -%}
-    </p>
+    {# The lead paragraph printed event.title — word for word the same text as
+       the hero <h1> a few hundred pixels above — so the page opened by saying
+       its own name twice (GT-129, Events page #1). Removed rather than
+       repointed at the description: the commented-out block above shows it
+       once held a description excerpt, and the full description already
+       renders in .event-detail__body just below the image. #}
 
     {% if event.image %}
         <figure class="event-detail__cover">

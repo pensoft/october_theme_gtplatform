@@ -117,6 +117,34 @@
                     {% endif %}
                 {% endif %}
 
+                {# Attachment indicators (GT-128 #8) — one badge per distinct
+                   kind, so the card shows at a glance that the discussion
+                   carries files. Mirrors the publication grid's block in
+                   forumtopiclist/grid.htm, except images count here too:
+                   flagging an attached image is the point of the ticket. #}
+                {% set exts = [] %}
+                {% for file in topic.attachments %}
+                    {% set canon = 'txt' %}
+                    {% if file.isImage() %}
+                        {% set canon = 'image' %}
+                    {% else %}
+                        {% set raw = file.file_name|split('.')|last|lower %}
+                        {% if raw == 'pdf' %}{% set canon = 'pdf' %}
+                        {% elseif raw in ['doc', 'docx'] %}{% set canon = 'doc' %}
+                        {% elseif raw in ['xls', 'xlsx', 'csv'] %}{% set canon = 'xls' %}
+                        {% elseif raw in ['ppt', 'pptx'] %}{% set canon = 'ppt' %}
+                        {% endif %}
+                    {% endif %}
+                    {% if canon not in exts %}{% set exts = exts|merge([canon]) %}{% endif %}
+                {% endfor %}
+                {% if exts|length %}
+                    <div class="forum-card__files" aria-label="Has attachments">
+                        {% for e in exts %}
+                            <span class="bp-fileicon">{% partial 'forumtopic/filetile-glyph' ext=e %}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
                 <div class="forum-card__actions">
                     {% if isLoggedIn %}
                         <button type="button" class="forum-pill forum-pill--like {{ topic.id in likedIds ? 'is-liked' : '' }}"

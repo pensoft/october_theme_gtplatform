@@ -1,3 +1,16 @@
+// Every modal and drawer on the site locks the page by setting
+// `document.body.style.overflow = 'hidden'` — the coming-soon modal behind the
+// Training corner / R&I pills, the events and jobs filter drawers, the topic
+// filter, the user card, the job detail gallery. Hiding the overflow removes
+// the scrollbar, the viewport gets ~15px wider, and every centred container
+// jumps right by half of that as the modal opens (GT-129, Homepage overall #3).
+// Reserving the gutter permanently costs nothing visually and fixes all of
+// them at once, rather than padding the body in each of those handlers.
+// Browsers without support simply ignore it and behave as before.
+html {
+    scrollbar-gutter: stable;
+}
+
 .container {
     max-width: 100%;
     padding-right: 0;

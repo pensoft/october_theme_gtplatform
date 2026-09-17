@@ -299,6 +299,11 @@ description_limit = 0
     })();
 </script>
 
+{# Replaces the native <select> panels with an animatable listbox (GT-129,
+   Post a job #2). Enhancement only — the selects stay in the DOM and remain
+   what the form posts, so the form still works if this never loads. #}
+<script src="{{ 'assets/js/pj-select.js'|theme }}"></script>
+
 <script src="{{ 'assets/js/ckeditor/ckeditor.js'|theme }}"></script>
 <script>
     (function () {
