@@ -74,6 +74,28 @@
         <div class="event-detail__body">{{ event.description|raw }}</div>
     {% endif %}
 
+    {% if event.id == 11 %}
+        {% set _pdfUrl = 'Green_Talent_Training_Modules.pdf'|media %}
+        {% set _pdfName = Green_Talent_Training_Modules.pdf|split('/')|last %}
+        <section class="event-pdf" data-event-pdf data-src="{{ _pdfUrl }}">
+            <div class="event-pdf__header">
+                <span class="event-pdf__counter" aria-live="polite">
+                    Page <span data-pdf-current>1</span> of <span data-pdf-total>…</span>
+                </span>
+                <a class="event-pdf__download" href="{{ _pdfUrl }}" download="{{ _pdfName }}" target="_blank" rel="noopener">Download PDF</a>
+            </div>
+            <div class="event-pdf__stage" tabindex="0" aria-roledescription="carousel" aria-label="{{ _pdfName }}">
+                <div class="event-pdf__track" data-pdf-track></div>
+                <div class="event-pdf__loading" data-pdf-loading>Loading PDF…</div>
+                <button type="button" class="event-pdf__nav event-pdf__nav--prev" data-pdf-prev aria-label="Previous page" disabled>&lsaquo;</button>
+                <button type="button" class="event-pdf__nav event-pdf__nav--next" data-pdf-next aria-label="Next page" disabled>&rsaquo;</button>
+            </div>
+        </section>
+        {% put scripts %}
+            <script src="{{ 'assets/js/event-pdf-viewer.js'|theme }}" defer></script>
+        {% endput %}
+    {% endif %}
+
     <div class="event-detail__meta">
         {% for t in event.topics %}
         <span class="event-detail__pill event-detail__pill--topic">{{ t.title }}</span>
