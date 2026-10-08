@@ -1549,3 +1549,11 @@
 
     &.is-error &__nav { display: none; }
 }
+
+// Viewer placed inside the description via <div id="PDF-Viewer"></div>
+.event-detail__body #PDF-Viewer {
+    margin: 30px 0;
+
+    .event-pdf__download { text-decoration: none; }
+    .event-pdf__download:hover { text-decoration: underline; }
+}

@@ -75,8 +75,11 @@
     {% endif %}
 
     {% if event.id == 11 %}
-        {% set _pdfUrl = 'Green_Talent_Training_Modules.pdf'|media %}
-        {% set _pdfName = Green_Talent_Training_Modules.pdf|split('/')|last %}
+        {% set _pdfPath = 'Green_Talent_Training_Modules.pdf' %}
+        {% set _pdfUrl = _pdfPath|media %}
+        {% set _pdfName = _pdfPath|split('/')|last %}
+        {# Rendered here as a fallback; event-pdf-viewer.js moves it into
+           <div id="PDF-Viewer"></div> when the description contains one. #}
         <section class="event-pdf" data-event-pdf data-src="{{ _pdfUrl }}">
             <div class="event-pdf__header">
                 <span class="event-pdf__counter" aria-live="polite">

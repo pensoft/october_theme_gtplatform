@@ -195,7 +195,19 @@
         });
     };
 
+    // Editors can place the viewer anywhere in the description with
+    // <div id="PDF-Viewer"></div>; otherwise it stays where it was rendered.
+    function placeViewer() {
+        var slot = document.getElementById('PDF-Viewer');
+        var viewer = document.querySelector('[data-event-pdf]');
+        if (slot && viewer) {
+            slot.innerHTML = '';
+            slot.appendChild(viewer);
+        }
+    }
+
     function boot() {
+        placeViewer();
         var nodes = document.querySelectorAll('[data-event-pdf]');
         for (var i = 0; i < nodes.length; i++) {
             new Viewer(nodes[i]).init();
